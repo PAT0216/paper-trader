@@ -1,11 +1,17 @@
-FROM mambaorg/micromamba:1.5.1
-
-COPY --chown=$MAMBA_USER:$MAMBA_USER environment.yml /tmp/env.yaml
-RUN micromamba install -y -n base -f /tmp/env.yaml && \
-    micromamba clean --all --yes
+FROM continuumio/miniconda3
 
 WORKDIR /app
+
+# Copy environment file
+COPY environment.yml .
+
+# Create Conda environment
+RUN conda env create -f environment.yml
+
+# Make RUN commands use the new environment
+SHELL ["conda", "run", "-n", "paper-trader", "/bin/bash", "-c"]
+
 COPY . .
 
 # Run as module to ensure 'src' is in path
-CMD ["python", "-m", "src.trading.run_bot"]
+CMD ["conda", "run", "--no-capture-output", "-n", "paper-trader", "python", "-m", "src.trading.run_bot"]
