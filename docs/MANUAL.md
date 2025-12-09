@@ -362,37 +362,34 @@ python run_backtest.py --start 2020-01-01 --end 2023-12-31 --cash 50000
 
 ## 📊 Understanding the Metrics
 
-### **Model Performance Metrics** (`results/metrics.txt`)
+### **Model Performance Metrics** (`results/metrics.txt`) ✨ *Updated in Phase 3*
 
-**Accuracy**: `(TP + TN) / Total`
-- Percentage of correct predictions
-- **Caveat**: Can be misleading if data is imbalanced
+**RMSE (Root Mean Squared Error)**:
+- Average prediction error in return terms
+- Example: RMSE = 0.0197 means ~2% average error
+- **Target**: < 0.025 (2.5%)
 
-**Precision**: `TP / (TP + FP)`
-- Of all predicted "price up", what % were actually correct?
-- High precision → Few false alarms
+**MAE (Mean Absolute Error)**:
+- Similar to RMSE but less sensitive to outliers
+- **Target**: < 0.015 (1.5%)
 
-**Recall**: `TP / (TP + FN)`
-- Of all actual "price up" days, what % did we predict?
-- High recall → Don't miss many opportunities
+**R² (Coefficient of Determination)**:
+- How much variance the model explains
+- R² = 0.0 means model = mean prediction
+- R² < 0 means model is worse than mean
+- **For daily returns**: Negative R² is common (markets are efficient)
 
-**F1 Score**: `2 × (Precision × Recall) / (Precision + Recall)`
-- Harmonic mean balancing precision and recall
-- **Target**: > 0.50 (better than random)
+**Directional Accuracy**:
+- Percentage of correct up/down predictions
+- **Target**: > 52% (edge over random)
+- Example: 52.03% = slight but consistent edge
 
-### **Confusion Matrix** (`results/confusion_matrix.png`)
+### **Feature Importance** (`results/feature_importance.png`)
 
-```
-                Predicted
-              Down    Up
-Actual Down   TN     FP   ← False positive (false alarm)
-       Up     FN     TP   ← False negative (missed opportunity)
-```
-
-- **True Positive (TP)**: Correctly predicted price increase
-- **True Negative (TN)**: Correctly predicted price decrease
-- **False Positive (FP)**: Predicted up, but went down (entered bad trade)
-- **False Negative (FN)**: Predicted down, but went up (missed opportunity)
+Shows which features drive predictions:
+- Higher importance = more predictive power
+- Helps understand model behavior
+- Useful for feature engineering decisions
 
 ### **Risk Metrics** (Displayed at runtime)
 
@@ -449,8 +446,8 @@ make train
 ```bash
 make test
 ```
-- Executes all 27 unit tests
-- Covers risk manager (14 tests) and data validator (13 tests)
+- Executes all 55 unit tests
+- Covers ML pipeline (12), backtesting (16), risk manager (14), validator (13)
 - Displays test results and coverage
 
 #### **Docker Deployment**

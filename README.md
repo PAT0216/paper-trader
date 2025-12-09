@@ -92,7 +92,7 @@ make backtest-quick
 1. **📊 Data Ingestion**: Fetches 3 years of OHLCV data for 30+ tickers
 2. **🔍 Data Validation**: Runs 10 quality checks, rejects invalid tickers
 3. **🧠 Model Training**: XGBoost trains on technical indicators (or loads existing model)
-4. **🔮 Prediction**: Generates buy/sell probability scores for each ticker
+4. **🔮 Prediction**: Generates expected return predictions for each ticker
 5. **⚖️ Risk-Adjusted Sizing**: Calculates position sizes based on volatility and constraints
 6. **✅ Pre-Trade Validation**: Ensures trades comply with risk limits
 7. **💼 Portfolio Rebalancing**: Executes validated trades and updates ledger
@@ -117,8 +117,9 @@ tickers:
 model:
   training_period: "3y"      # Historical data window
   retrain_daily: true        # Retrain on each run?
-  threshold_buy: 0.55        # Min probability to buy (55%)
-  threshold_sell: 0.45       # Max probability to sell (45%)
+  # Phase 3: Now uses expected return thresholds
+  # BUY threshold: +0.5% expected return
+  # SELL threshold: -0.5% expected return
 
 # Portfolio settings
 portfolio:
@@ -167,8 +168,8 @@ paper-trader/
 ├── docs/
 │   └── MANUAL.md               # Technical documentation
 ├── results/                     # Training & backtest reports
-│   ├── metrics.txt
-│   ├── confusion_matrix.png
+│   ├── metrics.txt             # CV metrics (RMSE, MAE, R², Dir.Acc)
+│   ├── feature_importance.png  # Feature importance chart
 │   ├── backtest_summary.txt    # ✨ NEW
 │   └── backtest_trades.csv     # ✨ NEW
 ├── models/                      # Serialized model artifacts
