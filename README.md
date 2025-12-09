@@ -3,7 +3,7 @@
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
-![Tests](https://img.shields.io/badge/tests-27%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-43%20passed-brightgreen)
 
 **Paper Trader AI** is a professional-grade, risk-managed algorithmic trading system designed for the US Equity Market. It combines machine learning (XGBoost) with institutional-level risk controls to make intelligent, probability-based trading decisions on a simulated portfolio.
 
@@ -28,11 +28,18 @@
 - **Automatic Rejection**: Invalid tickers filtered before model training
 - **Comprehensive Logging**: Detailed validation reports for every data fetch
 
+### 📈 **Backtesting Framework** *(New in Phase 2)*
+- **Event-Driven Engine**: Simulates strategy over 7+ years of historical data
+- **Transaction Costs**: Realistic slippage (5 bps) and market impact modeling
+- **Professional Quant Metrics**: Sharpe, Sortino, Calmar, VaR, CVaR, Alpha, Beta
+- **Regime Analysis**: Performance split by bull/bear/crisis/sideways markets
+- **Multi-Ticker Portfolio**: Full portfolio backtesting with risk controls
+
 ### 🏗️ **Production Infrastructure**
 - **Containerized Architecture**: Fully Dockerized with `miniconda3`
 - **Multi-Asset Support**: Manages 30+ S&P 500 stocks simultaneously
 - **Automated Execution**: GitHub Actions scheduled daily at market close
-- **Comprehensive Testing**: 27 unit tests covering risk management and data validation
+- **Comprehensive Testing**: 43 unit tests covering risk, validation, and backtesting
 
 ---
 
@@ -72,6 +79,12 @@ make train
 
 # Run test suite
 make test
+
+# Run backtest (2017-2024)
+make backtest
+
+# Quick backtest (2023-2024)
+make backtest-quick
 ```
 
 ### What Happens During Execution?
@@ -122,13 +135,17 @@ portfolio:
 
 ## 📂 Project Structure
 
-```
 paper-trader/
 ├── main.py                      # Application entry point
+├── run_backtest.py              # Backtesting CLI runner ✨ NEW
 ├── src/
+│   ├── backtesting/             # Backtesting framework ✨ NEW
+│   │   ├── backtester.py       # Event-driven engine
+│   │   ├── performance.py      # Quant metrics (Sharpe, VaR, etc.)
+│   │   └── costs.py            # Transaction cost modeling
 │   ├── data/
 │   │   ├── loader.py           # Market data fetching (yfinance)
-│   │   └── validator.py        # Data quality checks ✨ NEW
+│   │   └── validator.py        # Data quality checks
 │   ├── features/
 │   │   └── indicators.py       # Technical indicator generation
 │   ├── models/
@@ -136,19 +153,23 @@ paper-trader/
 │   │   └── predictor.py        # Inference engine
 │   ├── trading/
 │   │   ├── portfolio.py        # Position tracking & ledger
-│   │   └── risk_manager.py     # Risk controls & sizing ✨ NEW
+│   │   └── risk_manager.py     # Risk controls & sizing
 │   └── utils/
 │       └── config.py           # YAML config loader
-├── tests/                       # Unit test suite ✨ NEW
-│   ├── test_risk_manager.py   # Risk management tests (14)
-│   └── test_validator.py      # Data validation tests (13)
+├── tests/                       # Unit test suite (43 tests)
+│   ├── test_backtester.py      # Backtesting tests (16) ✨ NEW
+│   ├── test_risk_manager.py    # Risk management tests (14)
+│   └── test_validator.py       # Data validation tests (13)
 ├── config/
-│   └── settings.yaml           # System configuration
+│   ├── settings.yaml           # Trading configuration
+│   └── backtest_settings.yaml  # Backtest configuration ✨ NEW
 ├── docs/
 │   └── MANUAL.md               # Technical documentation
-├── results/                     # Training metrics & reports
+├── results/                     # Training & backtest reports
 │   ├── metrics.txt
-│   └── confusion_matrix.png
+│   ├── confusion_matrix.png
+│   ├── backtest_summary.txt    # ✨ NEW
+│   └── backtest_trades.csv     # ✨ NEW
 ├── models/                      # Serialized model artifacts
 │   └── xgb_model.joblib
 ├── ledger.csv                   # Transaction history
@@ -224,10 +245,11 @@ pytest tests/test_risk_manager.py -v
 pytest tests/test_validator.py -v
 ```
 
-**Test Coverage**: 27 tests across risk management and data validation
+**Test Coverage**: 43 tests across backtesting, risk management, and data validation
+- ✅ Backtesting engine and performance metrics
 - ✅ Position sizing with volatility adjustment
 - ✅ Sector concentration enforcement
-- ✅ VaR calculation
+- ✅ VaR calculation and transaction costs
 - ✅ Data quality checks (OHLC, outliers, missing values)
 
 ---
@@ -249,13 +271,14 @@ pytest tests/test_validator.py -v
 - ✅ VaR monitoring
 - ✅ Unit test coverage
 
-### 🔜 Phase 2: Testing & Validation (Next)
-- [ ] Backtesting framework with transaction costs
-- [ ] Walk-forward analysis across market regimes
-- [ ] Performance analytics (Sharpe, Sortino, max drawdown)
-- [ ] Historical validation (3-5 years out-of-sample)
+### ✅ Phase 2: Testing & Validation (Complete)
+- ✅ Backtesting framework with transaction costs
+- ✅ Walk-forward analysis across market regimes (2017-2024)
+- ✅ Performance analytics (Sharpe, Sortino, Calmar, VaR, Alpha, Beta)
+- ✅ Regime-based performance analysis (bull/bear/crisis)
+- ✅ 16 additional unit tests
 
-### 🔜 Phase 3: Model Improvements
+### 🔜 Phase 3: Model Improvements (Next)
 - [ ] Fix data leakage in feature generation
 - [ ] Time series cross-validation
 - [ ] Regression target (return magnitude vs. binary classification)

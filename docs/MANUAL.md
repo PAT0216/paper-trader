@@ -246,6 +246,105 @@ Checks:
 
 ---
 
+### 6. Backtesting Framework ✨ *New in Phase 2*
+
+The backtesting module (`src/backtesting/`) provides event-driven strategy validation with professional quant metrics.
+
+#### **Backtester** (`src/backtesting/backtester.py`)
+
+**Architecture**: Event-driven simulation engine that walks through historical data day-by-day, simulating trades with realistic costs and risk controls.
+
+```python
+from src.backtesting import Backtester, BacktestConfig
+
+config = BacktestConfig(
+    start_date="2017-01-01",
+    end_date="2024-12-31",
+    initial_cash=100000.0,
+    benchmark_ticker="SPY",
+    slippage_bps=5.0,           # 5 basis points slippage
+    max_position_pct=0.15,      # Max 15% per position
+    rebalance_frequency="daily" # daily, weekly, monthly
+)
+
+backtester = Backtester(config)
+metrics, trades_df, summary = backtester.run(
+    data_dict=data_dict,
+    signal_generator=my_strategy_function,
+    benchmark_data=spy_data
+)
+```
+
+#### **Performance Metrics** (`src/backtesting/performance.py`)
+
+**Professional Quant Metrics**:
+
+| Metric | Formula | Target |
+|--------|---------|--------|
+| **Sharpe Ratio** | `(Return - Rf) / Volatility` | > 1.0 |
+| **Sortino Ratio** | `(Return - Rf) / Downside Vol` | > 1.5 |
+| **Calmar Ratio** | `CAGR / Max Drawdown` | > 0.5 |
+| **Information Ratio** | `Active Return / Tracking Error` | > 0.5 |
+| **VaR (95%)** | 5th percentile of returns | < 2% daily |
+| **CVaR (Expected Shortfall)** | Average loss beyond VaR | < 3% daily |
+| **Alpha** | Excess return after beta adjustment | > 0% |
+| **Beta** | Market sensitivity | 0.5 - 1.5 |
+
+**Trade Quality Metrics**:
+- **Win Rate**: Percentage of profitable trades
+- **Profit Factor**: Gross profit / Gross loss
+- **Average Holding Period**: Days per position
+- **Turnover**: Annual portfolio turnover
+
+#### **Transaction Costs** (`src/backtesting/costs.py`)
+
+**Cost Components**:
+
+| Component | Default | Description |
+|-----------|---------|-------------|
+| **Slippage** | 5 bps | Bid-ask spread impact |
+| **Commission** | $0.00 | Per-share fee (zero for modern brokers) |
+| **Market Impact** | √(participation) × price | For orders > 0.5% of ADV |
+
+**Execution Price Calculation**:
+```python
+# BUY: Pay more than quoted price
+execution_price = price × (1 + slippage_bps/10000) + market_impact
+
+# SELL: Receive less than quoted price  
+execution_price = price × (1 - slippage_bps/10000) - market_impact
+```
+
+#### **Regime Classification**
+
+The backtester automatically classifies market regimes for stratified performance analysis:
+
+| Regime | Detection Criteria |
+|--------|-------------------|
+| **Bull** | SPY > SMA_200, Volatility < 1.5× average |
+| **Bear** | SPY < SMA_200 |
+| **Crisis** | Volatility > 2× average (e.g., COVID, 2008) |
+| **Sideways** | No clear trend |
+
+**Running a Backtest**:
+```bash
+# Full backtest (2017-2024)
+make backtest
+
+# Quick backtest (2023-2024)  
+make backtest-quick
+
+# CLI with custom dates
+python run_backtest.py --start 2020-01-01 --end 2023-12-31 --cash 50000
+```
+
+**Output Files**:
+- `results/backtest_summary.txt`: Human-readable performance summary
+- `results/backtest_metrics.json`: Machine-readable metrics
+- `results/backtest_trades.csv`: Complete trade log
+
+---
+
 ## 📊 Understanding the Metrics
 
 ### **Model Performance Metrics** (`results/metrics.txt`)

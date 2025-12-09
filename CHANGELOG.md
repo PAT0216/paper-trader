@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for Phase 2
-- Backtesting framework with transaction cost modeling
-- Walk-forward analysis across market regimes
-- Performance analytics (Sharpe ratio, Sortino ratio, max drawdown)
-- Comprehensive benchmarking vs SPY
-
 ### Planned for Phase 3
 - Fix data leakage in feature generation
 - Time series cross-validation
@@ -26,6 +20,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-strategy framework with weighted voting
 
 ---
+
+## [1.1.0] - 2025-12-09
+
+### 🎉 Phase 2: Testing & Validation - Complete
+
+This release adds a comprehensive backtesting framework with professional quant metrics, transaction cost modeling, and regime-based performance analysis.
+
+### Added
+
+#### Backtesting Framework (`src/backtesting/`)
+- **Event-Driven Engine** (`backtester.py`):
+  - Walk-forward simulation over 7+ years of historical data
+  - Multi-ticker portfolio backtesting
+  - Risk manager integration for position sizing
+  - Configurable rebalance frequency (daily/weekly/monthly)
+- **Performance Metrics** (`performance.py`):
+  - Sharpe ratio, Sortino ratio, Calmar ratio
+  - Value at Risk (VaR) and CVaR (Expected Shortfall)
+  - Alpha, Beta, Information Ratio
+  - Win rate, profit factor, average holding period
+- **Transaction Cost Modeling** (`costs.py`):
+  - Slippage simulation (5 bps default)
+  - Market impact for large orders (sqrt law)
+  - Cost tracking and breakdown
+
+#### Regime-Based Analysis
+- Automatic market regime classification (bull/bear/crisis/sideways)
+- Performance metrics split by regime
+- Uses SMA_200 and volatility thresholds
+
+#### Configuration (`config/backtest_settings.yaml`)
+- Date range: 2017-2024 (covers all market regimes)
+- Cost parameters (slippage, commission)
+- Risk settings (position limits, sector limits)
+- Benchmark ticker configuration
+
+#### Makefile Commands
+- `make backtest`: Full 2017-2024 backtest
+- `make backtest-quick`: Quick 2023-2024 backtest
+
+#### Unit Tests
+- 16 new tests for backtesting module (`tests/test_backtester.py`)
+- Total test count: 43 (27 Phase 1 + 16 Phase 2)
+
+### Changed
+
+#### Codebase Cleanup
+- **Removed** legacy files: `run_bot.py`, `strategy.py`
+- **Removed** empty `data/` directory
+- **Updated** `.gitignore` with pytest cache and coverage files
+- **Fixed** timezone handling in backtester (yfinance tz-aware dates)
+
+#### Documentation
+- **README.md**: Added Phase 2 features, updated project structure, marked Phase 2 complete in roadmap
+- **MANUAL.md**: Added 99 lines of backtesting documentation
+- **CHANGELOG.md**: This entry
 
 ## [1.0.0] - 2025-12-08
 

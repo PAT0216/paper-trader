@@ -8,15 +8,27 @@ env/
 venv/
 .env
 .ipynb_checkpoints/
-.DS_Store
 
-# Data
-# ledger.csv - CAREFUL: We want to track this in this specific project
-# because the Bot commits its trades back to the repo.
-# We usually commit the model for this specific project so the bot has a brain on start
-# but often it's ignored. Keeping it for now as per previous workflows.
-# models/
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+*.cover
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Misc
+*.log
+*.tmp
+
+# Data files (except ledger.csv which tracks trades)
+# ledger.csv - Tracked: Bot commits trades back to repo
+# models/ - Tracked: Bot needs trained model
