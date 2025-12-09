@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 from src.features.indicators import generate_features
 import os
 import joblib
@@ -58,12 +59,30 @@ def train_model(data_dict, test_size=0.2):
     preds = model.predict(X_test)
     acc = accuracy_score(y_test, preds)
     print(f"Model Accuracy: {acc:.4f}")
-    print(classification_report(y_test, preds))
+    report = classification_report(y_test, preds)
+    print(report)
     
-    # Save
+    # Save Metrics
+    results_dir = "results"
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+        
+    with open(os.path.join(results_dir, "metrics.txt"), "w") as f:
+        f.write(f"Model Accuracy: {acc:.4f}\n\n")
+        f.write("Classification Report:\n")
+        f.write(report)
+        
+    # Plot Confusion Matrix
+    disp = ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, cmap=plt.cm.Blues)
+    plt.title("Confusion Matrix")
+    plt.savefig(os.path.join(results_dir, "confusion_matrix.png"))
+    plt.close()
+    
+    # Save Model
     if not os.path.exists(MODEL_PATH):
         os.makedirs(MODEL_PATH)
     joblib.dump(model, MODEL_FILE)
     print(f"Model saved to {MODEL_FILE}")
+    print(f"Metrics saved to {results_dir}/metrics.txt & confusion_matrix.png")
     
     return model

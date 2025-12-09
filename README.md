@@ -29,16 +29,27 @@ cd paper-trader
 ```
 
 ### Execution
-The system is designed to run via Docker Compose for maximum stability:
+You can use the **Makefile** for easy commands:
 
-```bash
-docker-compose up --build
-```
+*   **Run Everything (Docker)**:
+    ```bash
+    make docker-up
+    ```
+*   **Run Locally**:
+    ```bash
+    make trade
+    ```
+*   **Force Retrain**:
+    ```bash
+    make train
+    ```
+
+For a detailed explanation of every file and how to read the metrics (Confusion Matrix, F1 Score), read the **[User Manual](docs/MANUAL.md)**.
 
 **What happens next?**
-1.  **Data Ingestion**: The system fetches 2 years of granular market data.
-2.  **Model Training**: The AI model retrains on the latest data to adapt to recent market regimes.
-3.  **Inference**: The model generates buy/sell probability scores for each asset.
+1.  **Data Ingestion**: The system fetches 3 years of granular market data.
+2.  **Model Training**: The AI model retrains and saves a report to `results/`.
+3.  **Inference**: The model generates buy/sell probability scores.
 4.  **Portfolio Rebalancing**: Trades are executed against the local ledger to align holdings with model convictions.
 
 ## ⚙️ Configuration
