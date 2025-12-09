@@ -13,5 +13,5 @@ SHELL ["conda", "run", "-n", "paper-trader", "/bin/bash", "-c"]
 
 COPY . .
 
-# Run as module to ensure 'src' is in path
-CMD ["conda", "run", "--no-capture-output", "-n", "paper-trader", "python", "-m", "src.trading.run_bot"]
+# Run the main entry point
+CMD ["conda", "run", "--no-capture-output", "-n", "paper-trader", "python", "main.py"]

@@ -1,0 +1,23 @@
+# -------------------------------------------------------------------
+# Paper Trader Configuration
+# -------------------------------------------------------------------
+
+# 📊 Market Universe
+# List the tickers you want the bot to trade.
+tickers:
+  - SPY
+  - QQQ
+  - IWM
+  - DIA
+
+# ⚙️ Model Settings
+model:
+  training_period: "2y"   # How much historical data to train on
+  retrain_daily: true     # Retrain the model every time the bot runs?
+  threshold_buy: 0.55     # Probability threshold to trigger a BUY
+  threshold_sell: 0.45    # Probability threshold to trigger a SELL
+
+# 💰 Portfolio Settings
+portfolio:
+  initial_cash: 10000.0   # Starting balance for fresh ledger
+  min_cash_buffer: 100.0  # Keep this much cash on hand

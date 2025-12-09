@@ -12,6 +12,7 @@ dependencies:
   - matplotlib
   - mplfinance
   - ta-lib
+  - pyyaml
   - pip
   - pip:
     - python-dotenv

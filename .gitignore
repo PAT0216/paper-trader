@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.ipynb_checkpoints/
+.DS_Store
+
+# Data
+ledger.csv
+# We usually commit the model for this specific project so the bot has a brain on start
+# but often it's ignored. Keeping it for now as per previous workflows.
+# models/
+
+# IDEs
+.vscode/
+.idea/

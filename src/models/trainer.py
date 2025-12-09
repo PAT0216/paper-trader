@@ -1,10 +1,10 @@
-import pandas as pd
-import xgboost as xgb
-import joblib
-import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
-from src.ml.features import generate_features
+from src.features.indicators import generate_features
+import os
+import joblib
+import pandas as pd
+import xgboost as xgb
 
 MODEL_PATH = "models"
 MODEL_FILE = os.path.join(MODEL_PATH, "xgb_model.joblib")

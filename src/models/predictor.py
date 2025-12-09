@@ -1,7 +1,7 @@
 import joblib
 import pandas as pd
 import os
-from src.ml.features import generate_features
+from src.features.indicators import generate_features
 
 MODEL_PATH = "models"
 MODEL_FILE = os.path.join(MODEL_PATH, "xgb_model.joblib")
