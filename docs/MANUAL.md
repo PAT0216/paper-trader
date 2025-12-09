@@ -112,36 +112,51 @@ Generates predictive features from OHLC data:
 - **1-Day Return**: `Close.pct_change()`
 - **5-Day Return**: `Close.pct_change(5)`
 
-**Target Variable**:
-- Binary classification: `1 if Next_Close > Current_Close else 0`
+**Target Variable** *(Phase 3)*:
+- Regression: Next-day return (percentage)
+- Created SEPARATELY from features to prevent look-ahead bias
 
 ---
 
-### 3. Machine Learning Pipeline
+### 3. Machine Learning Pipeline ✨ *Updated in Phase 3*
 
 #### **Model Trainer** (`src/models/trainer.py`)
-- **Algorithm**: XGBoost Classifier
+- **Algorithm**: XGBoost Regressor (predicts return magnitude)
 - **Features**: 9 technical indicators
-- **Target**: Binary (price up/down next day)
-- **Train/Test Split**: 80/20, time-series aware (no shuffle)
-- **Hyperparameters**:
-  - `n_estimators=100`
-  - `learning_rate=0.05`
-  - `max_depth=5`
+- **Target**: Next-day return (continuous)
+- **Cross-Validation**: 5-fold TimeSeriesSplit (proper walk-forward)
+- **Anti-Leakage**: Target created AFTER feature generation
+
+**Hyperparameters**:
+- `n_estimators=100`
+- `learning_rate=0.05`
+- `max_depth=5`
+- `objective='reg:squarederror'`
+
+**Cross-Validation Metrics**:
+- RMSE: Root Mean Squared Error
+- MAE: Mean Absolute Error
+- R²: Coefficient of determination
+- Directional Accuracy: % of correct up/down predictions
 
 **Output Artifacts**:
-- `models/xgb_model.joblib`: Serialized model
-- `results/metrics.txt`: Accuracy, precision, recall, F1
-- `results/confusion_matrix.png`: Visual classification performance
+- `models/xgb_model.joblib`: Serialized regressor
+- `results/metrics.txt`: CV metrics across all folds
+- `results/feature_importance.png`: Feature importance visualization
 
 #### **Predictor** (`src/models/predictor.py`)
 - **Input**: Raw OHLC DataFrame
-- **Output**: Probability `P(Price_Up | Features)`
+- **Output**: Expected next-day return (e.g., +1.2% or -0.5%)
 - **Process**:
   1. Transform OHLC → Features via `generate_features()`
   2. Extract latest row
-  3. Predict with loaded XGBoost model
-  4. Return probability for class 1 (price increase)
+  3. Predict with loaded XGBoost regressor
+  4. Return expected return value
+
+**Trading Thresholds**:
+- BUY: Expected return > +0.5%
+- SELL: Expected return < -0.5%
+- HOLD: otherwise
 
 ---
 

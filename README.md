@@ -3,7 +3,7 @@
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
-![Tests](https://img.shields.io/badge/tests-43%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-55%20passed-brightgreen)
 
 **Paper Trader AI** is a professional-grade, risk-managed algorithmic trading system designed for the US Equity Market. It combines machine learning (XGBoost) with institutional-level risk controls to make intelligent, probability-based trading decisions on a simulated portfolio.
 
@@ -12,9 +12,9 @@
 ## 📋 Key Features
 
 ### 🧠 **Predictive Intelligence**
-- **XGBoost Classifier** trained on **3 years** of historical data
+- **XGBoost Regressor** predicts expected returns with 5-fold TimeSeriesSplit
 - **Technical Indicators**: RSI, MACD, Bollinger Bands, SMA crossovers
-- **Multi-Factor Features**: Momentum, volatility, and trend indicators
+- **Anti-Leakage Pipeline**: Proper separation of features and target *(New in Phase 3)*
 
 ### 🛡️ **Professional Risk Management** *(New in Phase 1)*
 - **Volatility-Adjusted Position Sizing**: Inverse weighting by 30-day volatility
@@ -39,7 +39,7 @@
 - **Containerized Architecture**: Fully Dockerized with `miniconda3`
 - **Multi-Asset Support**: Manages 30+ S&P 500 stocks simultaneously
 - **Automated Execution**: GitHub Actions scheduled daily at market close
-- **Comprehensive Testing**: 43 unit tests covering risk, validation, and backtesting
+- **Comprehensive Testing**: 55 unit tests covering risk, validation, backtesting, and ML pipeline
 
 ---
 
@@ -156,10 +156,11 @@ paper-trader/
 │   │   └── risk_manager.py     # Risk controls & sizing
 │   └── utils/
 │       └── config.py           # YAML config loader
-├── tests/                       # Unit test suite (43 tests)
-│   ├── test_backtester.py      # Backtesting tests (16) ✨ NEW
-│   ├── test_risk_manager.py    # Risk management tests (14)
-│   └── test_validator.py       # Data validation tests (13)
+├── tests/                       # Unit test suite (55 tests)
+│   ├── test_ml_pipeline.py      # ML pipeline tests (12) ✨ NEW
+│   ├── test_backtester.py       # Backtesting tests (16)
+│   ├── test_risk_manager.py     # Risk management tests (14)
+│   └── test_validator.py        # Data validation tests (13)
 ├── config/
 │   ├── settings.yaml           # Trading configuration
 │   └── backtest_settings.yaml  # Backtest configuration ✨ NEW
@@ -245,10 +246,10 @@ pytest tests/test_risk_manager.py -v
 pytest tests/test_validator.py -v
 ```
 
-**Test Coverage**: 43 tests across backtesting, risk management, and data validation
+**Test Coverage**: 55 tests across ML pipeline, backtesting, risk management, and data validation
+- ✅ ML pipeline anti-leakage and TimeSeriesSplit
 - ✅ Backtesting engine and performance metrics
 - ✅ Position sizing with volatility adjustment
-- ✅ Sector concentration enforcement
 - ✅ VaR calculation and transaction costs
 - ✅ Data quality checks (OHLC, outliers, missing values)
 
@@ -278,16 +279,17 @@ pytest tests/test_validator.py -v
 - ✅ Regime-based performance analysis (bull/bear/crisis)
 - ✅ 16 additional unit tests
 
-### 🔜 Phase 3: Model Improvements (Next)
-- [ ] Fix data leakage in feature generation
-- [ ] Time series cross-validation
-- [ ] Regression target (return magnitude vs. binary classification)
-- [ ] Enhanced features (volume, macro indicators, sentiment)
+### ✅ Phase 3: Model Improvements (Complete)
+- ✅ Fixed data leakage (separate features from target)
+- ✅ 5-fold TimeSeriesSplit cross-validation
+- ✅ Regression target (predict return magnitude)
+- ✅ 12 new ML pipeline tests
 
-### 🔜 Phase 4: Production Readiness
+### 🔜 Phase 4: Production Readiness (Next)
 - [ ] Advanced logging and monitoring
 - [ ] Alerting system (email/Slack)
 - [ ] SQLite ledger (replace CSV)
+- [ ] Enhanced features (volume, macro indicators)
 - [ ] Multi-strategy framework
 
 ---
