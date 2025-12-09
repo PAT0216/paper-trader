@@ -69,11 +69,37 @@ class Portfolio:
                 
         return cash + holdings_value
 
+        return cash + holdings_value
+
+    def has_traded_today(self, ticker, date=None):
+        """
+        Checks if a trade for the given ticker has already occurred today.
+        """
+        if date is None:
+            date = datetime.now().strftime("%Y-%m-%d")
+            
+        if self.ledger.empty:
+            return False
+            
+        # Ensure date column is string for comparison
+        # (It should be, but safety first if pandas inferred objects differently)
+        today_trades = self.ledger[
+            (self.ledger["date"].astype(str) == date) & 
+            (self.ledger["ticker"] == ticker)
+        ]
+        return not today_trades.empty
+
     def record_trade(self, ticker, action, price, shares):
         """
         Records a trade and updates the ledger.
         """
         date = datetime.now().strftime("%Y-%m-%d")
+        
+        # 🛡️ Safety: Idempotency Check
+        if self.has_traded_today(ticker, date):
+            print(f"⚠️  Skipping {ticker}: Already traded today ({date}).")
+            return False
+
         current_cash = self.get_last_balance()
         amount = price * shares
         
