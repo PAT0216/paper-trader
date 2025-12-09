@@ -1,4 +1,11 @@
 pandas
 yfinance
+xgboost
+joblib
+pytest
+scikit-learn
+pandas
+numpy
 matplotlib
+pyyaml
 mplfinance
