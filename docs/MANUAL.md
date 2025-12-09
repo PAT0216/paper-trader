@@ -1,63 +1,57 @@
-# 📖 Paper Trader Manual
+# Technical Documentation
 
-Welcome to the comprehensive guide for the AI Paper Trader. This document explains "What Does What", how the data flows, and how to interpret the results.
+This document provides a technical overview of the Paper Trader architecture, data pipelines, and operational workflows.
 
 ---
 
 ## 🏗 System Architecture
 
-### 1. The Workflow
-1.  **Loader** (`src/data/loader.py`): Fetches raw price data from Yahoo Finance.
-2.  **Featurizer** (`src/features/indicators.py`): Calculates math (RSI, MACD) to give the AI context.
-3.  **Trainer** (`src/models/trainer.py`):
-    *   Splits data into "Past" (Train) and "Recent" (Test).
-    *   Teaches the XGBoost model patterns.
-    *   Evaluates performance and saves `metrics.txt` and `confusion_matrix.png`.
-4.  **Predictor** (`src/models/predictor.py`): Uses the saved model to guess *tomorrow's* move.
-5.  **Portfolio** (`src/trading/portfolio.py`):
-    *   Reads `ledger.csv` (Your bank account).
-    *   Executes Buy/Sell orders based on predictions.
+The application follows a modular architecture designed for extensibility and reproducibility.
 
-### 2. File Glossary
+### 1. Data Pipeline & Logic
+*   **Data Ingestion** (`src/data/loader.py`): Interfaces with the `yfinance` API to retrieve OHLCV data. optimized for bandwidth by caching requests where possible.
+*   **Feature Engineering** (`src/features/indicators.py`): Computes technical derivatives (RSI, MACD, Bollinger Bands) to generate the feature vector $X$ for the model.
+*   **Model Training** (`src/models/trainer.py`):
+    *   Implements an **XGBoost Classifier** on a rolling window basis.
+    *   Performs a time-series split to validate model generalization.
+    *   Serializes the trained model artifact to `models/xgb_model.joblib`.
+    *   Exports performance metrics (F1, Precision, Recall) to `results/`.
+*   **Inference Engine** (`src/models/predictor.py`): Deserializes the model artifact to generate probability estimates $P(Y=1|X)$ for the upcoming trading session.
+*   **Execution Engine** (`src/trading/portfolio.py`): Manages state persistence via `ledger.csv`, handling order execution, position sizing, and proper accounting.
 
-| File | Purpose |
+### 2. Component Glossary
+
+| Component | Description |
 | :--- | :--- |
-| **`main.py`** | **The Boss**. Run this file to start everything. It decides whether to Train or Trade. |
-| `Makefile` | A shortcut helper. Instead of typing long commands, you type `make train`. |
-| `config/settings.yaml` | **Control Panel**. Change stocks, training years, or risk settings here. |
-| `models/xgb_model.joblib` | **The Brain**. This is the saved AI file. "Joblib" is just a format for saving Python objects efficiently. |
-| `ledger.csv` | **The Bank**. Records every trade and your cash balance. |
-| `results/` | **The Report Card**. Contains charts and scores from the latest training run. |
+| **`main.py`** | **Application Entry Point**. Orchestrates the CLI arguments and delegates control to the training or trading subsystems. |
+| **`Makefile`** | **Automation**. Abstraction layer for common build and execution commands. |
+| **`config/settings.yaml`** | **Configuration**. Declarative configuration for the asset universe, hyperparameters, and risk constraints. |
+| **`ledger.csv`** | **Persistence**. CSV-based flat-file database for transaction history and current portfolio state. |
+| **`results/`** | **Telemetry**. Directory containing evaluation artifacts (confusion matrices, metric logs) from the latest training epoch. |
 
 ---
 
-## 📊 Interpreting Results
+## 📊 Evaluation & Telemetry
 
-After a training run (which happens daily), check the `results/` folder.
+The system generates the following artifacts post-training to verify model performance:
 
-### 1. `metrics.txt`
-*   **Accuracy**: Overall percentage of correct guesses. (e.g., 0.55 = 55%).
-*   **Precision**: When it said "BUY", how often was it right? (High precision = fewer false alarms).
-*   **Recall**: Out of all the real profitable opportunities, how many did it find?
-*   **F1-Score**: A balance between Precision and Recall.
+### 1. Metric Logs (`results/metrics.txt`)
+Contains standard classification metrics:
+*   **Accuracy**
+*   **Precision/Recall** (Per class)
+*   **F1-Score**
 
-### 2. `confusion_matrix.png`
-This chart shows the detailed mistakes.
-*   **True Positive (Bottom Right)**: Predicted UP, and it went UP. (Great!)
-*   **True Negative (Top Left)**: Predicted DOWN, and it went DOWN. (Good avoidance).
-*   **False Positive (Top Right)**: Predicted UP, but it went DOWN. (Ouch, lost money).
-*   **False Negative (Bottom Left)**: Predicted DOWN, but it went UP. (Missed opportunity).
-
-**Goal**: You want dark colors in Top-Left and Bottom-Right.
+### 2. Confusion Matrix (`results/confusion_matrix.png`)
+Visual representation of the classifier's performance, allowing for rapid assessment of Type I and Type II error rates.
 
 ---
 
-## 🛠 Automation (Makefile)
+## 🛠 Operations (Makefile)
 
-We included a `Makefile` to make your life easier. Run these commands in the terminal:
+The project utilizes `make` for standardized operations.
 
-*   `make setup`: Installs all the libraries you need.
-*   `make trade`: Runs the bot in trading mode (Standard daily run).
-*   `make train`: Forces the AI to retrain immediately.
-*   `make clean`: Deletes cache files and old results.
-*   `make docker-up`: Runs the whole thing inside the Docker container.
+*   `make setup`: Provision the Conda environment and install dependencies.
+*   `make trade`: Execute the standard daily trading workflow (Fetch -> Train -> Predict -> Execute).
+*   `make train`: Force a manual retraining of the model without executing trades.
+*   `make clean`: Remove build artifacts, pycache, and temporary results.
+*   `make docker-up`: Deploy the application within the Docker container (Recommended for production consistency).
