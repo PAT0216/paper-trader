@@ -25,11 +25,11 @@ trade:
 # 🐳 Docker
 .PHONY: docker-up
 docker-up:
-	docker-compose up --build
+	docker compose up --build
 
 .PHONY: docker-down
 docker-down:
-	docker-compose down
+	docker compose down
 
 # 🧹 Clean
 .PHONY: clean
