@@ -30,5 +30,8 @@ jobs:
       run: |
         git config --global user.name 'PAT0216'
         git config --global user.email '69978508+PAT0216@users.noreply.github.com'
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add ledger.csv models/xgb_model.joblib
         git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push)
+        # git config --global user.name 'PAT0216'
+        # git config --global user.email 'prabuddha.tamhane@gmail.com'
