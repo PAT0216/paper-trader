@@ -22,8 +22,9 @@ jobs:
 
     - name: Run Trading Bot in Docker
       # Mount the current directory to /app so we can persist ledger.csv and models/
+      # MUST use 'conda run' to execute inside the environment, and '-m' for imports to work
       run: |
-        docker run --rm -v ${{ github.workspace }}:/app paper-trader python src/trading/run_bot.py
+        docker run --rm -v ${{ github.workspace }}:/app paper-trader conda run --no-capture-output -n paper-trader python -m src.trading.run_bot
 
     - name: Push Changes
       run: |
