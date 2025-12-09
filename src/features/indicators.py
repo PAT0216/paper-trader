@@ -22,33 +22,82 @@ def compute_bollinger_bands(series, window=20, num_std=2):
     lower = rolling_mean - (rolling_std * num_std)
     return upper, lower
 
-def generate_features(df):
+def generate_features(df, include_target=False):
     """
-    Adds technical indicators and target variable to the dataframe.
+    Generates technical indicator features from OHLCV data.
+    
+    IMPORTANT: This function ONLY uses data available at time t.
+    No look-ahead bias - all features are calculated using past data only.
+    
+    Args:
+        df: DataFrame with OHLCV columns
+        include_target: If True, also creates target column (only for training)
+        
+    Returns:
+        DataFrame with feature columns added
     """
     df = df.copy()
     close = df['Close']
     
-    # 1. Momentum
+    # 1. Momentum Indicators (use only past data)
     df['RSI'] = compute_rsi(close)
     df['MACD'], df['MACD_signal'] = compute_macd(close)
     df['MACD_hist'] = df['MACD'] - df['MACD_signal']
     
-    # 2. Volatility
+    # 2. Volatility (past data only)
     df['BB_Upper'], df['BB_Lower'] = compute_bollinger_bands(close)
     df['BB_Width'] = (df['BB_Upper'] - df['BB_Lower']) / close
     
-    # 3. Trend
+    # 3. Trend (SMAs use only past data)
     df['SMA_50'] = close.rolling(window=50).mean()
     df['SMA_200'] = close.rolling(window=200).mean()
     df['Dist_SMA50'] = close / df['SMA_50'] - 1
     df['Dist_SMA200'] = close / df['SMA_200'] - 1
     
-    # 4. Returns
+    # 4. Returns (use only past data - pct_change looks backward)
     df['Return_1d'] = close.pct_change()
     df['Return_5d'] = close.pct_change(5)
     
-    # 5. Target: 1 if Next Close > Current Close
-    df['Target'] = (close.shift(-1) > close).astype(int)
+    # 5. Target (ONLY if requested - keeps feature generation separate)
+    # This should be called separately during training to avoid leakage
+    if include_target:
+        df = create_target(df, target_type='regression')
     
     return df.dropna()
+
+
+def create_target(df, target_type='regression', horizon=1):
+    """
+    Creates target variable for ML training.
+    
+    IMPORTANT: Call this function ONLY in the training pipeline,
+    AFTER splitting data into train/test to prevent look-ahead bias.
+    
+    Args:
+        df: DataFrame with 'Close' column
+        target_type: 'regression' (predict return) or 'classification' (predict direction)
+        horizon: Number of days ahead to predict (default: 1 day)
+        
+    Returns:
+        DataFrame with 'Target' column added
+    """
+    df = df.copy()
+    close = df['Close']
+    
+    if target_type == 'regression':
+        # Predict next-day return (percentage)
+        # shift(-horizon) looks into the future - ONLY use in training data
+        df['Target'] = close.pct_change().shift(-horizon)
+    else:
+        # Binary classification: 1 if next close > current close
+        df['Target'] = (close.shift(-horizon) > close).astype(int)
+    
+    return df
+
+
+# Feature column list - use this for consistency
+FEATURE_COLUMNS = [
+    'RSI', 'MACD', 'MACD_signal', 'MACD_hist',
+    'BB_Width', 'Dist_SMA50', 'Dist_SMA200',
+    'Return_1d', 'Return_5d'
+]

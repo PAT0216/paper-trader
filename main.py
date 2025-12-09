@@ -63,25 +63,49 @@ def main():
         print("\n--- 🔮 Generating Predictions ---")
         ai_predictor = predictor.Predictor()
         signals = {}
+        expected_returns = {}
+        
+        # Thresholds for return-based decisions (Phase 3)
+        # BUY if expected return > 0.5%, SELL if < -0.5%
+        return_buy_thresh = 0.005   # 0.5% expected return
+        return_sell_thresh = -0.005  # -0.5% expected return
         
         for ticker in tickers:
             if ticker not in data_dict:
                  continue
             df = data_dict[ticker]
-            prob = ai_predictor.predict(df)
             
-            thresh_buy = config['model']['threshold_buy']
-            thresh_sell = config['model']['threshold_sell']
+            # Get expected return from regression model
+            expected_ret = ai_predictor.predict(df)
+            expected_returns[ticker] = expected_ret
             
-            action = "HOLD"
-            if prob > thresh_buy:
-                action = "BUY"
-                print(f"🟢 {ticker}: BUY  (Prob: {prob:.4f})")
-            elif prob < thresh_sell:
-                action = "SELL"
-                print(f"🔴 {ticker}: SELL (Prob: {prob:.4f})")
+            # Legacy classifier compatibility: check if output looks like probability
+            if ai_predictor.is_regression:
+                # Regression: expected_ret is in decimal (e.g., 0.02 = 2%)
+                if expected_ret > return_buy_thresh:
+                    action = "BUY"
+                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%)")
+                elif expected_ret < return_sell_thresh:
+                    action = "SELL"
+                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%)")
+                else:
+                    action = "HOLD"
+                    print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%)")
             else:
-                print(f"⚪️ {ticker}: HOLD (Prob: {prob:.4f})")
+                # Legacy classifier: expected_ret is probability 0-1
+                prob = expected_ret
+                thresh_buy = config['model']['threshold_buy']
+                thresh_sell = config['model']['threshold_sell']
+                
+                if prob > thresh_buy:
+                    action = "BUY"
+                    print(f"🟢 {ticker}: BUY  (Prob: {prob:.4f})")
+                elif prob < thresh_sell:
+                    action = "SELL"
+                    print(f"🔴 {ticker}: SELL (Prob: {prob:.4f})")
+                else:
+                    action = "HOLD"
+                    print(f"⚪️ {ticker}: HOLD (Prob: {prob:.4f})")
                 
             signals[ticker] = action
             
