@@ -14,7 +14,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     # We build the Docker image to ensure the environment is exact
     - name: Build Docker Image
@@ -31,8 +33,9 @@ jobs:
         git config --global user.name 'PAT0216'
         git config --global user.email '69978508+PAT0216@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git fetch origin main
         git pull --rebase origin main
         git add ledger.csv models/xgb_model.joblib
-        git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push --force-with-lease)
         # git config --global user.name 'PAT0216'
         # git config --global user.email 'prabuddha.tamhane@gmail.com'
