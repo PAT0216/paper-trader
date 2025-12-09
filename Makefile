@@ -56,6 +56,20 @@ docker-down:
 	docker compose down
 	@echo "$(GREEN)✅ Containers stopped$(NC)"
 
+# 📈 Run Backtest
+.PHONY: backtest
+backtest:
+	@echo "$(YELLOW)📈 Running Backtest (2017-2024)...$(NC)"
+	conda run -n $(ENV_NAME) python run_backtest.py
+	@echo "$(GREEN)✅ Backtest complete - see results/$(NC)"
+
+# 📈 Quick Backtest (1 year)
+.PHONY: backtest-quick
+backtest-quick:
+	@echo "$(YELLOW)📈 Running Quick Backtest (2023-2024)...$(NC)"
+	conda run -n $(ENV_NAME) python run_backtest.py --start 2023-01-01 --end 2024-12-31
+	@echo "$(GREEN)✅ Quick backtest complete$(NC)"
+
 # 🔍 Validate Data Only
 .PHONY: validate
 validate:

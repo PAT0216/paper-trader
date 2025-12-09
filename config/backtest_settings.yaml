@@ -1,0 +1,72 @@
+# Backtesting Configuration
+
+backtest:
+  # Date range for backtesting
+  # Covers multiple market regimes: bull market, COVID crash, meme stocks, bear market, recovery
+  start_date: "2017-01-01"
+  end_date: "2024-12-31"
+  
+  # Split for training vs out-of-sample testing
+  # Train: 2017-2022 | Test: 2023-2024
+  train_end_date: "2022-12-31"
+  
+  # Initial capital
+  initial_cash: 100000.0
+  
+  # Benchmark for comparison
+  benchmark_ticker: "SPY"
+
+# Transaction cost settings
+costs:
+  # Slippage in basis points (5 bps = 0.05%)
+  slippage_bps: 5.0
+  
+  # Commission per share (most brokers now $0)
+  commission_per_share: 0.0
+  
+  # Minimum commission per trade
+  min_commission: 0.0
+  
+  # Market impact settings
+  market_impact_enabled: true
+  market_impact_coefficient: 0.1
+  adv_threshold: 0.005  # 0.5% of ADV triggers impact
+
+# Risk management during backtest
+risk:
+  max_position_pct: 0.15      # Max 15% per position
+  max_sector_pct: 0.40        # Max 40% per sector
+  min_cash_buffer: 100.0      # Reserve cash
+  volatility_lookback: 30     # Days for volatility calculation
+
+# Execution settings
+execution:
+  # How often to rebalance: daily, weekly, monthly
+  rebalance_frequency: "daily"
+  
+  # Use risk manager for position sizing
+  use_risk_manager: true
+
+# Performance analysis settings
+performance:
+  # Risk-free rate for Sharpe calculation
+  risk_free_rate: 0.04  # 4% (current environment)
+  
+  # Trading days per year
+  trading_days: 252
+
+# Regime classification settings
+regimes:
+  sma_period: 200           # SMA for trend detection
+  volatility_lookback: 30    # Days for volatility
+  
+  # Volatility thresholds
+  crisis_vol_mult: 2.0       # Crisis if vol > 2x average
+  high_vol_mult: 1.5         # High vol threshold
+
+# Output settings
+output:
+  save_trades: true
+  save_metrics_json: true
+  save_summary_txt: true
+  output_dir: "results"
