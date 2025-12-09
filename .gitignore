@@ -11,7 +11,8 @@ venv/
 .DS_Store
 
 # Data
-ledger.csv
+# ledger.csv - CAREFUL: We want to track this in this specific project
+# because the Bot commits its trades back to the repo.
 # We usually commit the model for this specific project so the bot has a brain on start
 # but often it's ignored. Keeping it for now as per previous workflows.
 # models/
