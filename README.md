@@ -1,50 +1,74 @@
-# 🤖 AI Paper Trader
+# Paper Trader AI
 
-An automated, containerized Artificial Intelligence that trades a paper portfolio on the US Stock Market (SPY, QQQ, IWM, DIA).
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.10-blue)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
 
-![Performance](performance.png)
+**Paper Trader AI** is an autonomous, containerized algorithmic trading system designed for the US Equity Market. It leverages machine learning (XGBoost) to analyze historical price action and execute probability-based trade decisions on a simulated portfolio.
 
-## 🚀 Quick Start (Locally)
+---
 
-1.  **Install**:
-    ```bash
-    git clone https://github.com/PAT0216/paper-trader.git
-    cd paper-trader
-    ```
+## 📋 Key Features
 
-2.  **Run (with Docker)**:
-    This is the easiest way. It handles all dependencies for you.
-    ```bash
-    docker-compose up --build
-    ```
-    *That's it!* The bot will fetch data, retrain its brain, and execute trades.
+*   **Predictive Intelligence**: Utilizes an XGBoost classifier trained on technical indicators (RSI, MACD, Bollinger Bands) to forecast daily price direction.
+*   **Containerized Architecture**: Fully Dockerized environment using `miniconda3` for reproducible, platform-independent execution.
+*   **Multi-Asset Support**: Capable of managing a diverse portfolio of assets (default: SPY, QQQ, IWM, DIA).
+*   **Automated Execution**: Integrated with GitHub Actions for scheduled daily operation at market close.
+
+## 🚀 Getting Started
+
+### Prerequisites
+*   Docker & Docker Compose
+*   Git
+
+### Installation
+Clone the repository and navigate to the project root:
+```bash
+git clone https://github.com/PAT0216/paper-trader.git
+cd paper-trader
+```
+
+### Execution
+The system is designed to run via Docker Compose for maximum stability:
+
+```bash
+docker-compose up --build
+```
+
+**What happens next?**
+1.  **Data Ingestion**: The system fetches 2 years of granular market data.
+2.  **Model Training**: The AI model retrains on the latest data to adapt to recent market regimes.
+3.  **Inference**: The model generates buy/sell probability scores for each asset.
+4.  **Portfolio Rebalancing**: Trades are executed against the local ledger to align holdings with model convictions.
 
 ## ⚙️ Configuration
 
-Want to trade different stocks? Easy.
-Open `config/settings.yaml` and edit the tickers:
+The system is data-driven and configurable via `config/settings.yaml`.
 
 ```yaml
 # config/settings.yaml
+
+# Define your trading universe
 tickers:
   - SPY
-  - AAPL  # <--- Added Apple!
+  - AAPL
   - MSFT
+
+# Adjust risk parameters
+model:
+  threshold_buy: 0.55  # Confidence required to enter position
 ```
 
-## 🧠 How it Works
+## 📂 Project Structure
 
-1.  **Data**: It downloads 2 years of daily price history from Yahoo Finance.
-2.  **Learning**: It feeds this data into an **XGBoost Algorithm** which learns patterns (RSI, MACD, Volatility).
-3.  **Predicting**: The AI predicts the probability of the price closing HIGHER tomorrow.
-    - `> 55%` -> **BUY** 🟢
-    - `< 45%` -> **SELL** 🔴
-4.  **Trading**: It connects to your local `ledger.csv` and updates your virtual portfolio.
-
-## ☁️ Automation
-
-This project is configured to run automatically on **GitHub Actions** every weekday at market close.
-Check the [Actions Tab](https://github.com/PAT0216/paper-trader/actions) to see it living its life!
+*   `main.py`: Application entry point and orchestrator.
+*   `src/`: Core application logic.
+    *   `data/`: Data fetching and preprocessing pipelines.
+    *   `features/`: Technical indicator engineering.
+    *   `models/`: Machine learning training and inference engines.
+    *   `trading/`: Portfolio management and order execution.
+*   `entrypoint.sh`: Container initialization script.
 
 ---
-*Disclaimer: This is for educational purposes only. Do not use this logic for real money trading without serious risk assessment.*
+
+**Disclaimer**: *This software is for educational and research purposes only. It is not financial advice, and the authors are not responsible for any financial losses incurred.*
