@@ -10,9 +10,9 @@
 
 ## 📋 Key Features
 
-*   **Predictive Intelligence**: Utilizes an XGBoost classifier trained on technical indicators (RSI, MACD, Bollinger Bands) to forecast daily price direction.
+*   **Predictive Intelligence**: Utilizes an XGBoost classifier trained on **3 Years** of historical data.
 *   **Containerized Architecture**: Fully Dockerized environment using `miniconda3` for reproducible, platform-independent execution.
-*   **Multi-Asset Support**: Capable of managing a diverse portfolio of assets (default: SPY, QQQ, IWM, DIA).
+*   **Multi-Asset Support**: Capable of managing a diverse portfolio of assets (default: **Top 30 S&P 500 Stocks**).
 *   **Automated Execution**: Integrated with GitHub Actions for scheduled daily operation at market close.
 
 ## 🚀 Getting Started

@@ -5,14 +5,51 @@
 # 📊 Market Universe
 # List the tickers you want the bot to trade.
 tickers:
+  # Indices
   - SPY
   - QQQ
   - IWM
   - DIA
+  # Tech / Growth
+  - AAPL
+  - MSFT
+  - NVDA
+  - GOOGL
+  - AMZN
+  - META
+  - TSLA
+  - AVGO
+  - AMD
+  - CRM
+  - NFLX
+  # Finance
+  - JPM
+  - V
+  - MA
+  - BAC
+  - BRK-B
+  # Consumer / Retail
+  - HD
+  - COST
+  - WMT
+  - PG
+  - KO
+  - PEP
+  - DIS
+  # Healthcare / Pharma
+  - UNH
+  - JNJ
+  - LLY
+  - MRK
+  # Energy / Industrial
+  - XOM
+  - CVX
+  - BA
+  - CAT
 
 # ⚙️ Model Settings
 model:
-  training_period: "2y"   # How much historical data to train on
+  training_period: "3y"   # Increased to 3 years for better trend capture
   retrain_daily: true     # Retrain the model every time the bot runs?
   threshold_buy: 0.55     # Probability threshold to trigger a BUY
   threshold_sell: 0.45    # Probability threshold to trigger a SELL
