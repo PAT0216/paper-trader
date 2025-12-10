@@ -72,10 +72,30 @@ def train_model(data_dict, n_splits=5, save_model=True):
     print(f"   Total samples: {len(full_df):,}")
     print(f"   Date range: {full_df.index.min()} to {full_df.index.max()}")
     
+    # Filter to recent data (2010+) for better quality
+    # Older data often has issues: missing values, stock splits, data errors
+    MIN_DATE = '2010-01-01'
+    full_df = full_df[full_df.index >= MIN_DATE]
+    print(f"   After date filter (>= {MIN_DATE}): {len(full_df):,} samples")
+    
     # Prepare X (features) and y (target)
     X = full_df[FEATURE_COLUMNS].values
     y = full_df['Target'].values
     
+    # Clean data: replace inf with NaN, then drop NaN rows
+    # This prevents XGBoost "Input contains inf" error
+    X = np.where(np.isinf(X), np.nan, X)
+    
+    # Find rows with NaN in X or y
+    valid_rows = ~(np.isnan(X).any(axis=1) | np.isnan(y))
+    X = X[valid_rows]
+    y = y[valid_rows]
+    
+    dropped = len(full_df) - len(X)
+    if dropped > 0:
+        print(f"   ⚠️ Dropped {dropped:,} rows with inf/NaN values")
+    
+    print(f"   Final samples: {len(X):,}")
     print(f"   Features: {len(FEATURE_COLUMNS)}")
     print(f"   Target: Next-day return (regression)")
     
@@ -340,8 +360,19 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
             continue
         
         full_df = pd.concat(all_features).sort_index()
+        
+        # Filter to recent data (2010+) for better quality
+        MIN_DATE = '2010-01-01'
+        full_df = full_df[full_df.index >= MIN_DATE]
+        
         X = full_df[FEATURE_COLUMNS].values
         y = full_df['Target'].values
+        
+        # Clean data: replace inf with NaN, then drop NaN rows
+        X = np.where(np.isinf(X), np.nan, X)
+        valid_rows = ~(np.isnan(X).any(axis=1) | np.isnan(y))
+        X = X[valid_rows]
+        y = y[valid_rows]
         
         print(f"   Samples: {len(full_df):,}")
         
