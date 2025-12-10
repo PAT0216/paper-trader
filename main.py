@@ -17,9 +17,26 @@ def main():
     # 1. Load Configuration
     try:
         config = load_config()
-        tickers = config['tickers']
+        
+        # Check for dynamic universe (S&P 500)
+        universe_type = config.get('universe', {}).get('type', 'config')
+        
+        if universe_type == 'sp500':
+            print("📊 Fetching S&P 500 universe from Wikipedia...")
+            from src.data.universe import fetch_sp500_tickers, get_mega_caps
+            try:
+                tickers = fetch_sp500_tickers()
+                print(f"   Loaded {len(tickers)} S&P 500 stocks")
+            except Exception as e:
+                print(f"   ⚠️ S&P 500 fetch failed: {e}")
+                print(f"   Falling back to mega-caps...")
+                tickers = get_mega_caps()
+        else:
+            # Use tickers from config
+            tickers = config['tickers']
+        
         print(f"--- 🤖 AI Paper Trader | Mode: {args.mode.upper()} | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ---")
-        print(f"Universe: {tickers}")
+        print(f"Universe: {len(tickers)} tickers")
     except Exception as e:
         print(f"❌ Configuration Error: {e}")
         sys.exit(1)

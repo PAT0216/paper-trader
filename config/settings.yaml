@@ -2,8 +2,14 @@
 # Paper Trader Configuration
 # -------------------------------------------------------------------
 
-# 📊 Market Universe
-# List the tickers you want the bot to trade.
+# 🌐 Universe Settings (NEW - Phase 4)
+# Options: 'config' (use tickers below), 'sp500' (fetch from Wikipedia)
+universe:
+  type: "sp500"   # Use full S&P 500 (~500 stocks)
+  # type: "config"  # Use manual tickers list below
+
+# 📊 Manual Ticker List (used when universe.type = 'config')
+# Also serves as fallback if S&P 500 fetch fails
 tickers:
   # Indices
   - SPY
