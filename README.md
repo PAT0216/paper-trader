@@ -31,7 +31,7 @@
 - **Local Cache**: 4.3M rows, 503 S&P 500 tickers
 - **Incremental Updates**: Only fetch new bars after initial load
 - **No Rate Limits**: Avoid yfinance throttling with cached data
-- **GitHub Artifacts**: Cache persists across workflow runs
+- **GitHub Actions Cache**: Persists across workflow runs (169MB, restored in ~3s)
 
 ### 🌐 **S&P 500 Universe** *(New in Phase 4)*
 - **Dynamic Universe**: Fetches current S&P 500 from Wikipedia
@@ -167,44 +167,56 @@ portfolio:
 ```
 paper-trader/
 ├── main.py                      # Application entry point
-├── run_backtest.py              # Backtesting CLI runner ✨ NEW
+├── run_backtest.py              # Backtesting CLI runner
+├── run_walkforward.py           # Walk-forward validation (Phase 5)
+├── run_hyperopt.py              # Hyperparameter optimization (Phase 5)
 ├── src/
-│   ├── backtesting/             # Backtesting framework ✨ NEW
+│   ├── backtesting/             # Backtesting framework
 │   │   ├── backtester.py       # Event-driven engine
 │   │   ├── performance.py      # Quant metrics (Sharpe, VaR, etc.)
 │   │   └── costs.py            # Transaction cost modeling
 │   ├── data/
 │   │   ├── loader.py           # Market data fetching (yfinance)
+│   │   ├── cache.py            # SQLite caching (Phase 4)
+│   │   ├── universe.py         # S&P 500 universe (Phase 4)
+│   │   ├── macro.py            # VIX and macro data
 │   │   └── validator.py        # Data quality checks
 │   ├── features/
-│   │   └── indicators.py       # Technical indicator generation
+│   │   └── indicators.py       # Technical indicator generation (15 features)
 │   ├── models/
 │   │   ├── trainer.py          # XGBoost training pipeline
-│   │   └── predictor.py        # Inference engine
+│   │   └── predictor.py        # Inference engine (single + ensemble)
 │   ├── trading/
 │   │   ├── portfolio.py        # Position tracking & ledger
-│   │   └── risk_manager.py     # Risk controls & sizing
+│   │   ├── risk_manager.py     # Risk controls & sizing
+│   │   └── regime.py           # VIX-based regime detection (Phase 3.6)
 │   └── utils/
 │       └── config.py           # YAML config loader
 ├── tests/                       # Unit test suite (55 tests)
-│   ├── test_ml_pipeline.py      # ML pipeline tests (12) ✨ NEW
+│   ├── test_ml_pipeline.py      # ML pipeline tests (12)
 │   ├── test_backtester.py       # Backtesting tests (16)
 │   ├── test_risk_manager.py     # Risk management tests (14)
 │   └── test_validator.py        # Data validation tests (13)
 ├── config/
 │   ├── settings.yaml           # Trading configuration
-│   └── backtest_settings.yaml  # Backtest configuration ✨ NEW
+│   └── backtest_settings.yaml  # Backtest configuration
+├── data/
+│   └── market.db               # SQLite cache (4.3M rows, 503 tickers)
 ├── docs/
 │   └── MANUAL.md               # Technical documentation
 ├── results/                     # Training & backtest reports
 │   ├── metrics.txt             # CV metrics (RMSE, MAE, R², Dir.Acc)
 │   ├── feature_importance.png  # Feature importance chart
-│   ├── backtest_summary.txt    # ✨ NEW
-│   └── backtest_trades.csv     # ✨ NEW
+│   ├── selected_features.txt   # Dynamically selected features
+│   ├── backtest_summary.txt    # Backtest performance summary
+│   ├── backtest_trades.csv     # Trade log
+│   └── hyperopt_results.csv    # Hyperparameter optimization (Phase 5)
 ├── models/                      # Serialized model artifacts
-│   └── xgb_model.joblib
+│   ├── xgb_model.joblib        # Single-horizon model
+│   └── xgb_ensemble.joblib     # Multi-horizon ensemble (Phase 3.6)
 ├── ledger.csv                   # Transaction history
 ├── Makefile                     # Build automation
+├── CHANGELOG.md                 # Version history
 └── docker-compose.yml          # Container orchestration
 ```
 
@@ -315,12 +327,28 @@ pytest tests/test_validator.py -v
 - ✅ Regression target (predict return magnitude)
 - ✅ 12 new ML pipeline tests
 
-### 🔜 Phase 4: Production Readiness (Next)
-- [ ] Advanced logging and monitoring
-- [ ] Alerting system (email/Slack)
-- [ ] SQLite ledger (replace CSV)
-- [ ] Enhanced features (volume, macro indicators)
-- [ ] Multi-strategy framework
+### ✅ Phase 4: Data Infrastructure (Complete)
+- ✅ SQLite data cache (4.3M rows, 503 tickers)
+- ✅ Incremental data fetching (only new bars)
+- ✅ S&P 500 dynamic universe from Wikipedia
+- ✅ Enhanced features (volume, volatility, VWAP)
+
+### ✅ Phase 5: Walk-Forward Validation (Complete)
+- ✅ True out-of-sample testing (train before each test year)
+- ✅ Walk-forward results: 630% return vs SPY 234% (2015-2024)
+- ✅ Hyperparameter optimization with overfitting checks
+- ✅ Next-day Open execution (no look-ahead bias)
+
+### ✅ Phase 6: Deployment & Reliability (Complete)
+- ✅ GitHub Actions Cache for market data persistence
+- ✅ Scheduled daily cron job (1 PM PST / 9 PM UTC)
+- ✅ Automated commits with ledger updates
+
+### 🔜 Phase 7: Risk Enhancements (Planned)
+- [ ] Position-level stop-loss (-8%)
+- [ ] Increased slippage for mid-caps (10 bps)
+- [ ] Survivorship bias disclosure
+- [ ] Trade return distribution analysis
 
 ---
 

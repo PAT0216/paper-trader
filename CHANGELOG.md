@@ -7,19 +7,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for Phase 3
-- Fix data leakage in feature generation
-- Time series cross-validation
-- Regression target (predict return magnitude)
-- Enhanced features (volume indicators, macro data, sentiment)
-
-### Planned for Phase 4
-- Advanced structured logging (JSON format)
-- Alerting system (email, Slack webhooks)
-- SQLite ledger to replace CSV
-- Multi-strategy framework with weighted voting
+### Planned for Phase 7: Risk Enhancements
+- Position-level stop-loss (-8% exit trigger)
+- Increased slippage for mid-caps (10 bps vs 5 bps)
+- Survivorship bias disclosure in documentation
+- Trade return distribution analysis
 
 ---
+
+## [1.6.0] - 2025-12-10
+
+### 🎉 Phase 6: Deployment & Reliability - Complete
+
+This release fixes the GitHub Actions cache persistence and establishes reliable daily automated trading.
+
+### Fixed
+- **GitHub Actions Caching**: Switched from `actions/upload-artifact` to `actions/cache@v4`
+  - Artifacts don't persist across workflow runs; cache does
+  - Market data (169MB) now restored in ~3 seconds
+  - Eliminates need to re-fetch 10+ years of S&P 500 data each run
+- **Shell Script Exit Code**: Fixed `Check Cache Status` step failing when `universe_cache.csv` missing
+
+### Changed
+- **Workflow Duration**: ~25 minutes → ~5 minutes (with cache hit)
+- **Cron Schedule**: Daily at 9 PM UTC / 1 PM PST (market close)
+
+---
+
+## [1.5.0] - 2025-12-10
+
+### 🎉 Phase 5: Walk-Forward Validation & Hyperopt - Complete
+
+True out-of-sample validation with model trained BEFORE each test period.
+
+### Added
+- **Walk-Forward Validation** (`run_walkforward.py`):
+  - Trains on 2010 to (Year-1), tests on Year
+  - No look-ahead bias: model trained before each test period
+  - Results: 630% return vs SPY 234% (2015-2024)
+- **Next-Day Open Execution**: Signals at T close, execute at T+1 open
+- **Priority Ranking**: Stocks sorted by expected return (highest first gets capital)
+- **Hyperparameter Optimization** (`run_hyperopt.py`):
+  - TimeSeriesSplit cross-validation
+  - Overfitting check (train/val gap)
+  - Current params already optimal
+
+### Fixed
+- **Look-Ahead Bias**: Execution now uses T+1 Open, not T Close
+- **Data Validation Filter**: 2010+ filter applied before validation (35/35 tickers pass)
+
+---
+
+## [1.4.0] - 2025-12-09
+
+### 🎉 Phase 4: Data Infrastructure - Complete
+
+SQLite caching and S&P 500 universe support.
+
+### Added
+- **SQLite Data Cache** (`src/data/cache.py`): 4.3M rows, 503 tickers
+- **Incremental Fetching**: Only fetch new bars after initial load
+- **S&P 500 Universe** (`src/data/universe.py`): Dynamic from Wikipedia
+- **Macro Data** (`src/data/macro.py`): VIX and yield curve support
+
+---
+
+## [1.3.0] - 2025-12-09
+
+### 🎉 Phase 3.6: Regime Detection & Multi-Horizon Ensemble
+
+VIX-based defensive positioning and ensemble predictions.
+
+### Added
+- **VIX Regime Detection**: NORMAL (<25), ELEVATED (25-35), CRISIS (>35)
+- **Position Multipliers**: 100% → 50% → 0% based on regime
+- **Multi-Horizon Ensemble**: 1-day (50%), 5-day (30%), 20-day (20%) blend
+
+---
+
+## [1.2.0] - 2025-12-09
+
+### 🎉 Phase 3.5: Enhanced Feature Engineering
+
+Expanded from 9 to 15 technical indicators.
+
+### Added
+- **Volume Features**: OBV Momentum, Volume Ratio, VWAP Deviation
+- **Volatility Features**: ATR %, Bollinger %B, Volatility Ratio
+- **Dynamic Feature Selection**: Auto-filter features with <3% importance
+
+---
+
 
 ## [1.1.0] - 2025-12-09
 
@@ -212,7 +290,13 @@ This release transforms the paper trader from a basic prototype into a professio
 
 | Version | Date | Phase | Key Features |
 |---------|------|-------|--------------|
-| **1.0.0** | 2024-12-08 | Phase 1 Complete | Risk management, data validation, testing |
+| **1.6.0** | 2025-12-10 | Phase 6 | GitHub Actions Cache, reliable deployment |
+| **1.5.0** | 2025-12-10 | Phase 5 | Walk-forward validation, T+1 execution |
+| **1.4.0** | 2025-12-09 | Phase 4 | SQLite cache, S&P 500 universe |
+| **1.3.0** | 2025-12-09 | Phase 3.6 | VIX regime, multi-horizon ensemble |
+| **1.2.0** | 2025-12-09 | Phase 3.5 | 15 features, dynamic selection |
+| **1.1.0** | 2025-12-09 | Phase 2 | Backtesting framework |
+| **1.0.0** | 2025-12-08 | Phase 1 | Risk management, data validation |
 | 0.1.0 | 2024-11-XX | Initial | Basic ML trading, no risk controls |
 
 ---

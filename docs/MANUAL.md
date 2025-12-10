@@ -683,18 +683,24 @@ FAILED tests/test_risk_manager.py::test_name
 - **Multi-horizon ensemble**: 1-day (50%), 5-day (30%), 20-day (20%)
 - **Blended signals**: More stable than single-horizon
 
-### ✅ Phase 4: Data Caching & Universe *(New)*
+### ✅ Phase 4: Data Caching & Universe *(Complete)*
 - **SQLite cache**: 4.3M rows, 503 tickers
 - **Incremental fetching**: Only new bars after initial load
 - **S&P 500 universe**: Dynamic from Wikipedia
-- **GitHub Artifacts**: Cache persists across workflow runs
+- **GitHub Actions Cache**: Market data persists across workflow runs (~3s restore)
 
-### ✅ Phase 5: Walk-Forward Validation & Hyperopt *(NEW!)*
+### ✅ Phase 5: Walk-Forward Validation & Hyperopt *(Complete)*
 - **Walk-forward validation**: True out-of-sample testing
 - **Results**: 630% return vs SPY 234% (2015-2024)
 - **2010+ data filter**: 35/35 tickers now pass validation
 - **Hyperparameter optimization**: Current params already optimal
 - **Overfitting check**: Negative train/val gap = model generalizes well
+
+### ✅ Phase 6: Deployment & Reliability *(Complete)*
+- **GitHub Actions Cache**: `actions/cache@v4` for cross-run persistence
+- **Daily Cron Job**: 9 PM UTC / 1 PM PST (market close)
+- **T+1 Execution**: Signals at close, execute at next Open
+- **Automated Commits**: Ledger and model updates pushed to repo
 
 ---
 
@@ -844,5 +850,5 @@ reg_lambda: 1
 
 ---
 
-**Last Updated**: December 2024 (Phase 5 Complete - Walk-Forward + Hyperopt)
+**Last Updated**: December 2024 (Phase 6 Complete - Deployment & Reliability)
 
