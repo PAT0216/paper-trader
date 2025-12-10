@@ -136,6 +136,7 @@ portfolio:
 
 ## 📂 Project Structure
 
+```
 paper-trader/
 ├── main.py                      # Application entry point
 ├── run_backtest.py              # Backtesting CLI runner ✨ NEW
