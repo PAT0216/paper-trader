@@ -284,3 +284,150 @@ def evaluate_model(model, test_df):
         'r2': r2_score(y_true, y_pred),
         'direction_accuracy': ((y_pred > 0) == (y_true > 0)).mean()
     }
+
+
+# ==================== MULTI-HORIZON ENSEMBLE (Phase 3.6) ====================
+
+ENSEMBLE_FILE = os.path.join(MODEL_PATH, "xgb_ensemble.joblib")
+HORIZONS = [1, 5, 20]  # Days ahead to predict
+HORIZON_WEIGHTS = {1: 0.5, 5: 0.3, 20: 0.2}  # More weight to short-term
+
+
+def train_ensemble(data_dict, n_splits=5, save_model=True):
+    """
+    Train multi-horizon ensemble model.
+    
+    Trains 3 separate XGBoost models for different prediction horizons:
+    - 1-day return (50% weight)
+    - 5-day return (30% weight)
+    - 20-day return (20% weight)
+    
+    Final prediction is a weighted blend that provides more stable signals.
+    
+    Args:
+        data_dict: Dictionary of {ticker: OHLCV DataFrame}
+        n_splits: Number of CV folds
+        save_model: Whether to save the ensemble
+        
+    Returns:
+        Ensemble dict with models and metadata
+    """
+    print("=" * 60)
+    print("ML TRAINING PIPELINE (Phase 3.6 - Multi-Horizon Ensemble)")
+    print("=" * 60)
+    
+    ensemble = {
+        'models': {},
+        'selected_features': {},
+        'weights': HORIZON_WEIGHTS,
+        'horizons': HORIZONS,
+        'all_features': FEATURE_COLUMNS
+    }
+    
+    for horizon in HORIZONS:
+        print(f"\n🎯 Training {horizon}-day horizon model...")
+        
+        # Prepare data with specific horizon
+        all_features = []
+        for ticker, df in data_dict.items():
+            processed_df = generate_features(df, include_target=False)
+            processed_df = create_target(processed_df, target_type='regression', horizon=horizon)
+            processed_df = processed_df.dropna(subset=['Target'])
+            all_features.append(processed_df)
+        
+        if not all_features:
+            print(f"   ❌ No data for {horizon}-day horizon")
+            continue
+        
+        full_df = pd.concat(all_features).sort_index()
+        X = full_df[FEATURE_COLUMNS].values
+        y = full_df['Target'].values
+        
+        print(f"   Samples: {len(full_df):,}")
+        
+        # Cross-validation
+        tscv = TimeSeriesSplit(n_splits=n_splits)
+        fold_metrics = []
+        
+        for fold, (train_idx, test_idx) in enumerate(tscv.split(X)):
+            X_train, X_test = X[train_idx], X[test_idx]
+            y_train, y_test = y[train_idx], y[test_idx]
+            
+            model = xgb.XGBRegressor(
+                n_estimators=100,
+                learning_rate=0.05,
+                max_depth=5,
+                objective='reg:squarederror',
+                random_state=42
+            )
+            model.fit(X_train, y_train)
+            
+            y_pred = model.predict(X_test)
+            direction_correct = ((y_pred > 0) == (y_test > 0)).mean()
+            fold_metrics.append(direction_correct)
+        
+        avg_dir_acc = np.mean(fold_metrics)
+        print(f"   Avg Directional Accuracy: {avg_dir_acc:.2%}")
+        
+        # Train final model
+        final_model = xgb.XGBRegressor(
+            n_estimators=100,
+            learning_rate=0.05,
+            max_depth=5,
+            objective='reg:squarederror',
+            random_state=42
+        )
+        final_model.fit(X, y)
+        
+        # Dynamic feature selection (same as single model)
+        IMPORTANCE_THRESHOLD = 0.03
+        feature_importance = pd.DataFrame({
+            'feature': FEATURE_COLUMNS,
+            'importance': final_model.feature_importances_
+        }).sort_values('importance', ascending=False)
+        
+        useful_features = feature_importance[
+            feature_importance['importance'] >= IMPORTANCE_THRESHOLD
+        ]['feature'].tolist()
+        
+        dropped = len(FEATURE_COLUMNS) - len(useful_features)
+        if dropped > 0:
+            print(f"   Dropped {dropped} low-importance features")
+            feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
+            X_selected = X[:, feature_indices]
+            final_model = xgb.XGBRegressor(
+                n_estimators=100,
+                learning_rate=0.05,
+                max_depth=5,
+                objective='reg:squarederror',
+                random_state=42
+            )
+            final_model.fit(X_selected, y)
+        
+        ensemble['models'][horizon] = final_model
+        ensemble['selected_features'][horizon] = useful_features
+        print(f"   ✅ {horizon}-day model ready ({len(useful_features)} features)")
+    
+    # Save ensemble
+    if save_model:
+        os.makedirs(MODEL_PATH, exist_ok=True)
+        joblib.dump(ensemble, ENSEMBLE_FILE)
+        print(f"\n💾 Ensemble saved to {ENSEMBLE_FILE}")
+    
+    # Also save single-horizon model for backward compatibility
+    if 1 in ensemble['models']:
+        single_model_data = {
+            'model': ensemble['models'][1],
+            'selected_features': ensemble['selected_features'][1],
+            'all_features': FEATURE_COLUMNS
+        }
+        joblib.dump(single_model_data, MODEL_FILE)
+        print(f"💾 Single model (1-day) saved to {MODEL_FILE}")
+    
+    print("\n" + "=" * 60)
+    print("✅ MULTI-HORIZON ENSEMBLE TRAINING COMPLETE")
+    print("=" * 60)
+    print(f"   Horizons: {HORIZONS}")
+    print(f"   Weights: {list(HORIZON_WEIGHTS.values())}")
+    
+    return ensemble

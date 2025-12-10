@@ -1,10 +1,13 @@
 """
-Macro Data Module for Paper Trader - Phase 3.5
+Macro Data Module for Paper Trader - Phase 3.6
 
 Fetches macroeconomic indicators from FRED (Federal Reserve Economic Data).
 These features provide market-wide context for individual stock predictions.
 
-FRED is free to use and requires no API key for basic access via pandas-datareader.
+Features:
+- VIX (fear index) for regime detection
+- Retry logic with exponential backoff
+- File-based caching (24-hour TTL)
 """
 
 import pandas as pd
@@ -12,6 +15,9 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 import warnings
+import time
+import os
+import json
 
 
 # FRED Series IDs for macro indicators
@@ -23,19 +29,96 @@ MACRO_SERIES = {
     'Fed_Funds': 'DFF',        # Effective Federal Funds Rate
 }
 
+# Cache settings
+CACHE_DIR = "data/cache"
+CACHE_TTL_HOURS = 24
+
+
+def _ensure_cache_dir():
+    """Create cache directory if it doesn't exist."""
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+
+def _get_cache_path(series_name: str) -> str:
+    """Get cache file path for a series."""
+    return os.path.join(CACHE_DIR, f"{series_name}_cache.json")
+
+
+def _is_cache_valid(cache_path: str) -> bool:
+    """Check if cache file exists and is within TTL."""
+    if not os.path.exists(cache_path):
+        return False
+    
+    mtime = os.path.getmtime(cache_path)
+    age_hours = (time.time() - mtime) / 3600
+    return age_hours < CACHE_TTL_HOURS
+
+
+def _save_to_cache(series_name: str, value: float, timestamp: str):
+    """Save a value to cache."""
+    _ensure_cache_dir()
+    cache_path = _get_cache_path(series_name)
+    cache_data = {
+        'value': value,
+        'timestamp': timestamp,
+        'cached_at': datetime.now().isoformat()
+    }
+    with open(cache_path, 'w') as f:
+        json.dump(cache_data, f)
+
+
+def _load_from_cache(series_name: str) -> Optional[float]:
+    """Load a value from cache if valid."""
+    cache_path = _get_cache_path(series_name)
+    if _is_cache_valid(cache_path):
+        try:
+            with open(cache_path, 'r') as f:
+                data = json.load(f)
+                return data.get('value')
+        except:
+            return None
+    return None
+
+
+def fetch_with_retry(func, max_retries: int = 3, delay_base: float = 1.0):
+    """
+    Execute function with retry logic and exponential backoff.
+    
+    Args:
+        func: Callable to execute
+        max_retries: Maximum number of attempts
+        delay_base: Base delay in seconds (doubles each retry)
+        
+    Returns:
+        Result of func() or None if all retries fail
+    """
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            if attempt < max_retries - 1:
+                delay = delay_base * (2 ** attempt)  # 1s, 2s, 4s
+                print(f"   ⚠️ Retry {attempt + 1}/{max_retries} after {delay}s: {e}")
+                time.sleep(delay)
+            else:
+                print(f"   ❌ All retries failed: {e}")
+                return None
+
 
 def fetch_fred_data(
     series: Optional[list] = None,
     start_date: str = None,
-    end_date: str = None
+    end_date: str = None,
+    use_cache: bool = True
 ) -> pd.DataFrame:
     """
-    Fetch macro data from FRED API.
+    Fetch macro data from FRED API with retry logic and caching.
     
     Args:
         series: List of series names from MACRO_SERIES keys. Default: ['VIX', 'Yield_10Y']
         start_date: Start date (YYYY-MM-DD). Default: 3 years ago
         end_date: End date (YYYY-MM-DD). Default: today
+        use_cache: Whether to use file-based caching
         
     Returns:
         DataFrame with macro indicators, DatetimeIndex
@@ -60,21 +143,67 @@ def fetch_fred_data(
     # Map friendly names to FRED series IDs
     fred_ids = [MACRO_SERIES.get(s, s) for s in series]
     
-    try:
+    def _fetch():
         data = pdr.DataReader(fred_ids, 'fred', start_date, end_date)
-        
         # Rename columns back to friendly names
         rename_map = {v: k for k, v in MACRO_SERIES.items()}
         data = data.rename(columns=rename_map)
-        
         # Forward-fill missing values (FRED has gaps on weekends/holidays)
         data = data.ffill()
-        
         return data
+    
+    result = fetch_with_retry(_fetch, max_retries=3)
+    
+    if result is not None:
+        # Cache the latest values
+        if use_cache and not result.empty:
+            for col in result.columns:
+                latest_value = result[col].dropna().iloc[-1]
+                _save_to_cache(col, float(latest_value), result.index[-1].strftime('%Y-%m-%d'))
+        return result
+    
+    return pd.DataFrame()
+
+
+def get_current_vix(use_cache: bool = True) -> float:
+    """
+    Get the current (or most recent) VIX value.
+    
+    Uses caching to avoid repeated API calls.
+    Falls back to cache if API fails.
+    
+    Args:
+        use_cache: Whether to check cache first
         
-    except Exception as e:
-        warnings.warn(f"Failed to fetch FRED data: {e}")
-        return pd.DataFrame()
+    Returns:
+        VIX value (float), or 20.0 as default if unavailable
+    """
+    DEFAULT_VIX = 20.0  # Historical average
+    
+    # Check cache first
+    if use_cache:
+        cached_vix = _load_from_cache('VIX')
+        if cached_vix is not None:
+            print(f"📊 Using cached VIX: {cached_vix:.2f}")
+            return cached_vix
+    
+    # Fetch fresh data
+    print("📊 Fetching current VIX from FRED...")
+    vix_data = fetch_fred_data(series=['VIX'], use_cache=use_cache)
+    
+    if not vix_data.empty and 'VIX' in vix_data.columns:
+        current_vix = vix_data['VIX'].dropna().iloc[-1]
+        print(f"   VIX: {current_vix:.2f}")
+        return float(current_vix)
+    
+    # Fallback to cache even if expired
+    cached_vix = _load_from_cache('VIX')
+    if cached_vix is not None:
+        print(f"   ⚠️ Using expired cache: VIX = {cached_vix:.2f}")
+        return cached_vix
+    
+    print(f"   ⚠️ VIX unavailable, using default: {DEFAULT_VIX}")
+    return DEFAULT_VIX
 
 
 def merge_macro_features(
