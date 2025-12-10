@@ -38,7 +38,9 @@ jobs:
         if [ -f data/market.db ]; then
           echo "✅ Cache hit - loaded market data from previous run"
           ls -lh data/market.db
-          [ -f data/universe_cache.csv ] && echo "✅ Universe cache also loaded"
+          if [ -f data/universe_cache.csv ]; then
+            echo "✅ Universe cache also loaded"
+          fi
         else
           echo "📥 Cache miss - will fetch fresh data (first run or cache expired)"
         fi
