@@ -1,63 +1,70 @@
 {
   "returns": {
-    "total_return": "178.39%",
-    "cagr": "23.21%"
+    "total_return": "748.15%",
+    "cagr": "26.96%"
   },
   "risk_adjusted": {
-    "sharpe_ratio": 0.843,
-    "sortino_ratio": 1.01,
-    "calmar_ratio": 0.732,
-    "information_ratio": 0.508
+    "sharpe_ratio": 1.041,
+    "sortino_ratio": 1.845,
+    "calmar_ratio": 0.927,
+    "information_ratio": 0.265
   },
   "risk": {
-    "volatility": "23.24%",
-    "max_drawdown": "31.70%",
-    "avg_drawdown": "10.63%",
-    "var_95": "2.00%",
-    "var_99": "4.16%",
-    "cvar_95": "3.43%"
+    "volatility": "17.20%",
+    "max_drawdown": "29.10%",
+    "avg_drawdown": "6.15%",
+    "var_95": "1.72%",
+    "var_99": "2.90%",
+    "cvar_95": "2.51%"
   },
   "market_exposure": {
-    "beta": 0.876,
-    "alpha": "9.48%"
+    "beta": 0.004,
+    "alpha": "22.92%"
   },
   "trade_quality": {
-    "win_rate": "55.0%",
-    "profit_factor": 2.5,
-    "avg_win": "$281.86",
-    "avg_loss": "$137.70",
-    "avg_holding_period": "124.3 days",
-    "total_trades": 80,
+    "win_rate": "66.9%",
+    "profit_factor": 2.84,
+    "avg_win": "$4683.52",
+    "avg_loss": "$3341.46",
+    "avg_holding_period": "12.3 days",
+    "total_trades": 354,
     "turnover": "0.0%"
   },
   "regime_performance": {
-    "bull": {
-      "days": 926,
-      "total_return": "242.82%",
-      "sharpe": 1.56,
-      "volatility": "20.20%",
-      "max_drawdown": "17.62%"
+    "unknown": {
+      "days": 436,
+      "total_return": "20.23%",
+      "sharpe": 0.53,
+      "volatility": "14.55%",
+      "max_drawdown": "12.08%"
     },
-    "bear": {
-      "days": 232,
-      "total_return": "-30.59%",
-      "sharpe": -2.83,
-      "volatility": "15.03%",
-      "max_drawdown": "28.12%"
+    "bull": {
+      "days": 1402,
+      "total_return": "543.16%",
+      "sharpe": 1.89,
+      "volatility": "16.32%",
+      "max_drawdown": "10.27%"
     },
     "sideways": {
-      "days": 31,
-      "total_return": "13.86%",
-      "sharpe": 3.72,
-      "volatility": "28.39%",
-      "max_drawdown": "6.03%"
+      "days": 72,
+      "total_return": "22.02%",
+      "sharpe": 3.19,
+      "volatility": "21.34%",
+      "max_drawdown": "4.48%"
+    },
+    "bear": {
+      "days": 270,
+      "total_return": "-34.91%",
+      "sharpe": -1.88,
+      "volatility": "22.08%",
+      "max_drawdown": "36.48%"
     },
     "crisis": {
-      "days": 47,
-      "total_return": "2.76%",
-      "sharpe": 0.49,
-      "volatility": "67.31%",
-      "max_drawdown": "18.71%"
+      "days": 77,
+      "total_return": "1.39%",
+      "sharpe": 0.13,
+      "volatility": "20.85%",
+      "max_drawdown": "10.86%"
     }
   }
 }

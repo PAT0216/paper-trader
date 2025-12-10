@@ -2,13 +2,13 @@
 
 backtest:
   # Date range for backtesting
-  # Covers multiple market regimes: bull market, COVID crash, meme stocks, bear market, recovery
-  start_date: "2017-01-01"
+  # Extended to 10 years: covers bull market, COVID crash, meme stocks, bear market, recovery
+  start_date: "2015-01-01"
   end_date: "2024-12-31"
   
   # Split for training vs out-of-sample testing
-  # Train: 2017-2022 | Test: 2023-2024
-  train_end_date: "2022-12-31"
+  # Train: 2015-2021 | Test: 2022-2024
+  train_end_date: "2021-12-31"
   
   # Initial capital
   initial_cash: 100000.0

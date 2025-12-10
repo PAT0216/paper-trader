@@ -23,8 +23,10 @@ from src.backtesting import (
     BacktestConfig,
     PerformanceCalculator,
     create_simple_signal_generator,
+    create_ml_signal_generator,
     generate_performance_summary
 )
+from src.models.predictor import Predictor
 from src.utils.config import load_config
 
 
@@ -60,7 +62,8 @@ def load_backtest_config(config_path: str = "config/backtest_settings.yaml") -> 
 def run_backtest(
     tickers: list,
     config: BacktestConfig,
-    output_dir: str = "results"
+    output_dir: str = "results",
+    use_ml: bool = False
 ) -> dict:
     """
     Run backtesting on specified tickers.
@@ -127,11 +130,25 @@ def run_backtest(
     backtester = Backtester(config)
     
     # Create signal generator
-    # Using simple SMA crossover for initial testing
-    # TODO: Replace with ML predictor for production use
-    signal_generator = create_simple_signal_generator()
+    if use_ml:
+        print("   Loading ML model...")
+        predictor = Predictor()
+        if predictor.model is None:
+            print("   ⚠️ No ML model found, falling back to SMA")
+            signal_generator = create_simple_signal_generator()
+            strategy_name = "Simple SMA Crossover (fallback)"
+        else:
+            signal_generator = create_ml_signal_generator(
+                predictor, 
+                threshold_buy=0.005,   # 0.5% expected return
+                threshold_sell=-0.005  # -0.5% expected return
+            )
+            strategy_name = "ML XGBoost Predictor"
+    else:
+        signal_generator = create_simple_signal_generator()
+        strategy_name = "Simple SMA Crossover"
     
-    print(f"   Using: Simple SMA Crossover Strategy")
+    print(f"   Using: {strategy_name}")
     print(f"   Rebalance: {config.rebalance_frequency}")
     print(f"   Risk Manager: {'Enabled' if config.use_risk_manager else 'Disabled'}")
     
@@ -193,6 +210,11 @@ def main():
         default='config/backtest_settings.yaml',
         help='Path to backtest config file'
     )
+    parser.add_argument(
+        '--ml',
+        action='store_true',
+        help='Use ML predictor instead of SMA strategy'
+    )
     
     args = parser.parse_args()
     
@@ -212,7 +234,7 @@ def main():
     tickers = main_config.get('tickers', ['SPY', 'AAPL', 'MSFT'])
     
     try:
-        summary = run_backtest(tickers, backtest_config, args.output)
+        summary = run_backtest(tickers, backtest_config, args.output, use_ml=args.ml)
         
         print("\n" + "=" * 60)
         print("✅ BACKTEST COMPLETE")
