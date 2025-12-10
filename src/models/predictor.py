@@ -29,10 +29,22 @@ class Predictor:
     def __init__(self):
         self.model = None
         self.is_regression = True  # Phase 3: regression model
+        self.selected_features = FEATURE_COLUMNS  # Default: use all features
         
         if os.path.exists(MODEL_FILE):
-            self.model = joblib.load(MODEL_FILE)
-            print("✅ Loaded XGBoost regression model.")
+            model_data = joblib.load(MODEL_FILE)
+            
+            # Handle new model format with metadata
+            if isinstance(model_data, dict) and 'model' in model_data:
+                self.model = model_data['model']
+                self.selected_features = model_data.get('selected_features', FEATURE_COLUMNS)
+                print(f"✅ Loaded XGBoost regression model.")
+                print(f"   Selected features: {len(self.selected_features)}/{len(FEATURE_COLUMNS)}")
+            else:
+                # Legacy format: model only
+                self.model = model_data
+                print("✅ Loaded XGBoost regression model.")
+                print("   (Legacy model format - using all features)")
             
             # Detect model type
             if hasattr(self.model, 'predict_proba'):
@@ -61,9 +73,9 @@ class Predictor:
         if processed_df.empty:
             return 0.0
         
-        # Extract features for the latest date
+        # Extract features for the latest date (use selected features only)
         try:
-            last_row = processed_df.iloc[[-1]][FEATURE_COLUMNS]
+            last_row = processed_df.iloc[[-1]][self.selected_features]
         except KeyError as e:
             print(f"⚠️ Missing feature columns: {e}")
             return 0.0

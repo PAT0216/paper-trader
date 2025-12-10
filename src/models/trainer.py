@@ -147,13 +147,57 @@ def train_model(data_dict, n_splits=5, save_model=True):
     )
     final_model.fit(X, y)
     
+    # ==================== DYNAMIC FEATURE SELECTION ====================
+    # Phase 3.5: Automatically filter features with importance < threshold
+    IMPORTANCE_THRESHOLD = 0.03  # 3% minimum importance
+    
+    feature_importance = pd.DataFrame({
+        'feature': FEATURE_COLUMNS,
+        'importance': final_model.feature_importances_
+    }).sort_values('importance', ascending=False)
+    
+    # Identify useful vs low-importance features
+    useful_features = feature_importance[feature_importance['importance'] >= IMPORTANCE_THRESHOLD]['feature'].tolist()
+    dropped_features = feature_importance[feature_importance['importance'] < IMPORTANCE_THRESHOLD]['feature'].tolist()
+    
+    print(f"\n🔍 Feature Selection (threshold: {IMPORTANCE_THRESHOLD*100:.1f}%):")
+    print(f"   Keeping: {len(useful_features)} features")
+    if dropped_features:
+        print(f"   ⚠️  Dropping: {dropped_features}")
+        
+        # Retrain with only useful features
+        feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
+        X_selected = X[:, feature_indices]
+        
+        print(f"\n🔄 Retraining with {len(useful_features)} selected features...")
+        final_model = xgb.XGBRegressor(
+            n_estimators=100,
+            learning_rate=0.05,
+            max_depth=5,
+            objective='reg:squarederror',
+            random_state=42
+        )
+        final_model.fit(X_selected, y)
+        
+        # Update feature importance for selected features only
+        feature_importance = pd.DataFrame({
+            'feature': useful_features,
+            'importance': final_model.feature_importances_
+        }).sort_values('importance', ascending=False)
+    else:
+        print("   ✅ All features above threshold - keeping all")
+    
+    # Store selected features for inference
+    selected_features = useful_features
+    # ==================== END DYNAMIC FEATURE SELECTION ====================
+    
     # Save metrics
     results_dir = "results"
     os.makedirs(results_dir, exist_ok=True)
     
     with open(os.path.join(results_dir, "metrics.txt"), "w") as f:
         f.write("=" * 50 + "\n")
-        f.write("ML MODEL METRICS (Phase 3 - Regression)\n")
+        f.write("ML MODEL METRICS (Phase 3.5 - Dynamic Feature Selection)\n")
         f.write("=" * 50 + "\n\n")
         f.write("Cross-Validation Results:\n")
         for m in fold_metrics:
@@ -166,26 +210,44 @@ def train_model(data_dict, n_splits=5, save_model=True):
         f.write(f"  Directional Accuracy: {avg_dir:.2%}\n")
         f.write(f"\n  Training Samples: {len(X):,}\n")
         f.write(f"  CV Folds: {n_splits}\n")
+        f.write(f"\nFeature Selection:\n")
+        f.write(f"  Threshold: {IMPORTANCE_THRESHOLD*100:.1f}%\n")
+        f.write(f"  Selected: {len(selected_features)} of {len(FEATURE_COLUMNS)}\n")
+        if dropped_features:
+            f.write(f"  Dropped: {dropped_features}\n")
     
-    # Feature importance plot
-    feature_importance = pd.DataFrame({
-        'feature': FEATURE_COLUMNS,
-        'importance': final_model.feature_importances_
-    }).sort_values('importance', ascending=True)
-    
+    # Feature importance plot (for selected features)
     plt.figure(figsize=(10, 6))
-    plt.barh(feature_importance['feature'], feature_importance['importance'])
+    feat_sorted = feature_importance.sort_values('importance', ascending=True)
+    colors = ['green' if imp >= IMPORTANCE_THRESHOLD else 'red' for imp in feat_sorted['importance']]
+    plt.barh(feat_sorted['feature'], feat_sorted['importance'], color=colors)
+    plt.axvline(x=IMPORTANCE_THRESHOLD, color='red', linestyle='--', label=f'Threshold ({IMPORTANCE_THRESHOLD*100:.0f}%)')
     plt.xlabel('Importance')
-    plt.title('Feature Importance (XGBoost Regressor)')
+    plt.title(f'Feature Importance (Selected: {len(selected_features)} features)')
+    plt.legend()
     plt.tight_layout()
     plt.savefig(os.path.join(results_dir, "feature_importance.png"))
     plt.close()
     
-    # Save model
+    # Save selected features list for inference
+    with open(os.path.join(results_dir, "selected_features.txt"), "w") as f:
+        f.write("# Selected Features (importance >= 3%)\n")
+        for feat in selected_features:
+            imp = feature_importance[feature_importance['feature'] == feat]['importance'].values[0]
+            f.write(f"{feat}: {imp:.4f}\n")
+    
+    # Save model with metadata
+    model_data = {
+        'model': final_model,
+        'selected_features': selected_features,
+        'all_features': FEATURE_COLUMNS
+    }
+    
     if save_model:
         os.makedirs(MODEL_PATH, exist_ok=True)
-        joblib.dump(final_model, MODEL_FILE)
+        joblib.dump(model_data, MODEL_FILE)
         print(f"\n💾 Model saved to {MODEL_FILE}")
+        print(f"   Selected features: {selected_features}")
     
     print(f"📊 Metrics saved to {results_dir}/metrics.txt")
     print(f"📈 Feature importance saved to {results_dir}/feature_importance.png")
