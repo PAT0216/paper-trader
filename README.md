@@ -17,34 +17,55 @@
 - **Dynamic Feature Selection**: Auto-filters features with <3% importance *(New in Phase 3.5)*
 - **Anti-Leakage Pipeline**: Proper separation of features and target
 
-### 📊 **Enhanced Feature Engineering** *(New in Phase 3.5)*
+### 🎯 **Multi-Horizon Ensemble** *(New in Phase 3.6)*
+- **3 XGBoost Models**: 1-day (50%), 5-day (30%), 20-day (20%) predictions
+- **Blended Signals**: More stable than single-horizon predictions
+- **Horizon Weights**: Configurable for different trading styles
+
+### 🛡️ **VIX-Based Regime Detection** *(New in Phase 3.6)*
+- **Market Regimes**: NORMAL (VIX<25), ELEVATED (25-35), CRISIS (>35)
+- **Defensive Mode**: Automatically reduces exposure during volatility spikes
+- **Position Multipliers**: 100% → 50% → 0% based on regime
+
+### 📦 **SQLite Data Caching** *(New in Phase 4)*
+- **Local Cache**: 4.3M rows, 503 S&P 500 tickers
+- **Incremental Updates**: Only fetch new bars after initial load
+- **No Rate Limits**: Avoid yfinance throttling with cached data
+- **GitHub Artifacts**: Cache persists across workflow runs
+
+### 🌐 **S&P 500 Universe** *(New in Phase 4)*
+- **Dynamic Universe**: Fetches current S&P 500 from Wikipedia
+- **Fallback**: Mega-cap tier if fetch fails
+- **Configuration**: `universe.type: sp500` or `config`
+
+### 📊 **Enhanced Feature Engineering** *(Phase 3.5)*
 - **Volume Indicators**: VWAP Deviation, OBV Momentum, Volume Ratio
 - **Volatility Features**: ATR, Bollinger %B, Volatility Ratio
 - **Momentum**: RSI, MACD (line, signal, histogram)
 - **Trend**: SMA distances (50/200), Bollinger Width, Returns (1d/5d)
 
-### 🛡️ **Professional Risk Management** *(New in Phase 1)*
+### 🛡️ **Professional Risk Management** *(Phase 1)*
 - **Volatility-Adjusted Position Sizing**: Inverse weighting by 30-day volatility
 - **Portfolio Constraints**: Max 15% per position, 40% per sector
 - **Value at Risk (VaR)**: Daily portfolio risk monitoring at 95% confidence
 - **Pre-Trade Validation**: All trades checked against risk limits before execution
-- **Sector Diversification**: Automatic tracking across Technology, Financials, Healthcare, Energy, Consumer sectors
 
-### ✅ **Data Quality Assurance** *(New in Phase 1)*
+### ✅ **Data Quality Assurance** *(Phase 1)*
 - **10 Validation Checks**: OHLC integrity, outlier detection, missing values, data freshness
 - **Automatic Rejection**: Invalid tickers filtered before model training
 - **Comprehensive Logging**: Detailed validation reports for every data fetch
 
-### 📈 **Backtesting Framework** *(New in Phase 2)*
-- **Event-Driven Engine**: Simulates strategy over 7+ years of historical data
+### 📈 **Backtesting Framework** *(Phase 2)*
+- **Event-Driven Engine**: 10 years of historical data (2015-2024)
+- **ML Predictor Mode**: `--ml` flag uses XGBoost instead of SMA
 - **Transaction Costs**: Realistic slippage (5 bps) and market impact modeling
 - **Professional Quant Metrics**: Sharpe, Sortino, Calmar, VaR, CVaR, Alpha, Beta
 - **Regime Analysis**: Performance split by bull/bear/crisis/sideways markets
-- **Backtest Results (2020-2024)**: 178% return, 0.84 Sharpe, 55% win rate, 9.5% alpha
+- **ML Backtest (2015-2024)**: 748% return, 1.04 Sharpe, 67% win rate, 27% CAGR
 
 ### 🏗️ **Production Infrastructure**
 - **Containerized Architecture**: Fully Dockerized with `miniconda3`
-- **Multi-Asset Support**: Manages 30+ S&P 500 stocks simultaneously
+- **Multi-Asset Support**: Manages 500+ S&P 500 stocks
 - **Automated Execution**: GitHub Actions scheduled daily at market close
 - **Comprehensive Testing**: 55 unit tests covering risk, validation, backtesting, and ML pipeline
 
