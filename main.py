@@ -170,7 +170,12 @@ def main():
                     print(f"📉 SOLD {shares} of {ticker} at ${price:.2f}")
 
         # Buys with Risk-Adjusted Position Sizing
-        buy_candidates = [t for t, a in signals.items() if a == "BUY"]
+        # CRITICAL: Sort by expected return (highest first) for priority allocation
+        buy_candidates = sorted(
+            [(t, expected_returns.get(t, 0.0)) for t, a in signals.items() if a == "BUY"],
+            key=lambda x: x[1],
+            reverse=True  # Highest expected return first
+        )
         if buy_candidates:
             # Refresh holdings after sells
             current_holdings = pf.get_holdings()
@@ -181,7 +186,7 @@ def main():
             if available_cash > 0:
                 print(f"\n💵 Available Cash for Buys: ${available_cash:.2f}")
                 
-                for ticker in buy_candidates:
+                for ticker, exp_ret in buy_candidates:
                     price = current_prices[ticker]
                     
                     # Calculate risk-adjusted position size

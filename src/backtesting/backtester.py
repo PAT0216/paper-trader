@@ -379,12 +379,16 @@ class Backtester:
                 continue
             
             # Generate signals for each ticker
+            # NOTE: Signal is generated based on data up to current bar's Close
+            # But execution will happen at NEXT bar's Open (see below)
             signals = {}
+            expected_returns = {}  # Track expected returns for priority ranking
+            
             for ticker, df in data_dict.items():
                 if date not in df.index:
                     continue
                 
-                # Get data up to current date (no look-ahead)
+                # Get data up to current date (no look-ahead in features)
                 df_to_date = df.loc[:date]
                 
                 if len(df_to_date) < 50:  # Need enough data for indicators
@@ -399,19 +403,47 @@ class Backtester:
                 }
                 
                 try:
-                    signal = signal_generator(ticker, df_to_date, portfolio_state)
+                    result = signal_generator(ticker, df_to_date, portfolio_state)
+                    # Support both old (signal only) and new (signal, expected_return) interface
+                    if isinstance(result, tuple):
+                        signal, exp_ret = result
+                    else:
+                        signal = result
+                        exp_ret = 0.0  # Default for old interface
                     signals[ticker] = signal
+                    expected_returns[ticker] = exp_ret
                 except Exception as e:
                     signals[ticker] = 'HOLD'
+                    expected_returns[ticker] = 0.0
+            
+            # ============================================================
+            # EXECUTION: Uses NEXT bar's Open price (T+1 Open)
+            # This is realistic: signal at T close, execute at T+1 open
+            # ============================================================
+            
+            # Get next trading day for execution prices
+            next_day_idx = i + 1
+            if next_day_idx >= len(trading_dates):
+                continue  # No next day to execute
+            
+            next_date = trading_dates[next_day_idx]
+            
+            # Get next day's OPEN prices for execution
+            execution_prices = {}
+            for ticker, df in data_dict.items():
+                if next_date in df.index and 'Open' in df.columns:
+                    execution_prices[ticker] = df.loc[next_date, 'Open']
+                elif next_date in df.index:
+                    execution_prices[ticker] = df.loc[next_date, 'Close']  # Fallback
             
             # Execute SELL signals first (to free up cash)
             for ticker, signal in signals.items():
                 if signal == 'SELL' and ticker in portfolio.positions:
                     position = portfolio.positions[ticker]
-                    price = current_prices.get(ticker)
+                    price = execution_prices.get(ticker)
                     if price:
                         portfolio.execute_trade(
-                            date=date,
+                            date=next_date,  # Trade on next day
                             ticker=ticker,
                             action='SELL',
                             shares=position.shares,
@@ -419,13 +451,19 @@ class Backtester:
                         )
             
             # Execute BUY signals with risk-adjusted sizing
-            buy_candidates = [t for t, s in signals.items() if s == 'BUY']
+            # CRITICAL: Sort by expected return (highest first) for priority allocation
+            buy_candidates = [
+                (t, expected_returns.get(t, 0.0)) 
+                for t, s in signals.items() 
+                if s == 'BUY'
+            ]
+            buy_candidates.sort(key=lambda x: x[1], reverse=True)  # Highest expected return first
             
             if buy_candidates and portfolio.cash > self.config.min_cash_buffer:
                 available_cash = portfolio.cash - self.config.min_cash_buffer
                 
-                for ticker in buy_candidates:
-                    price = current_prices.get(ticker)
+                for ticker, exp_return in buy_candidates:
+                    price = execution_prices.get(ticker)
                     if not price or price <= 0:
                         continue
                     
@@ -433,7 +471,7 @@ class Backtester:
                     if self.risk_manager:
                         ticker_df = data_dict.get(ticker)
                         if ticker_df is not None:
-                            df_to_date = ticker_df.loc[:date]
+                            df_to_date = ticker_df.loc[:date]  # Use signal date for vol calc
                             shares, _ = self.risk_manager.calculate_position_size(
                                 ticker=ticker,
                                 current_price=price,
@@ -441,7 +479,7 @@ class Backtester:
                                 portfolio_value=portfolio_value,
                                 historical_data=df_to_date,
                                 current_holdings=portfolio.get_holdings(),
-                                current_prices=current_prices
+                                current_prices=execution_prices
                             )
                         else:
                             shares = int(available_cash * 0.1 / price)
@@ -452,7 +490,7 @@ class Backtester:
                     
                     if shares > 0:
                         trade = portfolio.execute_trade(
-                            date=date,
+                            date=next_date,  # Trade on next day
                             ticker=ticker,
                             action='BUY',
                             shares=shares,
@@ -575,20 +613,23 @@ def create_ml_signal_generator(predictor, threshold_buy: float = 0.55, threshold
         threshold_sell: Probability threshold for SELL signal
         
     Returns:
-        Signal generator function
+        Signal generator function that returns (signal, expected_return)
     """
-    def generate_signal(ticker: str, df: pd.DataFrame, portfolio_state: Dict) -> str:
+    def generate_signal(ticker: str, df: pd.DataFrame, portfolio_state: Dict) -> tuple:
         try:
             prob = predictor.predict(df)
             
             if prob > threshold_buy:
-                return 'BUY'
+                signal = 'BUY'
             elif prob < threshold_sell:
-                return 'SELL'
+                signal = 'SELL'
             else:
-                return 'HOLD'
+                signal = 'HOLD'
+            
+            # Return both signal and expected return for priority ranking
+            return (signal, prob)
         except Exception:
-            return 'HOLD'
+            return ('HOLD', 0.0)
     
     return generate_signal
 

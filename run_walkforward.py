@@ -92,16 +92,19 @@ def predict_signals(model, data_dict, start_date, end_date, buy_threshold=0.005,
     Generate trading signals for a period using trained model.
     
     Returns:
-        Dict of {date: {ticker: signal}}
+        Tuple of:
+        - signals: Dict of {date: {ticker: signal}}
+        - expected_returns: Dict of {date: {ticker: expected_return}}
     """
     signals = {}
+    expected_returns = {}  # For priority ranking
     
     for ticker, df in data_dict.items():
         # Get test period data
         test_df = df[(df.index >= start_date) & (df.index < end_date)].copy()
         
         for date in test_df.index:
-            # Use data up to this date for prediction
+            # Use data up to this date for prediction (no look-ahead)
             hist = df[df.index <= date].copy()
             if len(hist) < 50:
                 continue
@@ -119,6 +122,10 @@ def predict_signals(model, data_dict, start_date, end_date, buy_threshold=0.005,
                 
                 if date not in signals:
                     signals[date] = {}
+                    expected_returns[date] = {}
+                
+                # Store expected return for priority ranking
+                expected_returns[date][ticker] = pred
                 
                 if pred > buy_threshold:
                     signals[date][ticker] = 'BUY'
@@ -129,53 +136,94 @@ def predict_signals(model, data_dict, start_date, end_date, buy_threshold=0.005,
             except Exception:
                 pass
     
-    return signals
+    return signals, expected_returns
 
 
-def simulate_portfolio(signals, data_dict, initial_cash=100000, max_position_pct=0.15):
+def simulate_portfolio(signals, expected_returns, data_dict, initial_cash=100000, max_position_pct=0.15):
     """
-    Simple portfolio simulation based on signals.
+    Portfolio simulation with proper execution timing.
     
+    CRITICAL: Executes at NEXT day's Open, not current day's Close
+    This eliminates look-ahead bias.
+    
+    Args:
+        signals: Dict of {date: {ticker: signal}}
+        expected_returns: Dict of {date: {ticker: expected_return}} for priority
+        data_dict: Dict of {ticker: DataFrame}
+        initial_cash: Starting capital
+        max_position_pct: Max position as % of portfolio
+        
     Returns:
-        Dict with portfolio values over time
+        DataFrame with portfolio values over time
     """
     cash = initial_cash
     holdings = {}  # {ticker: shares}
     portfolio_values = []
     
-    # Get all dates
+    # Get all dates sorted
     all_dates = sorted(set(signals.keys()))
     
-    for date in all_dates:
+    for i, date in enumerate(all_dates):
         day_signals = signals[date]
+        day_expected_returns = expected_returns.get(date, {})
         
-        # Calculate current portfolio value
+        # Calculate current portfolio value (using current Close for valuation only)
         portfolio_value = cash
         for ticker, shares in holdings.items():
             if ticker in data_dict and date in data_dict[ticker].index:
                 price = data_dict[ticker].loc[date, 'Close']
                 portfolio_value += shares * price
         
-        # Process signals
-        for ticker, signal in day_signals.items():
-            if ticker not in data_dict or date not in data_dict[ticker].index:
-                continue
-                
-            price = data_dict[ticker].loc[date, 'Close']
-            current_shares = holdings.get(ticker, 0)
+        # Get NEXT day for execution (no look-ahead)
+        next_day_idx = i + 1
+        if next_day_idx >= len(all_dates):
+            portfolio_values.append({
+                'date': date,
+                'value': portfolio_value,
+                'cash': cash,
+                'n_positions': len([h for h in holdings.values() if h > 0])
+            })
+            continue
             
-            if signal == 'BUY' and current_shares == 0:
-                # Buy position (max position size)
-                max_invest = portfolio_value * max_position_pct
-                shares_to_buy = int(max_invest / price)
-                if shares_to_buy > 0 and cash >= shares_to_buy * price:
-                    holdings[ticker] = shares_to_buy
-                    cash -= shares_to_buy * price
-                    
-            elif signal == 'SELL' and current_shares > 0:
-                # Sell all
-                cash += current_shares * price
-                holdings[ticker] = 0
+        next_date = all_dates[next_day_idx]
+        
+        # Get NEXT day's OPEN prices for execution
+        execution_prices = {}
+        for ticker in day_signals.keys():
+            if ticker in data_dict and next_date in data_dict[ticker].index:
+                df = data_dict[ticker]
+                if 'Open' in df.columns:
+                    execution_prices[ticker] = df.loc[next_date, 'Open']
+                else:
+                    execution_prices[ticker] = df.loc[next_date, 'Close']
+        
+        # Process SELL signals first (to free up cash)
+        for ticker, signal in day_signals.items():
+            if signal == 'SELL' and holdings.get(ticker, 0) > 0:
+                price = execution_prices.get(ticker)
+                if price:
+                    cash += holdings[ticker] * price
+                    holdings[ticker] = 0
+        
+        # Process BUY signals - SORTED BY EXPECTED RETURN (highest first)
+        buy_candidates = [
+            (ticker, day_expected_returns.get(ticker, 0.0))
+            for ticker, signal in day_signals.items()
+            if signal == 'BUY' and holdings.get(ticker, 0) == 0
+        ]
+        buy_candidates.sort(key=lambda x: x[1], reverse=True)  # Highest expected return first
+        
+        for ticker, exp_return in buy_candidates:
+            price = execution_prices.get(ticker)
+            if not price or price <= 0:
+                continue
+            
+            # Buy position (max position size)
+            max_invest = portfolio_value * max_position_pct
+            shares_to_buy = int(max_invest / price)
+            if shares_to_buy > 0 and cash >= shares_to_buy * price:
+                holdings[ticker] = shares_to_buy
+                cash -= shares_to_buy * price
         
         portfolio_values.append({
             'date': date,
@@ -252,6 +300,7 @@ def run_walkforward(start_year=2015, end_year=2024, initial_cash=100000, use_ful
     
     # Run walk-forward for each year
     all_signals = {}
+    all_expected_returns = {}  # For priority ranking
     
     for test_year in range(start_year, end_year + 1):
         train_end = f"{test_year}-01-01"
@@ -268,14 +317,15 @@ def run_walkforward(start_year=2015, end_year=2024, initial_cash=100000, use_ful
             continue
         
         # Generate signals for test period (using model trained BEFORE this period)
-        year_signals = predict_signals(model, data_dict, test_start, test_end)
+        year_signals, year_expected_returns = predict_signals(model, data_dict, test_start, test_end)
         all_signals.update(year_signals)
+        all_expected_returns.update(year_expected_returns)
         
         print(f"   ✅ Generated {len(year_signals)} days of signals")
     
-    # Simulate portfolio
-    print("\n💼 Simulating portfolio...")
-    portfolio = simulate_portfolio(all_signals, data_dict, initial_cash)
+    # Simulate portfolio (with next-day Open execution and priority ranking)
+    print("\n💼 Simulating portfolio (next-day Open execution)...")
+    portfolio = simulate_portfolio(all_signals, all_expected_returns, data_dict, initial_cash)
     
     if len(portfolio) == 0:
         print("   ❌ No portfolio data generated")
