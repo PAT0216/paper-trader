@@ -86,43 +86,68 @@ validator.print_validation_summary(results)
 
 ---
 
-### 2. Feature Engineering
+### 2. Feature Engineering ✨ *Updated in Phase 3.5*
 
 #### **Technical Indicators** (`src/features/indicators.py`)
-Generates predictive features from OHLC data:
 
-**Momentum Indicators**:
-- **RSI (14)**: Relative Strength Index for overbought/oversold detection
-- **MACD**: Moving Average Convergence Divergence
-  - Fast EMA: 12 days
-  - Slow EMA: 26 days
-  - Signal line: 9 days
-- **MACD Histogram**: MACD - Signal
+The model uses **15 features** across 4 categories. All features use only past data (no look-ahead bias).
 
-**Volatility Indicators**:
-- **Bollinger Bands**: 20-day SMA ± 2 standard deviations
-- **Bollinger Band Width**: `(Upper - Lower) / Close`
+---
 
-**Trend Indicators**:
-- **SMA 50**: 50-day simple moving average
-- **SMA 200**: 200-day simple moving average
-- **Distance to SMA**: `(Close / SMA) - 1` (percentage)
+**MOMENTUM INDICATORS** (4 features)
 
-**Returns**:
-- **1-Day Return**: `Close.pct_change()`
-- **5-Day Return**: `Close.pct_change(5)`
+| Feature | Formula | Trading Interpretation |
+|---------|---------|----------------------|
+| **RSI** | 100 - 100/(1 + RS) where RS = AvgGain/AvgLoss | >70 = overbought, <30 = oversold |
+| **MACD** | EMA(12) - EMA(26) | Positive = bullish momentum |
+| **MACD_signal** | EMA(9) of MACD | Crossover signals |
+| **MACD_hist** | MACD - Signal | Histogram divergence |
+
+---
+
+**TREND INDICATORS** (5 features)
+
+| Feature | Formula | Trading Interpretation |
+|---------|---------|----------------------|
+| **BB_Width** | (Upper - Lower) / Close | Low = consolidation, high = volatility |
+| **Dist_SMA50** | Close / SMA_50 - 1 | >0 = above trend, <0 = below |
+| **Dist_SMA200** | Close / SMA_200 - 1 | Long-term trend direction |
+| **Return_1d** | Close.pct_change() | Yesterday's return |
+| **Return_5d** | Close.pct_change(5) | Week momentum |
+
+---
+
+**VOLUME INDICATORS** (3 features) *(New in Phase 3.5)*
+
+| Feature | Formula | Trading Interpretation |
+|---------|---------|----------------------|
+| **OBV_Momentum** | pct_change(OBV, 10) | Rising OBV = buying pressure |
+| **Volume_Ratio** | Vol(5d avg) / Vol(20d avg) | >1 = unusual volume |
+| **VWAP_Dev** | Close / VWAP - 1 | >0 = trading above fair value |
+
+---
+
+**VOLATILITY INDICATORS** (3 features) *(New in Phase 3.5)*
+
+| Feature | Formula | Trading Interpretation |
+|---------|---------|----------------------|
+| **ATR_Pct** | ATR(14) / Close | Normalized volatility measure |
+| **BB_PctB** | (Close - Lower) / (Upper - Lower) | 0-1 position in bands |
+| **Vol_Ratio** | Vol(10d) / Vol(60d) | >1 = volatility expansion |
+
+---
 
 **Target Variable** *(Phase 3)*:
-- Regression: Next-day return (percentage)
+- **Regression**: Next-day return (percentage)
 - Created SEPARATELY from features to prevent look-ahead bias
 
 ---
 
-### 3. Machine Learning Pipeline ✨ *Updated in Phase 3*
+### 3. Machine Learning Pipeline ✨ *Updated in Phase 3.5*
 
 #### **Model Trainer** (`src/models/trainer.py`)
 - **Algorithm**: XGBoost Regressor (predicts return magnitude)
-- **Features**: 9 technical indicators
+- **Features**: 15 technical indicators (dynamically filtered)
 - **Target**: Next-day return (continuous)
 - **Cross-Validation**: 5-fold TimeSeriesSplit (proper walk-forward)
 - **Anti-Leakage**: Target created AFTER feature generation
@@ -133,6 +158,13 @@ Generates predictive features from OHLC data:
 - `max_depth=5`
 - `objective='reg:squarederror'`
 
+**Dynamic Feature Selection** *(New in Phase 3.5)*:
+1. Train initial model with all 15 features
+2. Calculate feature importance scores
+3. Drop features with importance < 3%
+4. Retrain with only useful features
+5. Save selected feature list with model
+
 **Cross-Validation Metrics**:
 - RMSE: Root Mean Squared Error
 - MAE: Mean Absolute Error
@@ -140,18 +172,20 @@ Generates predictive features from OHLC data:
 - Directional Accuracy: % of correct up/down predictions
 
 **Output Artifacts**:
-- `models/xgb_model.joblib`: Serialized regressor
+- `models/xgb_model.joblib`: Model + metadata (selected features)
 - `results/metrics.txt`: CV metrics across all folds
-- `results/feature_importance.png`: Feature importance visualization
+- `results/feature_importance.png`: Feature importance with threshold line
+- `results/selected_features.txt`: Features used for inference
 
 #### **Predictor** (`src/models/predictor.py`)
 - **Input**: Raw OHLC DataFrame
 - **Output**: Expected next-day return (e.g., +1.2% or -0.5%)
 - **Process**:
-  1. Transform OHLC → Features via `generate_features()`
-  2. Extract latest row
-  3. Predict with loaded XGBoost regressor
-  4. Return expected return value
+  1. Load model + selected features from metadata
+  2. Transform OHLC → Features via `generate_features()`
+  3. Extract only selected features for latest row
+  4. Predict with XGBoost regressor
+  5. Return expected return value
 
 **Trading Thresholds**:
 - BUY: Expected return > +0.5%
