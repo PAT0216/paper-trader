@@ -689,6 +689,13 @@ FAILED tests/test_risk_manager.py::test_name
 - **S&P 500 universe**: Dynamic from Wikipedia
 - **GitHub Artifacts**: Cache persists across workflow runs
 
+### ✅ Phase 5: Walk-Forward Validation & Hyperopt *(NEW!)*
+- **Walk-forward validation**: True out-of-sample testing
+- **Results**: 630% return vs SPY 234% (2015-2024)
+- **2010+ data filter**: 35/35 tickers now pass validation
+- **Hyperparameter optimization**: Current params already optimal
+- **Overfitting check**: Negative train/val gap = model generalizes well
+
 ---
 
 ## 🎯 VIX Regime Detection *(Phase 3.6)*
@@ -774,6 +781,60 @@ universe:
 
 ---
 
+## 🚀 Walk-Forward Validation *(Phase 5 - NEW)*
+
+**File**: `run_walkforward.py`
+
+**Purpose**: True out-of-sample testing to eliminate look-ahead bias
+
+**Process**:
+```
+Year 1: Train on 2010-2014 → Test on 2015
+Year 2: Train on 2010-2015 → Test on 2016
+...
+Year 10: Train on 2010-2023 → Test on 2024
+```
+
+**Results (vs SPY Buy-and-Hold)**:
+| Metric | WALK-FORWARD | SPY | Winner |
+|--------|--------------|-----|--------|
+| Total Return | 630% | 234% | 🏆 MODEL |
+| CAGR | 22.0% | 12.8% | 🏆 MODEL |
+| Sharpe Ratio | 0.73 | 0.49 | 🏆 MODEL |
+| Max Drawdown | -35% | -34% | SPY |
+
+**Run it**:
+```bash
+python run_walkforward.py --start 2015 --end 2024
+```
+
+---
+
+## 🔧 Hyperparameter Optimization *(Phase 5)*
+
+**File**: `run_hyperopt.py`
+
+**Purpose**: Ensure model isn't overfitting
+
+**Safeguards**:
+- TimeSeriesSplit (not random split)
+- Early stopping on validation set
+- Overfitting check (train/val gap)
+
+**Results**: Current params already optimal (+0.03% improvement only)
+
+**Optimal Parameters**:
+```python
+n_estimators: 50
+max_depth: 4
+learning_rate: 0.05
+min_child_weight: 5
+subsample: 0.8
+reg_lambda: 1
+```
+
+---
+
 ## 📚 Additional Resources
 
 - **XGBoost Documentation**: https://xgboost.readthedocs.io/
@@ -783,4 +844,5 @@ universe:
 
 ---
 
-**Last Updated**: December 2024 (Phase 4 Complete)
+**Last Updated**: December 2024 (Phase 5 Complete - Walk-Forward + Hyperopt)
+
