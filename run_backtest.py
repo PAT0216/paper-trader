@@ -103,9 +103,18 @@ def run_backtest(
     
     print(f"   Fetched data for {len(data_dict)} tickers")
     
-    # Validate data
-    print("\n🔍 Validating data quality...")
-    validator = DataValidator()
+    # Filter to 2010+ data BEFORE validation (matches training filter)
+    # This avoids rejecting tickers for old data issues we'll never use
+    MIN_DATE = '2010-01-01'
+    print(f"   Filtering to {MIN_DATE}+ (matching training data filter)")
+    for ticker in data_dict:
+        df = data_dict[ticker]
+        if hasattr(df.index, 'tz_localize'):
+            data_dict[ticker] = df[df.index >= MIN_DATE]
+    
+    # Validate data (now only on recent data we'll actually use)
+    print("\n🔍 Validating data quality (2010+ data only)...")
+    validator = DataValidator(backtest_mode=True)
     validation_results = validator.validate_data_dict(data_dict)
     
     # Remove invalid tickers

@@ -40,7 +40,9 @@ class DataValidator:
         outlier_std_threshold: float = 10.0,  # Flag returns > 10 std deviations
         max_data_age_hours: int = 48,  # Data should be within 48 hours
         min_price: float = 0.01,  # Minimum valid stock price
-        max_daily_return: float = 0.50  # Max 50% single-day move (likely error if higher)
+        max_daily_return: float = 0.50,  # Max 50% single-day move (likely error if higher)
+        ohlc_error_tolerance: float = 0.005,  # Allow 0.5% of bars to have OHLC issues
+        backtest_mode: bool = False  # Relax checks for backtesting
     ):
         """
         Initialize validator with configurable thresholds.
@@ -51,12 +53,22 @@ class DataValidator:
             max_data_age_hours: Maximum age of data before considered stale
             min_price: Minimum valid price (detect data errors)
             max_daily_return: Maximum realistic single-day return
+            ohlc_error_tolerance: Max % of bars with OHLC issues before rejection
+            backtest_mode: If True, skip data freshness checks
         """
         self.max_missing_pct = max_missing_pct
         self.outlier_std_threshold = outlier_std_threshold
         self.max_data_age_hours = max_data_age_hours
         self.min_price = min_price
         self.max_daily_return = max_daily_return
+        self.backtest_mode = backtest_mode
+        
+        # Relax thresholds significantly for backtesting (old data has issues)
+        if backtest_mode:
+            self.ohlc_error_tolerance = 0.025  # 2.5% for old historical data
+            self.min_price = 0.0001  # Some stocks traded <$1 before splits
+        else:
+            self.ohlc_error_tolerance = ohlc_error_tolerance
     
     def validate_dataframe(
         self,
@@ -96,10 +108,11 @@ class DataValidator:
         if not isinstance(df.index, pd.DatetimeIndex):
             errors.append(f"{ticker}: Index is not DatetimeIndex")
         
-        # Check 4: Data freshness
-        freshness_check = self._check_data_freshness(df, ticker)
-        if freshness_check:
-            warnings.append(freshness_check)
+        # Check 4: Data freshness (skip in backtest mode)
+        if not self.backtest_mode:
+            freshness_check = self._check_data_freshness(df, ticker)
+            if freshness_check:
+                warnings.append(freshness_check)
         
         # Check 5: Missing values
         missing_check = self._check_missing_values(df, ticker)
@@ -114,10 +127,10 @@ class DataValidator:
         if price_check:
             errors.extend(price_check)
         
-        # Check 7: OHLC relationship validity (High >= Low, Close between High/Low, etc.)
-        ohlc_check = self._check_ohlc_relationships(df, ticker)
-        if ohlc_check:
-            errors.extend(ohlc_check)
+        # Check 7: OHLC relationship validity (with tolerance)
+        ohlc_errors, ohlc_warnings = self._check_ohlc_relationships(df, ticker)
+        errors.extend(ohlc_errors)
+        warnings.extend(ohlc_warnings)
         
         # Check 8: Outlier detection in returns
         outlier_check = self._check_outliers(df, ticker)
@@ -218,38 +231,48 @@ class DataValidator:
         
         return errors
     
-    def _check_ohlc_relationships(self, df: pd.DataFrame, ticker: str) -> List[str]:
-        """Validate OHLC internal consistency."""
+    def _check_ohlc_relationships(self, df: pd.DataFrame, ticker: str) -> Tuple[List[str], List[str]]:
+        """
+        Validate OHLC internal consistency with tolerance.
+        
+        Returns:
+            Tuple of (errors, warnings)
+        """
         errors = []
+        warnings = []
+        n_bars = len(df)
+        
+        if n_bars == 0:
+            return errors, warnings
         
         required = ['Open', 'High', 'Low', 'Close']
         if not all(col in df.columns for col in required):
-            return errors  # Can't validate if columns missing
+            return errors, warnings
         
-        # High should be >= Low
-        invalid_high_low = (df['High'] < df['Low']).sum()
-        if invalid_high_low > 0:
-            errors.append(f"{ticker}: {invalid_high_low} bars where High < Low")
+        # Count issues
+        issues = {
+            'High < Low': (df['High'] < df['Low']).sum(),
+            'High < Open': (df['High'] < df['Open']).sum(),
+            'High < Close': (df['High'] < df['Close']).sum(),
+            'Low > Open': (df['Low'] > df['Open']).sum(),
+            'Low > Close': (df['Low'] > df['Close']).sum()
+        }
         
-        # High should be >= Open and Close
-        invalid_high_open = (df['High'] < df['Open']).sum()
-        if invalid_high_open > 0:
-            errors.append(f"{ticker}: {invalid_high_open} bars where High < Open")
+        total_issues = sum(issues.values())
+        issue_pct = total_issues / n_bars
         
-        invalid_high_close = (df['High'] < df['Close']).sum()
-        if invalid_high_close > 0:
-            errors.append(f"{ticker}: {invalid_high_close} bars where High < Close")
+        # Only error if exceeds tolerance (default 0.5%)
+        if issue_pct > self.ohlc_error_tolerance:
+            errors.append(
+                f"{ticker}: {issue_pct:.2%} OHLC errors ({total_issues}/{n_bars} bars) exceeds {self.ohlc_error_tolerance:.2%} threshold"
+            )
+        elif total_issues > 0:
+            # Warn but don't reject for minor issues
+            warnings.append(
+                f"{ticker}: {total_issues} minor OHLC issues ({issue_pct:.3%}) - within tolerance"
+            )
         
-        # Low should be <= Open and Close
-        invalid_low_open = (df['Low'] > df['Open']).sum()
-        if invalid_low_open > 0:
-            errors.append(f"{ticker}: {invalid_low_open} bars where Low > Open")
-        
-        invalid_low_close = (df['Low'] > df['Close']).sum()
-        if invalid_low_close > 0:
-            errors.append(f"{ticker}: {invalid_low_close} bars where Low > Close")
-        
-        return errors
+        return errors, warnings
     
     def _check_outliers(self, df: pd.DataFrame, ticker: str) -> List[str]:
         """Detect outliers in daily returns."""

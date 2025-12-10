@@ -3,36 +3,36 @@ BACKTEST PERFORMANCE SUMMARY
 ============================================================
 
 📈 RETURNS
-   Total Return: 748.15%
-   CAGR: 26.96%
+   Total Return: 333.00%
+   CAGR: 17.78%
 
 ⚖️ RISK-ADJUSTED
-   Sharpe Ratio: 1.041
-   Sortino Ratio: 1.845
-   Calmar Ratio: 0.927
-   Information Ratio: 0.265
+   Sharpe Ratio: 0.605
+   Sortino Ratio: 0.951
+   Calmar Ratio: 0.600
+   Information Ratio: -0.031
 
 🎯 RISK
-   Volatility (Ann.): 17.20%
-   Max Drawdown: 29.10%
-   VaR (95%): 1.72%
-   CVaR (95%): 2.51%
+   Volatility (Ann.): 17.45%
+   Max Drawdown: 29.65%
+   VaR (95%): 1.71%
+   CVaR (95%): 2.66%
 
 📊 MARKET EXPOSURE
-   Beta: 0.004
-   Alpha: 22.92%
+   Beta: -0.024
+   Alpha: 14.04%
 
 💼 TRADE QUALITY
-   Win Rate: 66.9%
-   Profit Factor: 2.84
-   Total Trades: 354
+   Win Rate: 54.2%
+   Profit Factor: 3.80
+   Total Trades: 192
    Annual Turnover: 0.0%
 
 🌍 REGIME PERFORMANCE
-   UNKNOWN: Sharpe=0.53, Return=20.23%, MaxDD=12.08%
-   BULL: Sharpe=1.89, Return=543.16%, MaxDD=10.27%
-   SIDEWAYS: Sharpe=3.19, Return=22.02%, MaxDD=4.48%
-   BEAR: Sharpe=-1.88, Return=-34.91%, MaxDD=36.48%
-   CRISIS: Sharpe=0.13, Return=1.39%, MaxDD=10.86%
+   UNKNOWN: Sharpe=0.26, Return=12.60%, MaxDD=15.48%
+   BULL: Sharpe=1.57, Return=317.78%, MaxDD=11.80%
+   SIDEWAYS: Sharpe=2.0, Return=13.82%, MaxDD=3.64%
+   BEAR: Sharpe=-2.91, Return=-34.71%, MaxDD=34.86%
+   CRISIS: Sharpe=-0.4, Return=-8.11%, MaxDD=21.75%
 
 ============================================================
