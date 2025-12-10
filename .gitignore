@@ -35,3 +35,5 @@ Thumbs.db
 
 # Local documentation (not published)
 docs/COMPLETE_PROJECT_GUIDE.md
+data/*.db
+data/universe_cache.csv
