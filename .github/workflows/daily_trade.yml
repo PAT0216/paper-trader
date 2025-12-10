@@ -18,24 +18,29 @@ jobs:
       with:
         fetch-depth: 0
 
-    # ==================== CACHE ARTIFACTS ====================
-    # Download cached market data from previous run (if exists)
-    # This avoids re-fetching years of historical data every time
-    - name: Download Data Cache (if exists)
-      uses: actions/download-artifact@v4
+    # ==================== CACHE MARKET DATA ====================
+    # Uses actions/cache for cross-run persistence (unlike artifacts)
+    # Cache key uses date to allow daily refresh, restore-keys enable fallback
+    - name: Cache Market Data
+      id: cache-market-data
+      uses: actions/cache@v4
       with:
-        name: market-data-cache
-        path: data/
-      continue-on-error: true  # OK if no cache exists yet
+        path: |
+          data/market.db
+          data/universe_cache.csv
+        key: market-data-${{ runner.os }}-${{ github.run_id }}
+        restore-keys: |
+          market-data-${{ runner.os }}-
 
     - name: Check Cache Status
       run: |
+        mkdir -p data
         if [ -f data/market.db ]; then
-          echo "✅ Loaded cached market data"
+          echo "✅ Cache hit - loaded market data from previous run"
           ls -lh data/market.db
+          [ -f data/universe_cache.csv ] && echo "✅ Universe cache also loaded"
         else
-          echo "📥 No cache found - will fetch fresh data"
-          mkdir -p data
+          echo "📥 Cache miss - will fetch fresh data (first run or cache expired)"
         fi
 
     # ==================== DOCKER BUILD & RUN ====================
@@ -47,24 +52,7 @@ jobs:
       run: |
         docker run --rm -v ${{ github.workspace }}:/app paper-trader conda run --no-capture-output -n paper-trader python main.py
 
-    # ==================== UPLOAD CACHE FOR NEXT RUN ====================
-    # The SQLite database now contains all fetched data
-    # Next run will download this and only fetch new bars
-    - name: Upload Data Cache
-      uses: actions/upload-artifact@v4
-      with:
-        name: market-data-cache
-        path: data/market.db
-        retention-days: 30  # Keep for 30 days
-        if-no-files-found: ignore
-
-    - name: Upload Universe Cache
-      uses: actions/upload-artifact@v4
-      with:
-        name: universe-cache
-        path: data/universe_cache.csv
-        retention-days: 30
-        if-no-files-found: ignore
+    # Cache is automatically saved at end of job if key changed
 
     # ==================== COMMIT RESULTS ====================
     - name: Push Changes
