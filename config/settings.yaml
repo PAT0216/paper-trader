@@ -49,7 +49,7 @@ tickers:
 
 # ⚙️ Model Settings
 model:
-  training_period: "3y"   # Increased to 3 years for better trend capture
+  training_period: "max"   # Maximum history (8+ years) for robust backtesting
   retrain_daily: true     # Retrain the model every time the bot runs?
   threshold_buy: 0.55     # Probability threshold to trigger a BUY
   threshold_sell: 0.45    # Probability threshold to trigger a SELL
