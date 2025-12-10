@@ -11,26 +11,37 @@ The application follows a modular, production-ready architecture designed for ex
 ### Core Components
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Main Trading Loop                     │
-│                      (main.py)                          │
-└─────────────────────────────────────────────────────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-│ Data Layer   │   │ Model Layer  │   │Trading Layer │
-│              │   │              │   │              │
-│ • loader.py  │   │ • trainer.py │   │• portfolio.py│
-│ • validator  │──▶│ • predictor  │──▶│• risk_mgr.py │
-│              │   │              │   │              │
-└──────────────┘   └──────────────┘   └──────────────┘
-        │                   │                   │
-        ▼                   ▼                   ▼
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-│ yfinance API │   │ XGBoost Model│   │ ledger.csv   │
-│ Market Data  │   │ Predictions  │   │ Transactions │
-└──────────────┘   └──────────────┘   └──────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Main Trading Loop                                │
+│                           (main.py)                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        ▼                           ▼                           ▼
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│   Data Layer     │       │   Model Layer    │       │  Trading Layer   │
+│                  │       │                  │       │                  │
+│ • loader.py      │       │ • trainer.py     │       │ • portfolio.py   │
+│ • cache.py ✨    │──────▶│ • predictor.py   │──────▶│ • risk_manager   │
+│ • universe.py ✨ │       │   (Ensemble) ✨  │       │ • regime.py ✨   │
+│ • validator.py   │       │                  │       │                  │
+│ • macro.py       │       │                  │       │                  │
+└──────────────────┘       └──────────────────┘       └──────────────────┘
+        │                           │                           │
+        ▼                           ▼                           ▼
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│ market.db (SQLite)│       │ XGBoost Models   │       │ ledger.csv       │
+│ • 503 tickers ✨  │       │ • 1d/5d/20d ✨   │       │ Trade History    │
+│ • 4.3M rows       │       │ • Ensemble       │       │                  │
+└──────────────────┘       └──────────────────┘       └──────────────────┘
+        │
+        ▼
+┌──────────────────┐
+│ S&P 500 Universe │
+│ (Wikipedia) ✨   │
+└──────────────────┘
+
+✨ = New in Phase 3.6 / Phase 4
 ```
 
 ---
@@ -645,26 +656,121 @@ FAILED tests/test_risk_manager.py::test_name
 
 ---
 
-## 🚀 Next Steps
+## 🚀 Completed Phases
 
-### Phase 2: Backtesting & Validation
-Before deploying real capital, implement:
-- Historical backtesting (2018-2024)
-- Transaction cost modeling (slippage, fees)
-- Walk-forward analysis
-- Sharpe ratio, max drawdown calculation
+### ✅ Phase 1: Risk Management & Data Validation
+- Volatility-adjusted position sizing
+- Portfolio constraints (15% max position, 40% max sector)
+- 10 data quality validation checks
 
-### Phase 3: Model Improvements
-- Fix data leakage in feature engineering
-- Time series cross-validation
-- Regression target (predict return magnitude)
-- Additional features (volume, macro indicators)
+### ✅ Phase 2: Backtesting Framework
+- Event-driven backtesting engine
+- Transaction cost modeling (slippage, market impact)
+- Regime-based performance analysis
 
-### Phase 4: Production Deployment
-- Advanced logging (JSON structured logs)
-- Alerting system (email, Slack)
-- SQLite ledger (replace CSV)
-- Live monitoring dashboard
+### ✅ Phase 3: ML Improvements
+- TimeSeriesSplit cross-validation
+- Regression target (return prediction)
+- Anti-leakage feature pipeline
+
+### ✅ Phase 3.5: Enhanced Features
+- 15 technical indicators (volume, volatility, momentum, trend)
+- Dynamic feature selection (auto-filter <3% importance)
+
+### ✅ Phase 3.6: Regime Detection & Multi-Horizon *(New)*
+- **VIX-based regime detection**: NORMAL/ELEVATED/CRISIS
+- **Position multipliers**: 100% → 50% → 0% based on VIX
+- **Multi-horizon ensemble**: 1-day (50%), 5-day (30%), 20-day (20%)
+- **Blended signals**: More stable than single-horizon
+
+### ✅ Phase 4: Data Caching & Universe *(New)*
+- **SQLite cache**: 4.3M rows, 503 tickers
+- **Incremental fetching**: Only new bars after initial load
+- **S&P 500 universe**: Dynamic from Wikipedia
+- **GitHub Artifacts**: Cache persists across workflow runs
+
+---
+
+## 🎯 VIX Regime Detection *(Phase 3.6)*
+
+**File**: `src/trading/regime.py`
+
+**Thresholds**:
+| VIX Level | Regime | Position Multiplier |
+|-----------|--------|---------------------|
+| < 25 | NORMAL | 100% |
+| 25-35 | ELEVATED | 50% |
+| > 35 | CRISIS | 0% (hold cash) |
+
+**Usage**:
+```python
+from src.trading.regime import RegimeDetector
+
+detector = RegimeDetector()
+info = detector.get_regime_info(vix_value=22)
+# Returns: {'regime': 'NORMAL', 'multiplier': 1.0}
+```
+
+---
+
+## 🎯 Multi-Horizon Ensemble *(Phase 3.6)*
+
+**File**: `src/models/predictor.py` → `EnsemblePredictor`
+
+**Horizons**:
+| Model | Weight | Purpose |
+|-------|--------|---------|
+| 1-day | 50% | Responsive to short-term moves |
+| 5-day | 30% | Weekly trend |
+| 20-day | 20% | Monthly direction |
+
+**Usage**:
+```python
+from src.models.predictor import EnsemblePredictor
+
+predictor = EnsemblePredictor()
+result = predictor.predict_with_regime(df, vix_value=22)
+# Returns: {'expected_return': 0.012, 'signal': 'BUY', 'regime': 'NORMAL'}
+```
+
+---
+
+## 📦 SQLite Data Cache *(Phase 4)*
+
+**File**: `src/data/cache.py`
+
+**Database**: `data/market.db`
+
+**Tables**:
+- `price_data`: OHLCV data (ticker, date, open, high, low, close, volume)
+- `macro_data`: VIX and other macro series
+- `cache_metadata`: Last update timestamps
+
+**Usage**:
+```python
+from src.data.cache import DataCache
+
+cache = DataCache()
+df = cache.get_price_data('AAPL', '2020-01-01', '2024-12-01')
+stats = cache.get_cache_stats()  # Shows rows per ticker
+```
+
+---
+
+## 🌐 S&P 500 Universe *(Phase 4)*
+
+**File**: `src/data/universe.py`
+
+**Configuration** (`config/settings.yaml`):
+```yaml
+universe:
+  type: "sp500"   # or "config" for manual tickers
+```
+
+**Functions**:
+- `fetch_sp500_tickers()`: Gets ~503 tickers from Wikipedia
+- `get_mega_caps()`: Returns top 50 mega-cap stocks (fallback)
+- `filter_by_liquidity()`: Filters by average daily volume
 
 ---
 
@@ -677,4 +783,4 @@ Before deploying real capital, implement:
 
 ---
 
-**Last Updated**: December 2024 (Phase 1 Complete)
+**Last Updated**: December 2024 (Phase 4 Complete)
