@@ -352,6 +352,16 @@ pytest tests/test_validator.py -v
 
 ---
 
+## ⚠️ Important Disclaimers
+
+### Survivorship Bias
+> **Note**: Backtests use the **current** S&P 500 constituent list applied to historical periods (2015-2024). Companies that were removed due to bankruptcy, delisting, or acquisition are not included. This may overstate historical returns by an estimated **2-4% annually**.
+
+### Return Concentration
+> **Note**: Trade analysis shows **84.1% of total P&L** comes from just 10 trades. Returns are driven by holding winners long (avg 496 days) vs cutting losers early (avg 131 days). This concentration means live performance may vary significantly.
+
+---
+
 ## ⚠️ Disclaimer
 
 > **IMPORTANT**: This software is for **educational and research purposes only**. It is **NOT financial advice**. Do not deploy with real capital until:

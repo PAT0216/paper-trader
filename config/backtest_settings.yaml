@@ -18,8 +18,8 @@ backtest:
 
 # Transaction cost settings
 costs:
-  # Slippage in basis points (5 bps = 0.05%)
-  slippage_bps: 5.0
+  # Slippage in basis points (10 bps = 0.1% - realistic for mid-caps)
+  slippage_bps: 10.0
   
   # Commission per share (most brokers now $0)
   commission_per_share: 0.0
@@ -35,7 +35,7 @@ costs:
 # Risk management during backtest
 risk:
   max_position_pct: 0.15      # Max 15% per position
-  max_sector_pct: 0.40        # Max 40% per sector
+  max_sector_pct: 0.30        # Max 30% per sector (reduced from 40%)
   min_cash_buffer: 100.0      # Reserve cash
   volatility_lookback: 30     # Days for volatility calculation
 

@@ -63,4 +63,4 @@ model:
 # 💰 Portfolio Settings
 portfolio:
   initial_cash: 10000.0   # Starting balance for fresh ledger
-  min_cash_buffer: 100.0  # Keep this much cash on hand
+  min_cash_buffer: 200.0  # Keep 2% of initial capital on hand
