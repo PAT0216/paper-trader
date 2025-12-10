@@ -4,8 +4,8 @@ xgboost
 joblib
 pytest
 scikit-learn
-pandas
 numpy
 matplotlib
 pyyaml
 mplfinance
+pandas-datareader

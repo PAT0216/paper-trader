@@ -18,7 +18,9 @@ from src.features.indicators import (
     create_target,
     FEATURE_COLUMNS,
     compute_rsi,
-    compute_macd
+    compute_macd,
+    compute_obv,
+    compute_atr
 )
 
 
@@ -79,10 +81,15 @@ class TestFeatureGeneration:
     
     def test_feature_columns_constant_exported(self):
         """Test FEATURE_COLUMNS constant is correctly exported."""
-        assert len(FEATURE_COLUMNS) == 9
+        # Phase 3.5: Updated from 9 to 15 features
+        assert len(FEATURE_COLUMNS) == 15
         assert 'RSI' in FEATURE_COLUMNS
         assert 'MACD' in FEATURE_COLUMNS
         assert 'Return_1d' in FEATURE_COLUMNS
+        # New Phase 3.5 features
+        assert 'OBV_Momentum' in FEATURE_COLUMNS
+        assert 'ATR_Pct' in FEATURE_COLUMNS
+        assert 'Vol_Ratio' in FEATURE_COLUMNS
     
     def test_no_future_data_in_returns(self, sample_ohlcv):
         """Test Return_1d uses only past data (pct_change looks backward)."""
