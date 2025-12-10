@@ -1,11 +1,19 @@
-Model Accuracy: 0.5241
+==================================================
+ML MODEL METRICS (Phase 3 - Regression)
+==================================================
 
-Classification Report:
-              precision    recall  f1-score   support
+Cross-Validation Results:
+  Fold 1: RMSE=0.0252, MAE=0.0167, Dir.Acc=50.11%
+  Fold 2: RMSE=0.0258, MAE=0.0170, Dir.Acc=52.07%
+  Fold 3: RMSE=0.0225, MAE=0.0158, Dir.Acc=49.67%
+  Fold 4: RMSE=0.0293, MAE=0.0185, Dir.Acc=49.89%
+  Fold 5: RMSE=0.0235, MAE=0.0141, Dir.Acc=49.46%
 
-           0       0.47      0.17      0.25      1806
-           1       0.53      0.83      0.65      2058
+Average Metrics:
+  RMSE: 0.0253
+  MAE:  0.0164
+  R²:   -0.1060
+  Directional Accuracy: 50.24%
 
-    accuracy                           0.52      3864
-   macro avg       0.50      0.50      0.45      3864
-weighted avg       0.51      0.52      0.47      3864
+  Training Samples: 2,755
+  CV Folds: 5
