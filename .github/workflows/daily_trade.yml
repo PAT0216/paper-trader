@@ -33,7 +33,20 @@ jobs:
         git config --global user.name 'PAT0216'
         git config --global user.email '69978508+PAT0216@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git add ledger.csv models/xgb_model.joblib
-        git fetch origin main
-        git pull --rebase --autostash origin main
-        git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push --force-with-lease)
+        
+        # Add files only if they exist
+        [ -f ledger.csv ] && git add ledger.csv
+        [ -f models/xgb_model.joblib ] && git add models/xgb_model.joblib
+        [ -f results/metrics.txt ] && git add results/metrics.txt
+        [ -f results/feature_importance.png ] && git add results/feature_importance.png
+        
+        # Get current branch name (works for both push and workflow_dispatch)
+        BRANCH_NAME="${GITHUB_REF_NAME}"
+        echo "📌 Pushing to branch: $BRANCH_NAME"
+        
+        # Fetch and rebase on current branch (not hardcoded main)
+        git fetch origin "$BRANCH_NAME" || true
+        git pull --rebase --autostash origin "$BRANCH_NAME" || true
+        
+        # Commit and push if there are staged changes
+        git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push origin HEAD:"$BRANCH_NAME" --force-with-lease)
