@@ -1,0 +1,11 @@
+Best Hyperparameters (found 2025-12-10T11:13:08.662830)
+==================================================
+
+n_estimators: 50
+max_depth: 4
+learning_rate: 0.05
+min_child_weight: 5
+subsample: 0.8
+reg_lambda: 1
+
+Validation Directional Accuracy: 0.5259
