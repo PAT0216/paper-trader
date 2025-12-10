@@ -18,16 +18,55 @@ jobs:
       with:
         fetch-depth: 0
 
-    # We build the Docker image to ensure the environment is exact
+    # ==================== CACHE ARTIFACTS ====================
+    # Download cached market data from previous run (if exists)
+    # This avoids re-fetching years of historical data every time
+    - name: Download Data Cache (if exists)
+      uses: actions/download-artifact@v4
+      with:
+        name: market-data-cache
+        path: data/
+      continue-on-error: true  # OK if no cache exists yet
+
+    - name: Check Cache Status
+      run: |
+        if [ -f data/market.db ]; then
+          echo "✅ Loaded cached market data"
+          ls -lh data/market.db
+        else
+          echo "📥 No cache found - will fetch fresh data"
+          mkdir -p data
+        fi
+
+    # ==================== DOCKER BUILD & RUN ====================
     - name: Build Docker Image
       run: docker build -t paper-trader .
 
     - name: Run Trading Bot in Docker
-      # Mount the current directory to /app so we can persist ledger.csv and models/
-      # MUST use 'conda run' to execute inside the environment
+      # Mount current directory to persist ledger.csv, models/, and data/
       run: |
         docker run --rm -v ${{ github.workspace }}:/app paper-trader conda run --no-capture-output -n paper-trader python main.py
 
+    # ==================== UPLOAD CACHE FOR NEXT RUN ====================
+    # The SQLite database now contains all fetched data
+    # Next run will download this and only fetch new bars
+    - name: Upload Data Cache
+      uses: actions/upload-artifact@v4
+      with:
+        name: market-data-cache
+        path: data/market.db
+        retention-days: 30  # Keep for 30 days
+        if-no-files-found: ignore
+
+    - name: Upload Universe Cache
+      uses: actions/upload-artifact@v4
+      with:
+        name: universe-cache
+        path: data/universe_cache.csv
+        retention-days: 30
+        if-no-files-found: ignore
+
+    # ==================== COMMIT RESULTS ====================
     - name: Push Changes
       run: |
         git config --global user.name 'PAT0216'
@@ -37,8 +76,10 @@ jobs:
         # Add files only if they exist
         [ -f ledger.csv ] && git add ledger.csv
         [ -f models/xgb_model.joblib ] && git add models/xgb_model.joblib
+        [ -f models/xgb_ensemble.joblib ] && git add models/xgb_ensemble.joblib
         [ -f results/metrics.txt ] && git add results/metrics.txt
         [ -f results/feature_importance.png ] && git add results/feature_importance.png
+        [ -f results/selected_features.txt ] && git add results/selected_features.txt
         
         # Get current branch name (works for both push and workflow_dispatch)
         BRANCH_NAME="${GITHUB_REF_NAME}"
