@@ -401,3 +401,30 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     results = run_walkforward(args.start, args.end, args.cash)
+    
+    # Save results to separate directory
+    output_dir = f"results/walkforward/{datetime.now().strftime('%Y-%m-%d')}_y{args.start}-{args.end}"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Save metrics
+    metrics = {
+        'total_return': float(results['total_return']),
+        'cagr': float(results['cagr']),
+        'sharpe': float(results['sharpe']),
+        'max_drawdown': float(results['max_dd']),
+        'spy_return': float(results['spy_return']),
+        'spy_cagr': float(results['spy_cagr']),
+        'spy_sharpe': float(results['spy_sharpe']),
+        'start_year': args.start,
+        'end_year': args.end,
+        'initial_cash': args.cash
+    }
+    
+    with open(f"{output_dir}/walkforward_metrics.json", 'w') as f:
+        json.dump(metrics, f, indent=2)
+    
+    # Save portfolio history
+    results['portfolio'].to_csv(f"{output_dir}/walkforward_portfolio.csv", index=False)
+    
+    print(f"\n✅ Results saved to: {output_dir}/")
+```
