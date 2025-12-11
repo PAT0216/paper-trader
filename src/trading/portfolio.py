@@ -136,6 +136,23 @@ class Portfolio:
 
         return cash + holdings_value
 
+    def get_positions(self) -> Dict[str, Dict]:
+        """
+        Returns a dictionary of current positions with detailed info.
+        Format: {ticker: {'ticker': t, 'shares': s, 'avg_price': p}}
+        """
+        positions = {}
+        holdings = self.get_holdings()
+        entry_prices = self.get_entry_prices()
+        
+        for ticker, shares in holdings.items():
+            positions[ticker] = {
+                'ticker': ticker,
+                'shares': shares,
+                'avg_price': entry_prices.get(ticker, 0.0)
+            }
+        return positions
+
     def has_traded_today(self, ticker, date=None):
         """
         Checks if a trade for the given ticker has already occurred today.
