@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Walk-Forward Backtesting Script
+Walk-Forward Backtesting Script - FIXED VERSION
 
-True out-of-sample validation where the model is trained BEFORE each test period.
-This eliminates look-ahead bias and provides realistic performance estimates.
+True out-of-sample validation using proper Backtester infrastructure.
+Now includes Phase 7 risk controls for valid comparison.
 
 Process:
-    Year 1: Train on 2010-2014, Test on 2015
-    Year 2: Train on 2010-2015, Test on 2016
+    Year 1: Train on 2010-2014, Test on 2015 (with risk controls)
+    Year 2: Train on 2010-2015, Test on 2016 (with risk controls)
     ...
-    Year 10: Train on 2010-2023, Test on 2024
+    Year 10: Train on 2010-2023, Test on 2024 (with risk controls)
 
 Usage: python run_walkforward.py [--start 2015] [--end 2024]
 """
@@ -20,15 +20,21 @@ import sys
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.data.loader import fetch_data
+from src.data.loader import fetch_data, fetch_from_cache_only
 from src.data.validator import DataValidator
 from src.data.cache import DataCache
 from src.features.indicators import generate_features
 from src.models.trainer import create_target, FEATURE_COLUMNS
 from src.utils.config import load_config
+from src.backtesting import (
+    Backtester,
+    BacktestConfig,
+    create_ml_signal_generator
+)
 import xgboost as xgb
 
 
@@ -87,152 +93,104 @@ def train_model_for_period(data_dict, end_date):
     return model
 
 
-def predict_signals(model, data_dict, start_date, end_date, buy_threshold=0.005, sell_threshold=-0.005):
-    """
-    Generate trading signals for a period using trained model.
-    
-    Returns:
-        Tuple of:
-        - signals: Dict of {date: {ticker: signal}}
-        - expected_returns: Dict of {date: {ticker: expected_return}}
-    """
-    signals = {}
-    expected_returns = {}  # For priority ranking
-    
-    for ticker, df in data_dict.items():
-        # Get test period data
-        test_df = df[(df.index >= start_date) & (df.index < end_date)].copy()
+def load_backtest_config():
+    """Load backtest configuration from YAML."""
+    config_path = "config/backtest_settings.yaml"
+    try:
+        with open(config_path, 'r') as f:
+            cfg = yaml.safe_load(f)
         
-        for date in test_df.index:
-            # Use data up to this date for prediction (no look-ahead)
-            hist = df[df.index <= date].copy()
-            if len(hist) < 50:
-                continue
-            
-            try:
-                features = generate_features(hist, include_target=False)
-                if len(features) == 0:
-                    continue
-                    
-                X = features[FEATURE_COLUMNS].iloc[-1:].values
-                X = np.where(np.isinf(X), 0, X)
-                X = np.nan_to_num(X, 0)
-                
-                pred = model.predict(X)[0]
-                
-                if date not in signals:
-                    signals[date] = {}
-                    expected_returns[date] = {}
-                
-                # Store expected return for priority ranking
-                expected_returns[date][ticker] = pred
-                
-                if pred > buy_threshold:
-                    signals[date][ticker] = 'BUY'
-                elif pred < sell_threshold:
-                    signals[date][ticker] = 'SELL'
-                else:
-                    signals[date][ticker] = 'HOLD'
-            except Exception:
-                pass
-    
-    return signals, expected_returns
+        bt = cfg.get('backtest', {})
+        costs = cfg.get('costs', {})
+        risk = cfg.get('risk', {})
+        
+        return BacktestConfig(
+            start_date="2015-01-01",  # Will be overridden per year
+            end_date="2024-12-31",
+            initial_cash=bt.get('initial_cash', 100000.0),
+            benchmark_ticker=bt.get('benchmark_ticker', 'SPY'),
+            max_position_pct=risk.get('max_position_pct', 0.15),
+            max_sector_pct=risk.get('max_sector_pct', 0.30),
+            min_cash_buffer=risk.get('min_cash_buffer', 200.0),
+            stop_loss_pct=risk.get('stop_loss_pct', 0.15),
+            use_stop_loss=risk.get('use_stop_loss', False),
+            use_drawdown_control=risk.get('use_drawdown_control', True),
+            drawdown_warning=risk.get('drawdown_warning', 0.15),
+            drawdown_halt=risk.get('drawdown_halt', 0.20),
+            drawdown_liquidate=risk.get('drawdown_liquidate', 0.25),
+            use_risk_manager=True,
+            slippage_bps=costs.get('slippage_bps', 10.0),
+            use_dated_folders=False  # Walk-forward manages own output
+        )
+    except Exception as e:
+        print(f"Warning: Could not load config: {e}, using defaults")
+        return BacktestConfig()
 
 
-def simulate_portfolio(signals, expected_returns, data_dict, initial_cash=100000, max_position_pct=0.15):
+def run_year_with_backtester(model, data_dict, year, config_template, cumulative_portfolio):
     """
-    Portfolio simulation with proper execution timing.
-    
-    CRITICAL: Executes at NEXT day's Open, not current day's Close
-    This eliminates look-ahead bias.
+    Run backtest for a single year using trained model and Backtester infrastructure.
     
     Args:
-        signals: Dict of {date: {ticker: signal}}
-        expected_returns: Dict of {date: {ticker: expected_return}} for priority
-        data_dict: Dict of {ticker: DataFrame}
-        initial_cash: Starting capital
-        max_position_pct: Max position as % of portfolio
+        model: Trained XGBoost model for this year
+        data_dict: Price data for all tickers
+        year: Year to test
+        config_template: BacktestConfig template
+        cumulative_portfolio: Portfolio state from previous years
         
     Returns:
-        DataFrame with portfolio values over time
+        Updated portfolio with this year's trades
     """
-    cash = initial_cash
-    holdings = {}  # {ticker: shares}
-    portfolio_values = []
+    # Create config for this year only
+    year_config = BacktestConfig(
+        start_date=f"{year}-01-01",
+        end_date=f"{year}-12-31",
+        initial_cash=cumulative_portfolio['cash'],  # Continue from previous year
+        **{k: v for k, v in config_template.__dict__.items() 
+           if k not in ['start_date', 'end_date', 'initial_cash']}
+    )
     
-    # Get all dates sorted
-    all_dates = sorted(set(signals.keys()))
+    # Create ML signal generator with trained model
+    signal_generator = create_ml_signal_generator(
+        model=model,
+        buy_threshold=0.005,  # 0.5% expected return
+        sell_threshold=-0.005
+    )
     
-    for i, date in enumerate(all_dates):
-        day_signals = signals[date]
-        day_expected_returns = expected_returns.get(date, {})
+    # Run backtest for this year
+    backtester = Backtester(
+        config=year_config,
+        signal_generator=signal_generator,
+        risk_manager=None  # Let Backtester create it
+    )
+    
+    try:
+        metrics, trades_df, summary = backtester.run(data_dict)
         
-        # Calculate current portfolio value (using current Close for valuation only)
-        portfolio_value = cash
-        for ticker, shares in holdings.items():
-            if ticker in data_dict and date in data_dict[ticker].index:
-                price = data_dict[ticker].loc[date, 'Close']
-                portfolio_value += shares * price
-        
-        # Get NEXT day for execution (no look-ahead)
-        next_day_idx = i + 1
-        if next_day_idx >= len(all_dates):
-            portfolio_values.append({
-                'date': date,
-                'value': portfolio_value,
-                'cash': cash,
-                'n_positions': len([h for h in holdings.values() if h > 0])
-            })
-            continue
-            
-        next_date = all_dates[next_day_idx]
-        
-        # Get NEXT day's OPEN prices for execution
-        execution_prices = {}
-        for ticker in day_signals.keys():
-            if ticker in data_dict and next_date in data_dict[ticker].index:
-                df = data_dict[ticker]
-                if 'Open' in df.columns:
-                    execution_prices[ticker] = df.loc[next_date, 'Open']
-                else:
-                    execution_prices[ticker] = df.loc[next_date, 'Close']
-        
-        # Process SELL signals first (to free up cash)
-        for ticker, signal in day_signals.items():
-            if signal == 'SELL' and holdings.get(ticker, 0) > 0:
-                price = execution_prices.get(ticker)
-                if price:
-                    cash += holdings[ticker] * price
-                    holdings[ticker] = 0
-        
-        # Process BUY signals - SORTED BY EXPECTED RETURN (highest first)
-        buy_candidates = [
-            (ticker, day_expected_returns.get(ticker, 0.0))
-            for ticker, signal in day_signals.items()
-            if signal == 'BUY' and holdings.get(ticker, 0) == 0
-        ]
-        buy_candidates.sort(key=lambda x: x[1], reverse=True)  # Highest expected return first
-        
-        for ticker, exp_return in buy_candidates:
-            price = execution_prices.get(ticker)
-            if not price or price <= 0:
-                continue
-            
-            # Buy position (max position size)
-            max_invest = portfolio_value * max_position_pct
-            shares_to_buy = int(max_invest / price)
-            if shares_to_buy > 0 and cash >= shares_to_buy * price:
-                holdings[ticker] = shares_to_buy
-                cash -= shares_to_buy * price
-        
-        portfolio_values.append({
-            'date': date,
-            'value': portfolio_value,
-            'cash': cash,
-            'n_positions': len([h for h in holdings.values() if h > 0])
+        # Update cumulative portfolio
+        final_value = metrics.get('ending_value', year_config.initial_cash)
+        cumulative_portfolio['cash'] = final_value
+        cumulative_portfolio['trades'].extend(trades_df.to_dict('records') if not trades_df.empty else [])
+        cumulative_portfolio['yearly_values'].append({
+            'year': year,
+            'value': final_value,
+            'return': metrics.get('total_return', 0.0),
+            'start_value': metrics.get('starting_value', year_config.initial_cash),
+            'sharpe': metrics.get('sharpe_ratio', 0.0),
+            'max_drawdown': metrics.get('max_drawdown', 0.0),
+            'cagr': metrics.get('cagr', 0.0)
         })
+        
+        # Append daily portfolio history for this year
+        if 'portfolio_history' in summary and not summary['portfolio_history'].empty:
+            cumulative_portfolio['daily_portfolio_history'].append(summary['portfolio_history'])
+        
+        print(f"   Final value: ${final_value:,.0f}")
+        
+    except Exception as e:
+        print(f"   ⚠️  Backtest failed for {year}: {e}")
     
-    return pd.DataFrame(portfolio_values).set_index('date')
+    return cumulative_portfolio
 
 
 def get_spy_returns(start_year, end_year):
@@ -298,55 +256,77 @@ def run_walkforward(start_year=2015, end_year=2024, initial_cash=100000, use_ful
     
     print(f"   {len(data_dict)} tickers with sufficient data (2010+)")
     
-    # Run walk-forward for each year
-    all_signals = {}
-    all_expected_returns = {}  # For priority ranking
     
+    # Load backtest config template
+    config_template = load_backtest_config()
+    
+    # Initialize cumulative portfolio tracking
+    cumulative_portfolio = {
+        'cash': initial_cash,
+        'trades': [],
+        'yearly_values': [],
+        'daily_portfolio_history': []
+    }
+    
+    # Run walk-forward for each year with proper Backtester
     for test_year in range(start_year, end_year + 1):
         train_end = f"{test_year}-01-01"
-        test_start = f"{test_year}-01-01"
-        test_end = f"{test_year + 1}-01-01"
         
         print(f"\n🔄 Year {test_year}: Train on 2010-{test_year-1}, Test on {test_year}")
         
-        # Train model on historical data only
+        # Train model on historical data only (before test year)
         model = train_model_for_period(data_dict, train_end)
         
         if model is None:
             print(f"   ⚠️ Insufficient training data, skipping {test_year}")
             continue
         
-        # Generate signals for test period (using model trained BEFORE this period)
-        year_signals, year_expected_returns = predict_signals(model, data_dict, test_start, test_end)
-        all_signals.update(year_signals)
-        all_expected_returns.update(year_expected_returns)
-        
-        print(f"   ✅ Generated {len(year_signals)} days of signals")
+        # Run backtest for this year with trained model and risk controls
+        cumulative_portfolio = run_year_with_backtester(
+            model=model,
+            data_dict=data_dict,
+            year=test_year,
+            config_template=config_template,
+            cumulative_portfolio=cumulative_portfolio
+        )
     
-    # Simulate portfolio (with next-day Open execution and priority ranking)
-    print("\n💼 Simulating portfolio (next-day Open execution)...")
-    portfolio = simulate_portfolio(all_signals, all_expected_returns, data_dict, initial_cash)
     
-    if len(portfolio) == 0:
-        print("   ❌ No portfolio data generated")
+    # Calculate metrics from cumulative portfolio
+    if not cumulative_portfolio['yearly_values']:
+        print("   ❌ No yearly data generated")
         return
     
-    # Calculate metrics
+    print("\n📊 Calculating cumulative metrics...")
+    
+    # Calculate overall metrics from yearly values
     start_value = initial_cash
-    end_value = portfolio['value'].iloc[-1]
+    end_value = cumulative_portfolio['cash']
     total_return = (end_value - start_value) / start_value
     
-    years = (portfolio.index[-1] - portfolio.index[0]).days / 365.25
+    years = end_year - start_year + 1
     cagr = (1 + total_return) ** (1/years) - 1 if years > 0 else 0
     
-    daily_returns = portfolio['value'].pct_change().dropna()
-    volatility = daily_returns.std() * np.sqrt(252)
-    sharpe = (cagr - 0.04) / volatility if volatility > 0 else 0
+    # Calculate Sharpe from yearly returns
+    yearly_returns = [y['return'] for y in cumulative_portfolio['yearly_values']]
+    if yearly_returns:
+        avg_return = np.mean(yearly_returns)
+        volatility = np.std(yearly_returns)
+        sharpe = (avg_return - 0.04) / volatility if volatility > 0 else 0
+    else:
+        sharpe = 0
     
-    # Max drawdown
-    rolling_max = portfolio['value'].cummax()
-    drawdown = (portfolio['value'] - rolling_max) / rolling_max
-    max_dd = drawdown.min()
+    # Max drawdown from yearly values
+    cumulative_values = [initial_cash]
+    for y in cumulative_portfolio['yearly_values']:
+        cumulative_values.append(y['value'])
+    
+    rolling_max = np.maximum.accumulate(cumulative_values)
+    drawdowns = [(val - peak) / peak for val, peak in zip(cumulative_values, rolling_max)]
+    max_dd = min(drawdowns)
+    
+    # Create portfolio DataFrame for saving
+    portfolio = pd.DataFrame(cumulative_portfolio['yearly_values'])
+    portfolio.index = portfolio['year']
     
     # Get SPY comparison
     print("\n📈 Comparing to S&P 500 (SPY)...")
