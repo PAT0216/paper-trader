@@ -178,13 +178,55 @@ def run_backtest(
     
     # Generate reports
     print("\n📈 Generating reports...")
-    os.makedirs(output_dir, exist_ok=True)
-    backtester.generate_report(metrics, output_dir)
+    
+    # Create dated output directory if use_dated_folders is enabled
+    from datetime import datetime
+    if config.use_dated_folders:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        # Find description from command line or config
+        description = "full_universe" if len(tickers) > 100 else "custom"
+        dated_dir = os.path.join(output_dir, f"{date_str}_{description}")
+        os.makedirs(dated_dir, exist_ok=True)
+        actual_output_dir = dated_dir
+        print(f"   Saving to: {dated_dir}")
+    else:
+        actual_output_dir = output_dir
+        os.makedirs(actual_output_dir, exist_ok=True)
+    
+    backtester.generate_report(metrics, actual_output_dir)
     
     # Save trades
     if len(trades_df) > 0:
-        trades_df.to_csv(os.path.join(output_dir, "backtest_trades.csv"), index=False)
-        print(f"   Trades saved to {output_dir}/backtest_trades.csv")
+        trades_df.to_csv(os.path.join(actual_output_dir, "backtest_trades.csv"), index=False)
+        print(f"   Trades saved to {actual_output_dir}/backtest_trades.csv")
+    
+    # Create symlinks for dashboard access (latest backtest)
+    if config.use_dated_folders:
+        results_root = "results"
+        symlink_files = [
+            ("backtest_metrics.json", "backtest_metrics.json"),
+            ("backtest_summary.txt", "backtest_summary.txt"),
+            ("backtest_trades.csv", "backtest_trades.csv")
+        ]
+        
+        for src_file, link_name in symlink_files:
+            src_path = os.path.join(actual_output_dir, src_file)
+            link_path = os.path.join(results_root, link_name)
+            
+            if os.path.exists(src_path):
+                # Remove old symlink/file
+                if os.path.exists(link_path) or os.path.islink(link_path):
+                    os.remove(link_path)
+                # Create symlink (relative path for portability)
+                rel_path = os.path.relpath(src_path, results_root)
+                try:
+                    os.symlink(rel_path, link_path)
+                except OSError:
+                    # Fallback: copy if symlink fails (Windows)
+                    import shutil
+                    shutil.copy2(src_path, link_path)
+        
+        print(f"   ✅ Symlinks created in results/ for dashboard access")
     
     # Save summary
     summary_text = generate_performance_summary(metrics)

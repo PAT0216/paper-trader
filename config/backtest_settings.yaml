@@ -4,7 +4,7 @@ backtest:
   # Date range for backtesting
   # Extended to 10 years: covers bull market, COVID crash, meme stocks, bear market, recovery
   start_date: "2015-01-01"
-  end_date: "2024-12-31"
+  end_date: "2025-12-10"  # Updated to yesterday
   
   # Split for training vs out-of-sample testing
   # Train: 2015-2021 | Test: 2022-2024
@@ -79,4 +79,8 @@ output:
   save_trades: true
   save_metrics_json: true
   save_summary_txt: true
-  output_dir: "results"
+  # Use dated subdirectories for backtest archives
+  # Latest backtest is symlinked to results/ root for dashboard access
+  output_dir: "results/backtests"
+  use_dated_folders: true  # Creates results/backtests/YYYY-MM-DD/
+
