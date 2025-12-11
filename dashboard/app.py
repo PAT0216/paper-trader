@@ -154,19 +154,27 @@ if page == "🏠 Home":
             """, unsafe_allow_html=True)
         
         with col4:
-            if backtest_metrics and 'sharpe_ratio' in backtest_metrics:
+            # Try to get sharpe from backtest metrics
+            sharpe_value = None
+            if backtest_metrics:
+                if 'sharpe_ratio' in backtest_metrics:
+                    sharpe_value = backtest_metrics['sharpe_ratio']
+                elif 'risk_adjusted' in backtest_metrics and 'sharpe_ratio' in backtest_metrics['risk_adjusted']:
+                    sharpe_value = backtest_metrics['risk_adjusted']['sharpe_ratio']
+            
+            if sharpe_value is not None:
                 st.markdown(f"""
                 <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Backtest Sharpe</div>
-                    <div style="color: #0e1117; font-size: 2rem; font-weight: bold;">{backtest_metrics['sharpe_ratio']:.2f}</div>
+                    <div style="color: #0e1117; font-size: 2rem; font-weight: bold;">{sharpe_value:.2f}</div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
+                # Show placeholder encouraging backtest
                 st.markdown(f"""
                 <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Backtest Sharpe</div>
-                    <div style="color: #0e1117; font-size: 1.5rem; font-weight: bold;">Run backtest</div>
-                    <div style="color: #09ab3b; font-size: 0.75rem; margin-top: 5px;">→ make backtest</div>
+                    <div style="color: #999; font-size: 2rem; font-weight: bold;">--</div>
                 </div>
                 """, unsafe_allow_html=True)
     
