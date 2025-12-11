@@ -172,6 +172,10 @@ class TestIndicatorFunctions:
 class TestPredictor:
     """Tests for Predictor class."""
     
+    @pytest.mark.skipif(
+        not pytest.importorskip("xgboost", reason="xgboost not installed"),
+        reason="xgboost required for predictor tests"
+    )
     def test_predictor_returns_float(self):
         """Test predictor returns numeric value."""
         from src.models.predictor import Predictor

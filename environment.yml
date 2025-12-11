@@ -7,6 +7,7 @@ dependencies:
   - pandas
   - numpy
   - scikit-learn
+  - scipy
   - xgboost
   - yfinance
   - matplotlib
