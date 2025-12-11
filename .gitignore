@@ -33,7 +33,6 @@ Thumbs.db
 # ledger.csv - Tracked: Bot commits trades back to repo
 # models/ - Tracked: Bot needs trained model
 
-# Local documentation (not published)
-docs/COMPLETE_PROJECT_GUIDE.md
+# Data files
 data/*.db
 data/universe_cache.csv
