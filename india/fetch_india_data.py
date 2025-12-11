@@ -71,14 +71,28 @@ def fetch_and_cache_india_data(period="10y"):
                 failed.append(ticker)
                 continue
             
+            # Handle multi-level columns from yfinance
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            
             # Reset index to make Date a column
             df = df.reset_index()
             df['ticker'] = ticker
             
-            # Rename columns to standard format
-            df.columns = [c.lower() if isinstance(c, str) else c for c in df.columns]
+            # Standardize column names
+            df.columns = [str(c).lower().replace(' ', '_') for c in df.columns]
             
-            # Save to SQLite (replace if exists)
+            # Ensure we have required columns
+            required = ['date', 'open', 'high', 'low', 'close', 'volume']
+            if not all(col in df.columns for col in required):
+                print(f"❌ Missing columns: {df.columns.tolist()}")
+                failed.append(ticker)
+                continue
+            
+            # Select only needed columns
+            df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'ticker']]
+            
+            # Save to SQLite (append)
             df.to_sql(
                 name='price_data',
                 con=conn,
@@ -90,7 +104,7 @@ def fetch_and_cache_india_data(period="10y"):
             success += 1
             
             # Small delay to avoid rate limiting
-            time.sleep(0.5)
+            time.sleep(0.3)
             
         except Exception as e:
             print(f"❌ {e}")

@@ -23,8 +23,9 @@ jobs:
           pip install yfinance pandas numpy xgboost joblib scipy scikit-learn
       
       - name: Fetch Indian market data
+        continue-on-error: true
         run: |
-          python india/fetch_india_data.py
+          python india/fetch_india_data.py || true
       
       - name: Upload India data cache
         uses: actions/upload-artifact@v4
@@ -32,15 +33,26 @@ jobs:
           name: india-market-data
           path: india/data/india_cache.db
           retention-days: 90
+          if-no-files-found: warn
       
       - name: Show cache stats
+        continue-on-error: true
         run: |
-          ls -lh india/data/
+          ls -lh india/data/ || echo "No data directory"
           python -c "
           import sqlite3
-          conn = sqlite3.connect('india/data/india_cache.db')
-          cursor = conn.execute('SELECT COUNT(DISTINCT ticker), COUNT(*) FROM price_data')
-          tickers, rows = cursor.fetchone()
-          print(f'Cached: {tickers} tickers, {rows:,} rows')
-          conn.close()
+          import os
+          db_path = 'india/data/india_cache.db'
+          if os.path.exists(db_path):
+              conn = sqlite3.connect(db_path)
+              try:
+                  cursor = conn.execute('SELECT COUNT(DISTINCT ticker), COUNT(*) FROM price_data')
+                  tickers, rows = cursor.fetchone()
+                  print(f'Cached: {tickers} tickers, {rows:,} rows')
+              except Exception as e:
+                  print(f'Error: {e}')
+              conn.close()
+          else:
+              print('No cache file found')
           "
+
