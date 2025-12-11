@@ -47,12 +47,19 @@ def load_backtest_config(config_path: str = "config/backtest_settings.yaml") -> 
             initial_cash=bt.get('initial_cash', 100000.0),
             benchmark_ticker=bt.get('benchmark_ticker', 'SPY'),
             max_position_pct=risk.get('max_position_pct', 0.15),
-            max_sector_pct=risk.get('max_sector_pct', 0.40),
-            min_cash_buffer=risk.get('min_cash_buffer', 100.0),
-            slippage_bps=costs.get('slippage_bps', 5.0),
+            max_sector_pct=risk.get('max_sector_pct', 0.30),
+            min_cash_buffer=risk.get('min_cash_buffer', 200.0),
+            slippage_bps=costs.get('slippage_bps', 10.0),
             commission_per_share=costs.get('commission_per_share', 0.0),
             rebalance_frequency=execution.get('rebalance_frequency', 'daily'),
             use_risk_manager=execution.get('use_risk_manager', True),
+            # Phase 7: Stop-loss and drawdown controls
+            stop_loss_pct=risk.get('stop_loss_pct', 0.08),
+            drawdown_warning=risk.get('drawdown_warning', 0.15),
+            drawdown_halt=risk.get('drawdown_halt', 0.20),
+            drawdown_liquidate=risk.get('drawdown_liquidate', 0.25),
+            use_stop_loss=risk.get('use_stop_loss', True),
+            use_drawdown_control=risk.get('use_drawdown_control', True),
         )
     except FileNotFoundError:
         print(f"Config file not found: {config_path}. Using defaults.")

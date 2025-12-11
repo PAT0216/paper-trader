@@ -68,7 +68,8 @@ portfolio:
 # 🛡️ Risk Management Settings (NEW - Phase 7)
 risk:
   # Position-level stop-loss: sell if position drops X% from entry
-  stop_loss_pct: 0.08     # 8% stop-loss (triggers automatic sell)
+  # A/B tested: 15% is balanced default (protects capital, lets winners run)
+  stop_loss_pct: 0.15       # 15% stop-loss (triggers automatic sell)
   
   # Portfolio drawdown controls
   drawdown_warning: 0.15  # At -15%: reduce new position sizes by 50%

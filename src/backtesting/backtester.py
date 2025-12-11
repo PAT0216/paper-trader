@@ -19,7 +19,7 @@ from src.backtesting.performance import (
     generate_performance_summary
 )
 from src.backtesting.costs import TransactionCostModel, CostTracker, CostConfig
-from src.trading.risk_manager import RiskManager, RiskLimits
+from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
 
 
 @dataclass
@@ -32,8 +32,17 @@ class BacktestConfig:
     
     # Risk settings
     max_position_pct: float = 0.15
-    max_sector_pct: float = 0.40
-    min_cash_buffer: float = 100.0
+    max_sector_pct: float = 0.30  # Updated Phase 7
+    min_cash_buffer: float = 200.0  # Updated Phase 7
+    
+    # Phase 7: Stop-loss and drawdown controls
+    # A/B tested with diverse stocks - 15% is balanced default
+    stop_loss_pct: float = 0.15  # Sell if position drops 15% from entry
+    drawdown_warning: float = 0.15  # 50% position reduction at -15%
+    drawdown_halt: float = 0.20  # No new buys at -20%
+    drawdown_liquidate: float = 0.25  # Force liquidation at -25%
+    use_stop_loss: bool = True  # Enable stop-loss
+    use_drawdown_control: bool = True  # Enable drawdown control
     
     # Cost settings
     slippage_bps: float = 5.0
@@ -292,6 +301,16 @@ class Backtester:
         self.benchmark_values = []
         self.dates = []
         
+        # Phase 7: Drawdown controller
+        if self.config.use_drawdown_control:
+            self.drawdown_controller = DrawdownController(
+                warning_threshold=self.config.drawdown_warning,
+                halt_threshold=self.config.drawdown_halt,
+                liquidate_threshold=self.config.drawdown_liquidate
+            )
+        else:
+            self.drawdown_controller = None
+        
     def run(
         self,
         data_dict: Dict[str, pd.DataFrame],
@@ -377,6 +396,51 @@ class Backtester:
             # Check if rebalance day
             if date not in rebalance_dates:
                 continue
+            
+            # ==================== PHASE 7: STOP-LOSS CHECK ====================
+            if self.config.use_stop_loss:
+                stop_losses_triggered = []
+                for ticker, position in list(portfolio.positions.items()):
+                    current_price = current_prices.get(ticker)
+                    if current_price is None:
+                        continue
+                    
+                    loss_pct = (current_price - position.avg_cost) / position.avg_cost
+                    if loss_pct < -self.config.stop_loss_pct:
+                        stop_losses_triggered.append((ticker, current_price, position))
+                
+                # Execute stop-loss sells
+                for ticker, price, position in stop_losses_triggered:
+                    trade = portfolio.execute_trade(
+                        date=date,
+                        ticker=ticker,
+                        action='SELL',
+                        shares=position.shares,
+                        price=price
+                    )
+                    if trade:
+                        available_cash = portfolio.cash - self.config.min_cash_buffer
+            # ==================== END STOP-LOSS ====================
+            
+            # ==================== PHASE 7: DRAWDOWN CHECK ====================
+            position_multiplier = 1.0
+            if self.drawdown_controller:
+                self.drawdown_controller.update(portfolio_value)
+                position_multiplier = self.drawdown_controller.get_position_multiplier()
+                
+                # Emergency liquidation
+                if self.drawdown_controller.should_liquidate():
+                    for ticker, position in list(portfolio.positions.items()):
+                        price = current_prices.get(ticker)
+                        if price:
+                            portfolio.execute_trade(
+                                date=date,
+                                ticker=ticker,
+                                action='SELL',
+                                shares=position.shares // 2,  # Sell 50%
+                                price=price
+                            )
+            # ==================== END DRAWDOWN ====================
             
             # Generate signals for each ticker
             # NOTE: Signal is generated based on data up to current bar's Close
@@ -489,13 +553,18 @@ class Backtester:
                         shares = int(budget / price)
                     
                     if shares > 0:
-                        trade = portfolio.execute_trade(
-                            date=next_date,  # Trade on next day
-                            ticker=ticker,
-                            action='BUY',
-                            shares=shares,
-                            price=price
-                        )
+                        # Apply drawdown position multiplier
+                        if position_multiplier < 1.0:
+                            shares = int(shares * position_multiplier)
+                        
+                        if shares > 0:
+                            trade = portfolio.execute_trade(
+                                date=next_date,  # Trade on next day
+                                ticker=ticker,
+                                action='BUY',
+                                shares=shares,
+                                price=price
+                            )
                         
                         if trade:
                             available_cash = portfolio.cash - self.config.min_cash_buffer

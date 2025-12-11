@@ -36,8 +36,18 @@ costs:
 risk:
   max_position_pct: 0.15      # Max 15% per position
   max_sector_pct: 0.30        # Max 30% per sector (reduced from 40%)
-  min_cash_buffer: 100.0      # Reserve cash
+  min_cash_buffer: 200.0      # Reserve cash (increased from 100)
   volatility_lookback: 30     # Days for volatility calculation
+  
+  # Phase 7: Stop-loss and drawdown controls
+  # A/B tested with diverse stocks (banks, energy, cyclicals, value traps)
+  # 15% = balanced default: protects capital without cutting winners too early
+  stop_loss_pct: 0.15         # Sell if position drops 15% from entry
+  drawdown_warning: 0.15      # Reduce positions 50% at -15% drawdown
+  drawdown_halt: 0.20         # No new buys at -20% drawdown
+  drawdown_liquidate: 0.25    # Emergency liquidation at -25% drawdown
+  use_stop_loss: true         # Enable stop-loss checking
+  use_drawdown_control: true  # Enable portfolio drawdown control
 
 # Execution settings
 execution:
