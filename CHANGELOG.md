@@ -5,13 +5,22 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.7.0] - 2025-12-10
 
-### Planned for Phase 7: Risk Enhancements
-- Position-level stop-loss (-8% exit trigger)
-- Increased slippage for mid-caps (10 bps vs 5 bps)
-- Survivorship bias disclosure in documentation
-- Trade return distribution analysis
+### 🛡️ Phase 7: Quant Risk Enhancements - Complete
+
+This release implements institutional-grade risk controls and ranking-based signal generation to address the R² paradox and improve robustness.
+
+### Added
+- **DrawdownController**: Automating risk reduction (-15% position cut) and trading halts (-20%) during drawdowns.
+- **Position-Level Stop-Loss**: Hard -8% stop based on entry price tracking.
+- **Cross-Sectional Z-Scores**: Signals now based on daily relative ranking (Z > 1.0) rather than raw returns.
+- **Ranking Metrics**: Spearman Rank Correlation and Top-10% Accuracy added to model evaluation.
+
+### Changed
+- **Risk Limits**: Reduced max sector exposure (40% → 30%), increased cash buffer ($100 → $200).
+- **Slippage**: Increased from 5 bps to 10 bps for more realistic backtests.
+- **Documentation**: Added detailed disclosures on survivorship bias and return concentration.
 
 ---
 
