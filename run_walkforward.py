@@ -427,4 +427,3 @@ if __name__ == "__main__":
     results['portfolio'].to_csv(f"{output_dir}/walkforward_portfolio.csv", index=False)
     
     print(f"\n✅ Results saved to: {output_dir}/")
-```
