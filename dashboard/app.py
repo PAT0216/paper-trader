@@ -41,18 +41,40 @@ st.markdown("""
         padding: 20px;
         margin: 10px 0;
     }
-    .stMetric {
-        background-color: white;
-        padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* White background for metrics (dark mode compatible) */
+    [data-testid="metric-container"] {
+        background-color: white !important;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    /* Make metric values DARK and visible */
+    [data-testid="stMetricValue"] {
+        color: #0e1117 !important;
+        font-size: 2rem !important;
+        font-weight: bold !important;
+    }
+    /* Make metric labels dark */
+    [data-testid="stMetricLabel"] {
+        color: #31333F !important;
+        font-weight: 500 !important;
+    }
+    /* Green delta */
+    [data-testid="stMetricDelta"] {
+        color: #09ab3b !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
-    st.image("https://via.placeholder.com/200x80/1f77b4/ffffff?text=Paper+Trader+AI", use_container_width=True)
+    # Logo as styled text instead of image
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+        <h2 style="color: white; margin: 0; font-weight: bold;">📈 Paper Trader AI</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.title("Navigation")
     
     page = st.radio(
@@ -61,10 +83,13 @@ with st.sidebar:
         label_visibility="collapsed"
     )
     
+    
     st.markdown("---")
-    st.caption("Phase 7: Risk Controls")
-    st.metric("Stop-Loss", "15%")
-    st.metric("Max Drawdown Control", "-20%")
+    st.markdown("""
+    **Phase 7: Risk Controls**
+    - 🛡️ Stop-Loss: **15%**
+    - 📉 Max Drawdown: **-20%**
+    """)
     
     st.markdown("---")
     st.caption("📚 [Documentation](https://github.com/PAT0216/paper-trader)")
@@ -96,22 +121,55 @@ if page == "🏠 Home":
     backtest_metrics = load_backtest_metrics()
     portfolio_stats = calculate_portfolio_stats(ledger)
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Only show metrics if we have data
+    if ledger.empty and not backtest_metrics:
+        st.info("📝 **No trading data yet** - Run `make train && make trade` to start generating data")
+    else:
+        # Use custom HTML metrics for dark mode visibility
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown(f"""
+            <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Total Trades</div>
+                <div style="color: #0e1117; font-size: 2rem; font-weight: bold;">{portfolio_stats['num_trades']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f"""
+            <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Portfolio Value</div>
+                <div style="color: #0e1117; font-size: 2rem; font-weight: bold;">${portfolio_stats['total_value']:,.2f}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            return_color = "#09ab3b" if portfolio_stats['total_return_pct'] >= 0 else "#ff4b4b"
+            st.markdown(f"""
+            <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Return</div>
+                <div style="color: {return_color}; font-size: 2rem; font-weight: bold;">{portfolio_stats['total_return_pct']:.2f}%</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            if backtest_metrics and 'sharpe_ratio' in backtest_metrics:
+                st.markdown(f"""
+                <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Backtest Sharpe</div>
+                    <div style="color: #0e1117; font-size: 2rem; font-weight: bold;">{backtest_metrics['sharpe_ratio']:.2f}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 5px;">Backtest Sharpe</div>
+                    <div style="color: #0e1117; font-size: 1.5rem; font-weight: bold;">Run backtest</div>
+                    <div style="color: #09ab3b; font-size: 0.75rem; margin-top: 5px;">→ make backtest</div>
+                </div>
+                """, unsafe_allow_html=True)
     
-    with col1:
-        st.metric("Total Trades", portfolio_stats['num_trades'])
-    
-    with col2:
-        st.metric("Portfolio Value", f"${portfolio_stats['total_value']:,.2f}")
-    
-    with col3:
-        st.metric("Return", f"{portfolio_stats['total_return_pct']:.2f}%")
-    
-    with col4:
-        if backtest_metrics:
-            st.metric("Backtest Sharpe", f"{backtest_metrics.get('sharpe_ratio', 0):.2f}")
-        else:
-            st.metric("Backtest Sharpe", "N/A")
     
     st.markdown("---")
     

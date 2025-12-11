@@ -103,30 +103,49 @@ def calculate_portfolio_stats(ledger_df: pd.DataFrame) -> Dict:
             'num_positions': 0
         }
     
+    # Count trades (BUY/SELL actions)
+    num_trades = len(ledger_df[ledger_df['action'] == 'BUY'])
+    
+    # Get current cash
     latest = ledger_df.iloc[-1]
+    cash = latest['cash_balance'] if 'cash_balance' in ledger_df.columns else latest.get('cash', 0)
     
-    # Count trades (BUY/SELL actions) - handle missing 'action' column
-    if 'action' in ledger_df.columns:
-        num_trades = len(ledger_df[ledger_df['action'].isin(['BUY', 'SELL'])])
-    else:
-        num_trades = len(ledger_df)
+    # Calculate positions (shares held per ticker)
+    positions = {}
+    for _, row in ledger_df.iterrows():
+        ticker = row['ticker']
+        action = row['action']
+        
+        if action == 'BUY':
+            shares = row.get('shares', 0)
+            price = row['price']
+            if ticker not in positions:
+                positions[ticker] = {'shares': 0, 'avg_price': 0}
+            positions[ticker]['shares'] += shares
+            # Simple average for demo (not weighted)
+            positions[ticker]['avg_price'] = price
+        elif action == 'SELL':
+            shares = row.get('shares', 0)
+            if ticker in positions:
+                positions[ticker]['shares'] -= shares
     
-    # Count current positions (approximate - would need position tracking)
-    num_positions = 0  # TODO: implement position tracking
+    # Remove positions with 0 shares
+    positions = {t: p for t, p in positions.items() if p['shares'] > 0}
+    num_positions = len(positions)
     
-    # Get values with fallbacks for missing columns
-    total_value = latest.get('total_value', 0) if hasattr(latest, 'get') else 0
-    cash = latest.get('cash', 0) if hasattr(latest, 'get') else 0
+    # Calculate portfolio value (cash + positions value)
+    # Note: We'd need current prices to get real value, for now use entry prices
+    position_value = sum(p['shares'] * p['avg_price'] for p in positions.values())
+    total_value = cash + position_value
     
-    # Calculate return if initial value is known
-    if len(ledger_df) > 1 and 'total_value' in ledger_df.columns:
-        initial_value = ledger_df.iloc[0]['total_value']
-        if initial_value > 0:
-            total_return_pct = ((total_value - initial_value) / initial_value) * 100
-        else:
-            total_return_pct = 0
-    else:
-        total_return_pct = 0
+    # Get initial deposit
+    initial_value = 10000  # Default
+    deposit_rows = ledger_df[ledger_df['action'] == 'DEPOSIT']
+    if not deposit_rows.empty:
+        initial_value = deposit_rows.iloc[0]['amount']
+    
+    # Calculate return
+    total_return_pct = ((total_value - initial_value) / initial_value) * 100 if initial_value > 0 else 0
     
     return {
         'total_value': total_value,
