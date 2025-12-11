@@ -61,13 +61,30 @@ class ShapAnalyzer:
         """
         Load a trained XGBoost model from disk.
         
+        Handles both raw XGBoost models and dict-wrapped models
+        (as saved by trainer.py with metadata).
+        
         Args:
             model_path: Path to .joblib model file
         """
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model not found: {model_path}")
         
-        self.model = joblib.load(model_path)
+        loaded = joblib.load(model_path)
+        
+        # Handle dict-wrapped models (from trainer.py)
+        if isinstance(loaded, dict):
+            if 'model' in loaded:
+                self.model = loaded['model']
+                # Also extract feature names if available
+                if 'selected_features' in loaded and self.feature_names is None:
+                    self.feature_names = loaded['selected_features']
+                print(f"   Loaded model with {len(self.feature_names)} selected features")
+            else:
+                raise ValueError("Dict doesn't contain 'model' key")
+        else:
+            self.model = loaded
+        
         self._initialize_explainer()
     
     def explain_prediction(
