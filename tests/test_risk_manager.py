@@ -8,7 +8,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from src.trading.risk_manager import RiskManager, RiskLimits
+from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
 
 
 @pytest.fixture
@@ -37,12 +37,16 @@ def risk_manager():
 
 
 def test_risk_limits_defaults():
-    """Test that RiskLimits has sensible defaults."""
+    """Test that RiskLimits has sensible defaults (updated Phase 7)."""
     limits = RiskLimits()
     assert limits.max_position_pct == 0.15
-    assert limits.max_sector_pct == 0.40
-    assert limits.min_cash_buffer == 100.0
+    assert limits.max_sector_pct == 0.30  # Updated from 0.40 in Phase 7
+    assert limits.min_cash_buffer == 200.0  # Updated from 100 in Phase 7
     assert limits.max_daily_var_pct == 0.025
+    # New Phase 7 drawdown controls
+    assert limits.drawdown_warning == 0.15
+    assert limits.drawdown_halt == 0.20
+    assert limits.drawdown_liquidate == 0.25
 
 
 def test_calculate_volatility(risk_manager, sample_historical_data):
@@ -132,15 +136,15 @@ def test_sector_concentration_limit(risk_manager, sample_historical_data):
         'MSFT': 300.0
     }
     # Tech sector = $3000 / $10000 = 30%
-    # Limit is 40%, so can add max $1000 more to tech
+    # Limit is 30%, so already at limit - should get 0
     
     shares, reason = risk_manager.calculate_position_size(
         ticker, current_price, available_cash, portfolio_value,
         sample_historical_data, current_holdings, current_prices
     )
     
-    # Should be limited by sector constraint
-    assert shares * current_price <= (0.40 * portfolio_value - 3000) * 1.01
+    # Should be limited by sector constraint (at or near 0)
+    assert shares * current_price <= (0.30 * portfolio_value - 3000) * 1.01 + 1
 
 
 def test_validate_trade_buy_valid(risk_manager):
@@ -303,6 +307,67 @@ def test_correlation_penalty(risk_manager, sample_historical_data):
     # Should have some penalty since sector is already 30% (above 25% threshold)
     assert penalty >= 0
     assert penalty <= 0.5  # Max penalty
+
+
+# ==================== NEW: DrawdownController Tests (Phase 7) ====================
+
+def test_drawdown_controller_normal():
+    """Test DrawdownController in normal conditions."""
+    dc = DrawdownController()
+    
+    dc.update(100000)  # Peak at 100k
+    assert dc.peak_value == 100000
+    assert dc.current_drawdown == 0.0
+    assert dc.get_position_multiplier() == 1.0
+    assert not dc.should_liquidate()
+
+
+def test_drawdown_controller_warning():
+    """Test DrawdownController warning level (-15%)."""
+    dc = DrawdownController()
+    
+    dc.update(100000)
+    dc.update(84000)  # -16% drawdown
+    
+    assert dc.current_drawdown == 0.16
+    assert dc.get_position_multiplier() == 0.5  # 50% reduction
+    assert not dc.should_liquidate()
+    assert "WARNING" in dc.get_status()
+
+
+def test_drawdown_controller_halt():
+    """Test DrawdownController halt level (-20%)."""
+    dc = DrawdownController()
+    
+    dc.update(100000)
+    dc.update(78000)  # -22% drawdown
+    
+    assert dc.get_position_multiplier() == 0.0  # No new buys
+    assert not dc.should_liquidate()
+    assert "HALT" in dc.get_status()
+
+
+def test_drawdown_controller_liquidate():
+    """Test DrawdownController liquidation level (-25%)."""
+    dc = DrawdownController()
+    
+    dc.update(100000)
+    dc.update(74000)  # -26% drawdown
+    
+    assert dc.should_liquidate()
+    assert "LIQUIDATE" in dc.get_status()
+
+
+def test_drawdown_controller_recovery():
+    """Test DrawdownController tracks new peaks after recovery."""
+    dc = DrawdownController()
+    
+    dc.update(100000)  # Initial peak
+    dc.update(90000)   # -10%
+    dc.update(110000)  # New peak!
+    
+    assert dc.peak_value == 110000
+    assert dc.current_drawdown == 0.0
 
 
 if __name__ == "__main__":

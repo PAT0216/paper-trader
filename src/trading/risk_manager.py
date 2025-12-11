@@ -15,11 +15,86 @@ from dataclasses import dataclass
 class RiskLimits:
     """Configuration for risk management constraints."""
     max_position_pct: float = 0.15  # Max 15% per position
-    max_sector_pct: float = 0.40    # Max 40% in any sector
-    min_cash_buffer: float = 100.0  # Minimum cash reserve
+    max_sector_pct: float = 0.30    # Max 30% in any sector (updated Phase 7)
+    min_cash_buffer: float = 200.0  # Minimum cash reserve (updated Phase 7)
     max_daily_var_pct: float = 0.025  # Max 2.5% Value at Risk
     volatility_lookback: int = 30   # Days for volatility calculation
     correlation_threshold: float = 0.7  # Reduce size if correlation > 70%
+    # Drawdown controls (NEW - Phase 7)
+    drawdown_warning: float = 0.15   # -15%: reduce positions by 50%
+    drawdown_halt: float = 0.20      # -20%: stop new buys
+    drawdown_liquidate: float = 0.25 # -25%: force liquidate to 50% cash
+
+
+class DrawdownController:
+    """
+    Monitors portfolio drawdown and provides risk reduction signals.
+    
+    Drawdown = (Peak Value - Current Value) / Peak Value
+    
+    Thresholds:
+    - Warning (-15%): Reduce new position sizes by 50%
+    - Halt (-20%): Stop all new buys
+    - Liquidate (-25%): Force sell to 50% cash
+    """
+    
+    def __init__(
+        self,
+        warning_threshold: float = 0.15,
+        halt_threshold: float = 0.20,
+        liquidate_threshold: float = 0.25
+    ):
+        self.warning_threshold = warning_threshold
+        self.halt_threshold = halt_threshold
+        self.liquidate_threshold = liquidate_threshold
+        self.peak_value = 0.0
+        self.current_drawdown = 0.0
+    
+    def update(self, current_value: float) -> None:
+        """
+        Update peak value and calculate current drawdown.
+        
+        Args:
+            current_value: Current portfolio value
+        """
+        if current_value > self.peak_value:
+            self.peak_value = current_value
+        
+        if self.peak_value > 0:
+            self.current_drawdown = (self.peak_value - current_value) / self.peak_value
+        else:
+            self.current_drawdown = 0.0
+    
+    def get_position_multiplier(self) -> float:
+        """
+        Get position sizing multiplier based on current drawdown.
+        
+        Returns:
+            1.0 = normal sizing
+            0.5 = warning level, reduce by 50%
+            0.0 = halt level, no new buys
+        """
+        if self.current_drawdown >= self.halt_threshold:
+            return 0.0
+        elif self.current_drawdown >= self.warning_threshold:
+            return 0.5
+        else:
+            return 1.0
+    
+    def should_liquidate(self) -> bool:
+        """Check if portfolio should force liquidate to 50% cash."""
+        return self.current_drawdown >= self.liquidate_threshold
+    
+    def get_status(self) -> str:
+        """Get human-readable drawdown status."""
+        if self.current_drawdown >= self.liquidate_threshold:
+            return f"🚨 LIQUIDATE ({self.current_drawdown:.1%} drawdown)"
+        elif self.current_drawdown >= self.halt_threshold:
+            return f"🛑 HALT ({self.current_drawdown:.1%} drawdown - no new buys)"
+        elif self.current_drawdown >= self.warning_threshold:
+            return f"⚠️ WARNING ({self.current_drawdown:.1%} drawdown - 50% position reduction)"
+        else:
+            return f"✅ NORMAL ({self.current_drawdown:.1%} drawdown)"
 
 
 class RiskManager:

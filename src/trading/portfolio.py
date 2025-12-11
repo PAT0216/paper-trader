@@ -1,8 +1,10 @@
 import pandas as pd
 import os
 from datetime import datetime
+from typing import Dict, List, Tuple
 
 LEDGER_FILE = "ledger.csv"
+DEFAULT_STOP_LOSS_PCT = 0.08  # 8% stop-loss from entry price
 
 class Portfolio:
     def __init__(self, start_cash=10000.0):
@@ -53,6 +55,69 @@ class Portfolio:
                 holdings[t] = current_shares
                 
         return holdings
+    
+    def get_entry_prices(self) -> Dict[str, float]:
+        """
+        Calculate average entry price for each current holding.
+        Uses FIFO-like weighted average across all buys.
+        
+        Returns:
+            Dict of {ticker: avg_entry_price}
+        """
+        entry_prices = {}
+        holdings = self.get_holdings()
+        
+        for ticker in holdings.keys():
+            ticker_ledger = self.ledger[self.ledger["ticker"] == ticker]
+            buys = ticker_ledger[ticker_ledger["action"] == "BUY"]
+            
+            if buys.empty:
+                continue
+            
+            # Calculate weighted average entry price
+            total_shares = buys["shares"].sum()
+            total_cost = (buys["shares"] * buys["price"]).sum()
+            
+            if total_shares > 0:
+                entry_prices[ticker] = total_cost / total_shares
+        
+        return entry_prices
+    
+    def check_stop_losses(
+        self, 
+        current_prices: Dict[str, float], 
+        stop_loss_pct: float = DEFAULT_STOP_LOSS_PCT
+    ) -> List[Tuple[str, float, float, float]]:
+        """
+        Check which positions have breached stop-loss threshold.
+        
+        Args:
+            current_prices: Dict of {ticker: current_price}
+            stop_loss_pct: Stop-loss threshold (default 8%)
+            
+        Returns:
+            List of (ticker, current_price, entry_price, loss_pct) for triggered stops
+        """
+        triggered = []
+        holdings = self.get_holdings()
+        entry_prices = self.get_entry_prices()
+        
+        for ticker, shares in holdings.items():
+            if ticker not in current_prices or ticker not in entry_prices:
+                continue
+            
+            current = current_prices[ticker]
+            entry = entry_prices[ticker]
+            
+            if entry <= 0:
+                continue
+            
+            loss_pct = (entry - current) / entry
+            
+            if loss_pct >= stop_loss_pct:
+                triggered.append((ticker, current, entry, loss_pct))
+        
+        return triggered
     
     def get_portfolio_value(self, current_prices):
         """
