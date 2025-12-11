@@ -429,6 +429,27 @@ python run_backtest.py --start 2020-01-01 --end 2023-12-31 --cash 50000
 - **Target**: > 52% (edge over random)
 - Example: 52.03% = slight but consistent edge
 
+### **Ranking Metrics** *(New in Phase 7)*
+
+> **Why Ranking Matters**: The model may have negative R² (bad at predicting exact returns) but still profit if it correctly *ranks* stocks (picks winners over losers).
+
+**Spearman Rank Correlation**:
+- Measures if predicted ranks match actual ranks
+- Range: -1 to +1 (0 = random)
+- **Target**: > 0.10 (weak but profitable correlation)
+
+**Top-10% Accuracy**:
+- Of stocks you'd buy (top 10% by prediction), how many are actually top 10%?
+- **Target**: > 15% (better than 10% random chance)
+
+**The R² Paradox Explained**:
+| Metric | Value | Meaning |
+|--------|-------|---------|
+| R² | -0.01 | Bad at magnitude prediction |
+| Spearman | 0.12 | Decent at ranking |
+| Win Rate | 37% | Low, but winners are 3x larger |
+| Result | +497% | Strategy still profits!
+
 ### **Feature Importance** (`results/feature_importance.png`)
 
 Shows which features drive predictions:
