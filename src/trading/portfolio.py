@@ -184,17 +184,21 @@ class Portfolio:
         holdings = self.get_holdings()
         entry_prices = self.get_entry_prices()
         
-        # Calculate current position value
+        # Calculate position value - use entry prices consistently
+        # Don't use current trade price to avoid double-counting on sells
         position_value = sum(
-            holdings[t] * (price if t == ticker else entry_prices.get(t, 0))
+            holdings[t] * entry_prices.get(t, 0)
             for t in holdings.keys()
         )
         
-        # For BUY: add new position value, for SELL: position already in holdings
+        # Adjust for the current trade
         if action == "BUY":
+            # Add new position value (not yet in holdings)
             total_value = new_cash + position_value + (shares * price)
-        else:
-            total_value = new_cash + position_value
+        else:  # SELL
+            # Remove sold position value (still in holdings until trade completes)
+            sold_value = shares * entry_prices.get(ticker, price)
+            total_value = new_cash + position_value - sold_value
             
         self._add_entry(date, ticker, action, price, shares, amount, new_cash, total_value) 
         return True
