@@ -53,7 +53,14 @@ def get_sp500_tickers() -> list:
     # Fallback to Wikipedia scrape
     try:
         import pandas as pd
-        table = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
+        import urllib.request
+        
+        # Add user agent to avoid 403
+        req = urllib.request.Request(
+            'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies',
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        table = pd.read_html(req)[0]
         tickers = table['Symbol'].str.replace('.', '-').tolist()
         
         # Filter out problematic tickers
