@@ -5,6 +5,13 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-12-11
+
+### Fixed
+- **Workflow Crash**: Fixed `AttributeError: 'Portfolio' object has no attribute 'get_positions'` in `record_trade` by implementing the missing method and improving trade recording logic.
+- **Ledger Calculation**: Fixed `total_value` double-counting bug on SELL orders (was adding sold value instead of subtracting).
+- **Ledger Repair**: Added `repair_ledger.py` utility and repaired historical `total_value` column in `ledger.csv`.
+
 ## [1.7.0] - 2025-12-10
 
 ### 🛡️ Phase 7: Quant Risk Enhancements - Complete
