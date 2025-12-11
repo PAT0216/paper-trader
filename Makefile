@@ -70,6 +70,56 @@ backtest-quick:
 	conda run -n $(ENV_NAME) python run_backtest.py --start 2023-01-01 --end 2024-12-31
 	@echo "$(GREEN)✅ Quick backtest complete$(NC)"
 
+# 🔬 Walk-Forward Backtest
+.PHONY: backtest-walkforward
+backtest-walkforward:
+	@echo "$(YELLOW)🔬 Running Walk-Forward Validation (yearly retraining)...$(NC)"
+	conda run -n $(ENV_NAME) python run_walkforward.py
+	@echo "$(GREEN)✅ Walk-forward backtest complete$(NC)"
+
+# 🎯 Phase 7: Risk Control Testing
+.PHONY: test-stoploss
+test-stoploss:
+	@echo "$(YELLOW)🎯 Running Stop-Loss Threshold Sweep...$(NC)"
+	conda run -n $(ENV_NAME) python run_stoploss_test.py
+	@echo "$(GREEN)✅ Stop-loss test complete$(NC)"
+
+.PHONY: test-ab
+test-ab:
+	@echo "$(YELLOW)🎯 Running A/B Test (Fixed vs Z-Score signals)...$(NC)"
+	conda run -n $(ENV_NAME) python run_ab_test.py
+	@echo "$(GREEN)✅ A/B test complete$(NC)"
+
+.PHONY: test-unbiased
+test-unbiased:
+	@echo "$(YELLOW)🎯 Running Unbiased A/B Test (walk-forward, 75 random stocks)...$(NC)"
+	conda run -n $(ENV_NAME) python run_unbiased_comparison.py
+	@echo "$(GREEN)✅ Unbiased comparison complete$(NC)"
+
+.PHONY: test-holdout
+test-holdout:
+	@echo "$(YELLOW)🎯 Running Double Holdout Test (unseen tickers)...$(NC)"
+	@echo "   This tests the model on tickers it has NEVER seen before"
+	conda run -n $(ENV_NAME) python run_double_holdout.py
+	@echo "$(GREEN)✅ Double holdout test complete$(NC)"
+
+# 🇮🇳 India Market Testing
+.PHONY: india-fetch
+india-fetch:
+	@echo "$(YELLOW)🇮🇳 Fetching Indian market data (NIFTY 50)...$(NC)"
+	conda run -n $(ENV_NAME) python india/fetch_india_data.py
+	@echo "$(GREEN)✅ India data cached$(NC)"
+
+.PHONY: india-test
+india-test:
+	@echo "$(YELLOW)🇮🇳 Running India Market Test (cross-market validation)...$(NC)"
+	@if [ ! -f india/data/india_cache.db ]; then \
+		echo "$(YELLOW)No cache found. Run 'make india-fetch' first or download from GitHub Actions$(NC)"; \
+		exit 1; \
+	fi
+	conda run -n $(ENV_NAME) python india/run_india_test.py
+	@echo "$(GREEN)✅ India market test complete$(NC)"
+
 # 🔍 Validate Data Only
 .PHONY: validate
 validate:
@@ -127,29 +177,44 @@ help:
 	@echo "$(GREEN)Paper Trader AI - Makefile Commands$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Setup & Installation:$(NC)"
-	@echo "  make setup          - Create Conda environment and install dependencies"
-	@echo "  make install        - Install dependencies with pip (no Conda)"
+	@echo "  make setup               - Create Conda environment and install dependencies"
+	@echo "  make install             - Install dependencies with pip (no Conda)"
 	@echo ""
 	@echo "$(YELLOW)Execution:$(NC)"
-	@echo "  make trade          - Run trading bot (fetch data, train, execute trades)"
-	@echo "  make train          - Train model only (no trade execution)"
-	@echo "  make validate       - Validate data quality for sample tickers"
+	@echo "  make trade               - Run trading bot (fetch data, train, execute trades)"
+	@echo "  make train               - Train model only (no trade execution)"
+	@echo "  make validate            - Validate data quality for sample tickers"
+	@echo ""
+	@echo "$(YELLOW)Backtesting:$(NC)"
+	@echo "  make backtest            - Full backtest (2017-2024)"
+	@echo "  make backtest-quick      - Quick backtest (2023-2024)"
+	@echo "  make backtest-walkforward - Walk-forward validation (yearly retraining)"
+	@echo ""
+	@echo "$(YELLOW)Phase 7: Risk Control Validation:$(NC)"
+	@echo "  make test-stoploss       - Test different stop-loss thresholds"
+	@echo "  make test-ab             - A/B test (Fixed vs Z-Score signals)"
+	@echo "  make test-unbiased       - Unbiased A/B test (75 random stocks, walk-forward)"
+	@echo "  make test-holdout        - Double holdout test (truly unseen tickers)"
+	@echo ""
+	@echo "$(YELLOW)India Market Testing:$(NC)"
+	@echo "  make india-fetch         - Fetch NIFTY 50 data to local cache"
+	@echo "  make india-test          - Test model on Indian market (cross-market validation)"
 	@echo ""
 	@echo "$(YELLOW)Testing:$(NC)"
-	@echo "  make test           - Run unit test suite (27 tests)"
-	@echo "  make test-coverage  - Run tests with HTML coverage report"
+	@echo "  make test                - Run unit test suite (55 tests)"
+	@echo "  make test-coverage       - Run tests with HTML coverage report"
 	@echo ""
 	@echo "$(YELLOW)Docker:$(NC)"
-	@echo "  make docker-up      - Start Docker containers"
-	@echo "  make docker-down    - Stop Docker containers"
+	@echo "  make docker-up           - Start Docker containers"
+	@echo "  make docker-down         - Stop Docker containers"
 	@echo ""
 	@echo "$(YELLOW)Monitoring:$(NC)"
-	@echo "  make status         - Show recent portfolio transactions"
-	@echo "  make results        - Display model performance metrics"
+	@echo "  make status              - Show recent portfolio transactions"
+	@echo "  make results             - Display model performance metrics"
 	@echo ""
 	@echo "$(YELLOW)Maintenance:$(NC)"
-	@echo "  make clean          - Remove build artifacts and cache"
-	@echo "  make clean-all      - Remove all artifacts, results, and models"
+	@echo "  make clean               - Remove build artifacts and cache"
+	@echo "  make clean-all           - Remove all artifacts, results, and models"
 	@echo ""
 
 .DEFAULT_GOAL := help
