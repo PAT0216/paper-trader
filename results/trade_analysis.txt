@@ -1,21 +1,21 @@
 Trade Return Distribution Analysis
 ========================================
 
-Total Trades: 192
-Total P&L: $174,022.53
-Win Rate: 54.2%
-Profit Factor: 3.80
+Total Trades: 535
+Total P&L: $185,860.19
+Win Rate: 37.2%
+Profit Factor: 1.86
 
-P&L Concentration (Top 10): 84.1%
+P&L Concentration (Top 10): 91.5%
 
 Top 10 Winners:
-  MSFT: $44,254.59
-  BA: $19,068.99
-  LLY: $13,841.77
-  CAT: $12,826.89
-  UNH: $11,949.14
-  QQQ: $11,771.95
-  HD: $9,124.02
-  MA: $8,961.32
-  QQQ: $7,470.33
-  V: $7,161.56
+  CAT: $25,995.62
+  LLY: $25,014.28
+  BA: $20,215.52
+  MSFT: $18,637.09
+  CVX: $16,544.14
+  AMZN: $13,336.63
+  QQQ: $13,276.71
+  AAPL: $12,879.18
+  CAT: $12,407.84
+  META: $11,786.09

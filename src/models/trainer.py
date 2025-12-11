@@ -10,6 +10,7 @@ Key improvements over previous version:
 
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from scipy.stats import spearmanr
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -21,6 +22,8 @@ from src.features.indicators import generate_features, create_target, FEATURE_CO
 
 MODEL_PATH = "models"
 MODEL_FILE = os.path.join(MODEL_PATH, "xgb_model.joblib")
+RESULTS_LIVE_DIR = "results/live"  # Training/live metrics go here
+RESULTS_BACKTEST_DIR = "results/backtest"  # Backtest results go here
 
 
 def train_model(data_dict, n_splits=5, save_model=True):
@@ -132,6 +135,19 @@ def train_model(data_dict, n_splits=5, save_model=True):
         # Directional accuracy (did we predict the right direction?)
         direction_correct = ((y_pred > 0) == (y_test > 0)).mean()
         
+        # RANKING METRICS (Phase 7 - explains R² paradox)
+        # Spearman rank correlation: do predicted ranks match actual ranks?
+        spearman_corr, _ = spearmanr(y_pred, y_test)
+        
+        # Top-10 accuracy: if we pick top 10 predictions, how many are actually top 10?
+        n_top = min(10, len(y_pred) // 10)  # 10% or top 10, whichever is more meaningful
+        if n_top > 0:
+            pred_top_idx = np.argsort(y_pred)[-n_top:]
+            actual_top_idx = np.argsort(y_test)[-n_top:]
+            top_k_overlap = len(set(pred_top_idx) & set(actual_top_idx)) / n_top
+        else:
+            top_k_overlap = 0.0
+        
         fold_metrics.append({
             'fold': fold + 1,
             'train_size': len(train_idx),
@@ -139,7 +155,9 @@ def train_model(data_dict, n_splits=5, save_model=True):
             'rmse': rmse,
             'mae': mae,
             'r2': r2,
-            'direction_accuracy': direction_correct
+            'direction_accuracy': direction_correct,
+            'spearman': spearman_corr,
+            'top_k_accuracy': top_k_overlap
         })
         
         print(f"   Fold {fold+1}: RMSE={rmse:.4f}, MAE={mae:.4f}, R²={r2:.4f}, Dir.Acc={direction_correct:.2%}")
@@ -149,12 +167,18 @@ def train_model(data_dict, n_splits=5, save_model=True):
     avg_mae = np.mean([m['mae'] for m in fold_metrics])
     avg_r2 = np.mean([m['r2'] for m in fold_metrics])
     avg_dir = np.mean([m['direction_accuracy'] for m in fold_metrics])
+    avg_spearman = np.mean([m['spearman'] for m in fold_metrics])
+    avg_top_k = np.mean([m['top_k_accuracy'] for m in fold_metrics])
     
     print(f"\n📈 Cross-Validation Summary:")
     print(f"   Avg RMSE: {avg_rmse:.4f} ({avg_rmse*100:.2f}% return)")
     print(f"   Avg MAE:  {avg_mae:.4f}")
     print(f"   Avg R²:   {avg_r2:.4f}")
     print(f"   Avg Directional Accuracy: {avg_dir:.2%}")
+    print(f"")
+    print(f"   --- RANKING METRICS (explains R² paradox) ---")
+    print(f"   Avg Spearman Rank Corr: {avg_spearman:.4f}")
+    print(f"   Avg Top-10% Accuracy:   {avg_top_k:.2%}")
     
     # Final model: train on ALL data
     print(f"\n🏋️ Training final model on all {len(X):,} samples...")
@@ -211,11 +235,10 @@ def train_model(data_dict, n_splits=5, save_model=True):
     selected_features = useful_features
     # ==================== END DYNAMIC FEATURE SELECTION ====================
     
-    # Save metrics
-    results_dir = "results"
-    os.makedirs(results_dir, exist_ok=True)
+    # Save metrics to LIVE results directory (separate from backtest)
+    os.makedirs(RESULTS_LIVE_DIR, exist_ok=True)
     
-    with open(os.path.join(results_dir, "metrics.txt"), "w") as f:
+    with open(os.path.join(RESULTS_LIVE_DIR, "metrics.txt"), "w") as f:
         f.write("=" * 50 + "\n")
         f.write("ML MODEL METRICS (Phase 3.5 - Dynamic Feature Selection)\n")
         f.write("=" * 50 + "\n\n")
@@ -228,6 +251,9 @@ def train_model(data_dict, n_splits=5, save_model=True):
         f.write(f"  MAE:  {avg_mae:.4f}\n")
         f.write(f"  R²:   {avg_r2:.4f}\n")
         f.write(f"  Directional Accuracy: {avg_dir:.2%}\n")
+        f.write(f"\n  --- RANKING METRICS ---\n")
+        f.write(f"  Spearman Rank Corr: {avg_spearman:.4f}\n")
+        f.write(f"  Top-10% Accuracy: {avg_top_k:.2%}\n")
         f.write(f"\n  Training Samples: {len(X):,}\n")
         f.write(f"  CV Folds: {n_splits}\n")
         f.write(f"\nFeature Selection:\n")
@@ -246,11 +272,11 @@ def train_model(data_dict, n_splits=5, save_model=True):
     plt.title(f'Feature Importance (Selected: {len(selected_features)} features)')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(results_dir, "feature_importance.png"))
+    plt.savefig(os.path.join(RESULTS_LIVE_DIR, "feature_importance.png"))
     plt.close()
     
     # Save selected features list for inference
-    with open(os.path.join(results_dir, "selected_features.txt"), "w") as f:
+    with open(os.path.join(RESULTS_LIVE_DIR, "selected_features.txt"), "w") as f:
         f.write("# Selected Features (importance >= 3%)\n")
         for feat in selected_features:
             imp = feature_importance[feature_importance['feature'] == feat]['importance'].values[0]
@@ -269,8 +295,8 @@ def train_model(data_dict, n_splits=5, save_model=True):
         print(f"\n💾 Model saved to {MODEL_FILE}")
         print(f"   Selected features: {selected_features}")
     
-    print(f"📊 Metrics saved to {results_dir}/metrics.txt")
-    print(f"📈 Feature importance saved to {results_dir}/feature_importance.png")
+    print(f"📊 Metrics saved to {RESULTS_LIVE_DIR}/metrics.txt")
+    print(f"📈 Feature importance saved to {RESULTS_LIVE_DIR}/feature_importance.png")
     
     return final_model
 
@@ -302,7 +328,8 @@ def evaluate_model(model, test_df):
         'rmse': np.sqrt(mean_squared_error(y_true, y_pred)),
         'mae': mean_absolute_error(y_true, y_pred),
         'r2': r2_score(y_true, y_pred),
-        'direction_accuracy': ((y_pred > 0) == (y_true > 0)).mean()
+        'direction_accuracy': ((y_pred > 0) == (y_true > 0)).mean(),
+        'spearman': spearmanr(y_pred, y_true)[0]
     }
 
 
