@@ -151,10 +151,17 @@ def run_year_with_backtester(model, data_dict, year, config_template, cumulative
     )
     
     # Create ML signal generator with trained model
+    # create_ml_signal_generator expects a Predictor object, not raw model
+    from src.models.predictor import Predictor
+    
+    # Create predictor wrapper for model
+    predictor = Predictor(model_path=None)  # Don't load from file
+    predictor.model = model  # Set model directly
+    
     signal_generator = create_ml_signal_generator(
-        model=model,
-        buy_threshold=0.005,  # 0.5% expected return
-        sell_threshold=-0.005
+        predictor=predictor,
+        threshold_buy=0.005,  # 0.5% expected return (regression model, not classification)
+        threshold_sell=-0.005
     )
     
     # Run backtest for this year
