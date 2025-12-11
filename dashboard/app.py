@@ -52,7 +52,7 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
-    st.image("https://via.placeholder.com/200x80/1f77b4/ffffff?text=Paper+Trader+AI", use_column_width=True)
+    st.image("https://via.placeholder.com/200x80/1f77b4/ffffff?text=Paper+Trader+AI", use_container_width=True)
     st.title("Navigation")
     
     page = st.radio(

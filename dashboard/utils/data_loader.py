@@ -105,22 +105,32 @@ def calculate_portfolio_stats(ledger_df: pd.DataFrame) -> Dict:
     
     latest = ledger_df.iloc[-1]
     
-    # Count trades (BUY/SELL actions)
-    num_trades = len(ledger_df[ledger_df['action'].isin(['BUY', 'SELL'])])
+    # Count trades (BUY/SELL actions) - handle missing 'action' column
+    if 'action' in ledger_df.columns:
+        num_trades = len(ledger_df[ledger_df['action'].isin(['BUY', 'SELL'])])
+    else:
+        num_trades = len(ledger_df)
     
     # Count current positions (approximate - would need position tracking)
     num_positions = 0  # TODO: implement position tracking
     
+    # Get values with fallbacks for missing columns
+    total_value = latest.get('total_value', 0) if hasattr(latest, 'get') else 0
+    cash = latest.get('cash', 0) if hasattr(latest, 'get') else 0
+    
     # Calculate return if initial value is known
-    if len(ledger_df) > 1:
+    if len(ledger_df) > 1 and 'total_value' in ledger_df.columns:
         initial_value = ledger_df.iloc[0]['total_value']
-        total_return_pct = ((latest['total_value'] - initial_value) / initial_value) * 100
+        if initial_value > 0:
+            total_return_pct = ((total_value - initial_value) / initial_value) * 100
+        else:
+            total_return_pct = 0
     else:
         total_return_pct = 0
     
     return {
-        'total_value': latest['total_value'],
-        'cash': latest['cash'],
+        'total_value': total_value,
+        'cash': cash,
         'total_return_pct': total_return_pct,
         'num_trades': num_trades,
         'num_positions': num_positions
