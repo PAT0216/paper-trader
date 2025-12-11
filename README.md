@@ -51,10 +51,10 @@
 - **Pre-Trade Validation**: All trades checked against risk limits before execution
 
 ### 🎯 **Advanced Risk Controls** *(New in Phase 7)*
-- **15% Position Stop-Loss**: A/B tested on 75 random S&P 500 stocks (beats no stop-loss by +17% yearly)
+- **15% Position Stop-Loss**: A/B tested on 75 random S&P 500 stocks
 - **Portfolio Drawdown Control**: -15% warning, -20% halt, -25% emergency liquidation
 - **Walk-Forward A/B Testing**: `run_unbiased_comparison.py` for strategy validation
-- **Benchmark**: 104.8% avg yearly return vs S&P 500's 15.3% (2018-2024)
+- **Note**: Backtests show stop-loss outperforms no stop-loss; live results may vary (see disclaimers)
 
 ### ✅ **Data Quality Assurance** *(Phase 1)*
 - **10 Validation Checks**: OHLC integrity, outlier detection, missing values, data freshness
@@ -352,10 +352,10 @@ pytest tests/test_validator.py -v
 
 ### ✅ Phase 7: Quant Risk Enhancements (Complete)
 - [x] **Portfolio Drawdown Control**: -15% warning, -20% halt, -25% liquidation
-- [x] **Position-Level Stop-Loss**: 15% threshold (A/B tested: +17% vs no stop-loss)
+- [x] **Position-Level Stop-Loss**: 15% threshold (A/B tested: outperforms no stop-loss)
 - [x] **Walk-Forward A/B Testing**: `run_unbiased_comparison.py` for unbiased validation
 - [x] **Ranking Metrics**: Spearman IC and Top-10% accuracy tracking
-- [x] **Benchmark Results**: 104.8% avg yearly vs S&P 500's 15.3% (2018-2024)
+- [x] **Realistic Disclaimers**: Documented survivorship bias and backtest limitations
 
 ---
 

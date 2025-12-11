@@ -620,13 +620,16 @@ risk:
 ## 🛡️ Quant Risk Controls (Phase 7)
 
 ### 1. Position Stop-Loss (15%)
-A/B tested on 75 random S&P 500 stocks (2018-2024) using walk-forward validation:
+A/B tested on 75 random S&P 500 stocks (2018-2024) using walk-forward validation.
 
-| Strategy | Avg Yearly Return | Sharpe |
-|----------|-------------------|--------|
-| **15% Stop-Loss** | **104.8%** | **1.30** |
-| No Stop-Loss | 87.2% | 1.26 |
-| S&P 500 Benchmark | 15.3% | ~0.7 |
+**Finding**: 15% stop-loss outperforms no stop-loss.
+
+> **⚠️ Important Caveat**: Backtest returns may be inflated due to:
+> - **Survivorship bias**: Current S&P 500 excludes failed companies
+> - **Position concentration**: Large gains from few winning trades
+> - **Walk-forward limitations**: Model may overfit even with retraining
+>
+> Live trading should expect **significantly lower** returns than backtests suggest.
 
 Run the comparison yourself:
 ```bash

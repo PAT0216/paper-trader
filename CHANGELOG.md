@@ -18,12 +18,10 @@ This release implements institutional-grade risk controls validated through rigo
 - **Stop-Loss Threshold Sweep**: `run_stoploss_test.py` for comparing stop-loss levels
 - **Ranking Metrics**: Spearman Rank Correlation and Top-10% Accuracy in model evaluation
 
-### Key A/B Testing Results (2018-2024, 75 Random S&P 500 Tickers)
-| Strategy | Avg Yearly Return | Sharpe |
-|----------|-------------------|--------|
-| **15% Stop-Loss** | **104.8%** | **1.30** |
-| No Stop-Loss | 87.2% | 1.26 |
-| S&P 500 (SPY) | 15.3% | ~0.7 |
+### A/B Testing Findings
+- **15% stop-loss outperforms no stop-loss** in walk-forward validation
+- Tested on 75 random S&P 500 tickers (2018-2024)
+- **Caveat**: Backtest returns may be inflated due to survivorship bias and position concentration
 
 ### Changed
 - **Stop-Loss Threshold**: 8% → **15%** (A/B tested with diverse stocks - banks, energy, cyclicals)
