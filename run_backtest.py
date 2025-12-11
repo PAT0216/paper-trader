@@ -30,6 +30,50 @@ from src.models.predictor import Predictor
 from src.utils.config import load_config
 
 
+def get_sp500_tickers() -> list:
+    """
+    Get list of S&P 500 tickers.
+    
+    Strategy:
+    1. Try loading from cached file (data/sp500_tickers.txt)
+    2. Fallback to Wikipedia scrape
+    3. Filter out invalid/problematic tickers
+    """
+    import os
+    
+    cache_file = "data/sp500_tickers.txt"
+    
+    # Try cache first
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r') as f:
+            tickers = [line.strip() for line in f if line.strip()]
+        print(f"   Loaded {len(tickers)} tickers from cache")
+        return tickers
+    
+    # Fallback to Wikipedia scrape
+    try:
+        import pandas as pd
+        table = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
+        tickers = table['Symbol'].str.replace('.', '-').tolist()
+        
+        # Filter out problematic tickers
+        exclude = {'BRK.B', 'BF.B'}  # Dual class stocks
+        tickers = [t for t in tickers if t not in exclude]
+        
+        # Cache for next time
+        os.makedirs('data', exist_ok=True)
+        with open(cache_file, 'w') as f:
+            f.write('\n'.join(tickers))
+        
+        print(f"   Fetched {len(tickers)} S&P 500 tickers from Wikipedia")
+        return tickers
+        
+    except Exception as e:
+        print(f"   ⚠️ Failed to fetch S&P 500 list: {e}")
+        print(f"   Falling back to config tickers")
+        return []
+
+
 def load_backtest_config(config_path: str = "config/backtest_settings.yaml") -> BacktestConfig:
     """Load backtest configuration from YAML."""
     try:
@@ -180,9 +224,9 @@ def run_backtest(
     print("\n📈 Generating reports...")
     
     # Create dated output directory if use_dated_folders is enabled
-    from datetime import datetime
+    from datetime import datetime as dt
     if config.use_dated_folders:
-        date_str = datetime.now().strftime("%Y-%m-%d")
+        date_str = dt.now().strftime("%Y-%m-%d")
         # Find description from command line or config
         description = "full_universe" if len(tickers) > 100 else "custom"
         dated_dir = os.path.join(output_dir, f"{date_str}_{description}")
@@ -273,6 +317,11 @@ def main():
         action='store_true',
         help='Use ML predictor instead of SMA strategy'
     )
+    parser.add_argument(
+        '--full-universe',
+        action='store_true',
+        help='Run backtest on full S&P 500 universe'
+    )
     
     args = parser.parse_args()
     
@@ -288,8 +337,13 @@ def main():
     if args.cash:
         backtest_config.initial_cash = args.cash
     
-    # Get tickers from main config
-    tickers = main_config.get('tickers', ['SPY', 'AAPL', 'MSFT'])
+    # Get tickers - either full universe or config list
+    if args.full_universe:
+        tickers = get_sp500_tickers()
+        print(f"🌐 Using full S&P 500 universe: {len(tickers)} tickers")
+    else:
+        tickers = main_config.get('tickers', ['SPY', 'AAPL', 'MSFT'])
+        print(f"📋 Using config ticker list: {len(tickers)} tickers")
     
     try:
         summary = run_backtest(tickers, backtest_config, args.output, use_ml=args.ml)
