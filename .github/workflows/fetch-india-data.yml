@@ -1,0 +1,46 @@
+name: Fetch India Market Data
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  
+jobs:
+  fetch-india-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: feature/india-market-testing
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas numpy xgboost joblib scipy scikit-learn
+      
+      - name: Fetch Indian market data
+        run: |
+          python india/fetch_india_data.py
+      
+      - name: Upload India data cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: india-market-data
+          path: india/data/india_cache.db
+          retention-days: 90
+      
+      - name: Show cache stats
+        run: |
+          ls -lh india/data/
+          python -c "
+          import sqlite3
+          conn = sqlite3.connect('india/data/india_cache.db')
+          cursor = conn.execute('SELECT COUNT(DISTINCT ticker), COUNT(*) FROM price_data')
+          tickers, rows = cursor.fetchone()
+          print(f'Cached: {tickers} tickers, {rows:,} rows')
+          conn.close()
+          "

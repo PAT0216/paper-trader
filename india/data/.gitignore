@@ -1,0 +1,3 @@
+# India data cache
+india/data/*.db
+india/data/india_cache.db
