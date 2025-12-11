@@ -150,25 +150,15 @@ def run_backtest(
     
     # Determine data period
     start_year = int(config.start_date[:4])
+    current_year = datetime.now().year
+    years_needed = current_year - start_year + 1
+    period = f"{min(years_needed + 1, 10)}y"  # yfinance max ~10y reliable
     
     # Include benchmark ticker
     all_tickers = list(set(tickers + [config.benchmark_ticker]))
     
-    # For full universe (500+ tickers), use cache-only to avoid rate limits
-    if len(all_tickers) > 100:
-        print(f"   Large universe ({len(all_tickers)} tickers) - using CACHE ONLY")
-        from src.data.loader import fetch_from_cache_only
-        data_dict = fetch_from_cache_only(
-            tickers=all_tickers,
-            start_date=config.start_date,
-            end_date=config.end_date
-        )
-    else:
-        # Small universe - can fetch from API if needed
-        current_year = datetime.now().year
-        years_needed = current_year - start_year + 1
-        period = f"{min(years_needed + 1, 10)}y"
-        data_dict = fetch_data(all_tickers, period=period)
+    # fetch_data uses smart caching: loads from cache, then fetches only missing recent dates
+    data_dict = fetch_data(all_tickers, period=period, use_cache=True)
     
     if not data_dict:
         raise RuntimeError("Failed to fetch data")
