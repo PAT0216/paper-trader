@@ -85,6 +85,7 @@ def main():
         
         # Thresholds for return-based decisions (Phase 3)
         # BUY if expected return > 0.5%, SELL if < -0.5%
+        # A/B Test Result: Fixed thresholds (Sharpe 0.26) beat Z-Score (-0.43) and Hybrid (0.19)
         return_buy_thresh = 0.005   # 0.5% expected return
         return_sell_thresh = -0.005  # -0.5% expected return
         
@@ -96,44 +97,20 @@ def main():
             # Get expected return from regression model
             expected_ret = ai_predictor.predict(df)
             expected_returns[ticker] = expected_ret
-        
-        # ==================== CROSS-SECTIONAL NORMALIZATION (Phase 7) ====================
-        # Z-score normalize predictions to compare apples-to-apples
-        if expected_returns and ai_predictor.is_regression:
-            returns_array = np.array(list(expected_returns.values()))
-            mu = np.mean(returns_array)
-            sigma = np.std(returns_array)
             
-            if sigma > 0:
-                print(f"\n📊 Cross-sectional normalization: μ={mu*100:.2f}%, σ={sigma*100:.2f}%")
-                normalized_returns = {t: (r - mu) / sigma for t, r in expected_returns.items()}
-            else:
-                normalized_returns = {t: 0.0 for t in expected_returns}
-        else:
-            normalized_returns = expected_returns
-        # ==================== END NORMALIZATION ====================
-        
-        # Generate signals using z-scores (threshold = 1.0 = top ~16%)
-        z_buy_thresh = 1.0   # Buy if z-score > 1.0
-        z_sell_thresh = -1.0  # Sell if z-score < -1.0
-        
-        for ticker, expected_ret in expected_returns.items():
-            z_score = normalized_returns.get(ticker, 0.0)
-            
-            # Legacy classifier compatibility: check if output looks like probability
+            # Generate signals using FIXED THRESHOLDS (proven best in A/B test)
             if ai_predictor.is_regression:
-                # Use z-score thresholds for ranking-based signals
-                if z_score > z_buy_thresh:
+                if expected_ret > return_buy_thresh:
                     action = "BUY"
-                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
-                elif z_score < z_sell_thresh:
+                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%)")
+                elif expected_ret < return_sell_thresh:
                     action = "SELL"
-                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
+                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%)")
                 else:
                     action = "HOLD"
-                    # Only print if notable
-                    if abs(z_score) > 0.5:
-                        print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
+                    # Only print notable holds
+                    if abs(expected_ret) > 0.003:
+                        print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%)")
             else:
                 # Legacy classifier: expected_ret is probability 0-1
                 prob = expected_ret
