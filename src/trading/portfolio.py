@@ -178,6 +178,19 @@ class Portfolio:
             new_cash = current_cash + amount
         else:
             return False
+        
+        # Calculate total portfolio value (cash + position values)
+        # Note: Using entry prices for simplicity - ideally would use current market prices
+        positions = self.get_positions()
+        position_value = sum(pos['shares'] * price if pos['ticker'] == ticker else pos['shares'] * pos['avg_price'] 
+                            for pos in positions.values())
+        
+        # For BUY: add new position value, for SELL: position_value already adjusted
+        if action == "BUY":
+            total_value = new_cash + position_value + (shares * price)
+        else:
+            total_value = new_cash + position_value
             
-        self._add_entry(date, ticker, action, price, shares, amount, new_cash, 0.0) 
+        self._add_entry(date, ticker, action, price, shares, amount, new_cash, total_value) 
         return True
+
