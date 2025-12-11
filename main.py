@@ -7,7 +7,8 @@ from src.data import loader
 from src.data.validator import DataValidator
 from src.models import trainer, predictor
 from src.trading import portfolio
-from src.trading.risk_manager import RiskManager, RiskLimits
+from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
+import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description="AI Paper Trader")
@@ -95,19 +96,44 @@ def main():
             # Get expected return from regression model
             expected_ret = ai_predictor.predict(df)
             expected_returns[ticker] = expected_ret
+        
+        # ==================== CROSS-SECTIONAL NORMALIZATION (Phase 7) ====================
+        # Z-score normalize predictions to compare apples-to-apples
+        if expected_returns and ai_predictor.is_regression:
+            returns_array = np.array(list(expected_returns.values()))
+            mu = np.mean(returns_array)
+            sigma = np.std(returns_array)
+            
+            if sigma > 0:
+                print(f"\n📊 Cross-sectional normalization: μ={mu*100:.2f}%, σ={sigma*100:.2f}%")
+                normalized_returns = {t: (r - mu) / sigma for t, r in expected_returns.items()}
+            else:
+                normalized_returns = {t: 0.0 for t in expected_returns}
+        else:
+            normalized_returns = expected_returns
+        # ==================== END NORMALIZATION ====================
+        
+        # Generate signals using z-scores (threshold = 1.0 = top ~16%)
+        z_buy_thresh = 1.0   # Buy if z-score > 1.0
+        z_sell_thresh = -1.0  # Sell if z-score < -1.0
+        
+        for ticker, expected_ret in expected_returns.items():
+            z_score = normalized_returns.get(ticker, 0.0)
             
             # Legacy classifier compatibility: check if output looks like probability
             if ai_predictor.is_regression:
-                # Regression: expected_ret is in decimal (e.g., 0.02 = 2%)
-                if expected_ret > return_buy_thresh:
+                # Use z-score thresholds for ranking-based signals
+                if z_score > z_buy_thresh:
                     action = "BUY"
-                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%)")
-                elif expected_ret < return_sell_thresh:
+                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
+                elif z_score < z_sell_thresh:
                     action = "SELL"
-                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%)")
+                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
                 else:
                     action = "HOLD"
-                    print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%)")
+                    # Only print if notable
+                    if abs(z_score) > 0.5:
+                        print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%, z={z_score:.2f})")
             else:
                 # Legacy classifier: expected_ret is probability 0-1
                 prob = expected_ret
@@ -130,15 +156,45 @@ def main():
         pf = portfolio.Portfolio(start_cash=config['portfolio']['initial_cash'])
         current_holdings = pf.get_holdings()
         
-        # Initialize Risk Manager
+        # Load risk settings from config (Phase 7)
+        risk_config = config.get('risk', {})
         risk_limits = RiskLimits(
-            max_position_pct=0.15,
-            max_sector_pct=0.40,
-            min_cash_buffer=config['portfolio']['min_cash_buffer']
+            max_position_pct=risk_config.get('max_position_pct', 0.15),
+            max_sector_pct=risk_config.get('max_sector_pct', 0.30),
+            min_cash_buffer=config['portfolio']['min_cash_buffer'],
+            drawdown_warning=risk_config.get('drawdown_warning', 0.15),
+            drawdown_halt=risk_config.get('drawdown_halt', 0.20),
+            drawdown_liquidate=risk_config.get('drawdown_liquidate', 0.25)
         )
         risk_mgr = RiskManager(risk_limits=risk_limits)
         
+        # Initialize drawdown controller (Phase 7)
+        drawdown_ctrl = DrawdownController(
+            warning_threshold=risk_limits.drawdown_warning,
+            halt_threshold=risk_limits.drawdown_halt,
+            liquidate_threshold=risk_limits.drawdown_liquidate
+        )
+        
         portfolio_value = pf.get_portfolio_value(current_prices)
+        drawdown_ctrl.update(portfolio_value)
+        print(f"\n📈 Portfolio: ${portfolio_value:,.2f} | {drawdown_ctrl.get_status()}")
+        
+        # ==================== STOP-LOSS CHECK (Phase 7) ====================
+        stop_loss_pct = risk_config.get('stop_loss_pct', 0.08)
+        stop_losses_triggered = pf.check_stop_losses(current_prices, stop_loss_pct)
+        
+        if stop_losses_triggered:
+            print(f"\n🛑 STOP-LOSS TRIGGERED:")
+            for ticker, current, entry, loss_pct in stop_losses_triggered:
+                print(f"   {ticker}: {loss_pct:.1%} loss (entry=${entry:.2f}, now=${current:.2f})")
+                # Force SELL signal
+                signals[ticker] = "SELL"
+        # ==================== END STOP-LOSS ====================
+        
+        # Check drawdown status
+        position_multiplier = drawdown_ctrl.get_position_multiplier()
+        if position_multiplier < 1.0:
+            print(f"⚠️ Position sizing reduced to {position_multiplier:.0%} due to drawdown")
         
         # Display current risk metrics
         if current_holdings:
@@ -176,6 +232,12 @@ def main():
             key=lambda x: x[1],
             reverse=True  # Highest expected return first
         )
+        
+        # Check if buys are halted due to drawdown
+        if position_multiplier == 0.0:
+            print("🛑 Buys halted due to drawdown - skipping all buy orders")
+            buy_candidates = []
+        
         if buy_candidates:
             # Refresh holdings after sells
             current_holdings = pf.get_holdings()
@@ -199,6 +261,13 @@ def main():
                         current_holdings=current_holdings,
                         current_prices=current_prices
                     )
+                    
+                    # Apply drawdown position multiplier (Phase 7)
+                    if position_multiplier < 1.0 and shares > 0:
+                        original_shares = shares
+                        shares = int(shares * position_multiplier)
+                        if shares < original_shares:
+                            sizing_reason += f", drawdown={position_multiplier:.0%}"
                     
                     if shares == 0:
                         print(f"⚪️ {ticker}: Skip - {sizing_reason}")
