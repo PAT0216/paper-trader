@@ -46,7 +46,7 @@ risk:
   drawdown_warning: 0.15      # Reduce positions 50% at -15% drawdown
   drawdown_halt: 0.20         # No new buys at -20% drawdown
   drawdown_liquidate: 0.25    # Emergency liquidation at -25% drawdown
-  use_stop_loss: true         # Enable stop-loss checking
+  use_stop_loss: false        # Disabled for A/B comparison
   use_drawdown_control: true  # Enable portfolio drawdown control
 
 # Execution settings

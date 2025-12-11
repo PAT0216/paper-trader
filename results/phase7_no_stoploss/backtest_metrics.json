@@ -1,0 +1,63 @@
+{
+  "returns": {
+    "total_return": "49.10%",
+    "cagr": "5.13%"
+  },
+  "risk_adjusted": {
+    "sharpe_ratio": 0.143,
+    "sortino_ratio": 0.064,
+    "calmar_ratio": 0.194,
+    "information_ratio": -0.631
+  },
+  "risk": {
+    "volatility": "12.94%",
+    "max_drawdown": "26.52%",
+    "avg_drawdown": "18.30%",
+    "var_95": "0.81%",
+    "var_99": "2.75%",
+    "cvar_95": "2.12%"
+  },
+  "market_exposure": {
+    "beta": 0.413,
+    "alpha": "-3.25%"
+  },
+  "trade_quality": {
+    "win_rate": "49.1%",
+    "profit_factor": 2.08,
+    "avg_win": "$812.56",
+    "avg_loss": "$377.31",
+    "avg_holding_period": "42.5 days",
+    "total_trades": 230,
+    "turnover": "0.0%"
+  },
+  "regime_performance": {
+    "bull": {
+      "days": 1592,
+      "total_return": "123.48%",
+      "sharpe": 0.95,
+      "volatility": "9.74%",
+      "max_drawdown": "9.01%"
+    },
+    "sideways": {
+      "days": 72,
+      "total_return": "7.75%",
+      "sharpe": 1.53,
+      "volatility": "15.21%",
+      "max_drawdown": "3.74%"
+    },
+    "bear": {
+      "days": 270,
+      "total_return": "-22.83%",
+      "sharpe": -1.84,
+      "volatility": "14.74%",
+      "max_drawdown": "21.45%"
+    },
+    "crisis": {
+      "days": 77,
+      "total_return": "-19.76%",
+      "sharpe": -1.83,
+      "volatility": "37.67%",
+      "max_drawdown": "17.98%"
+    }
+  }
+}
