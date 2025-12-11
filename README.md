@@ -344,13 +344,12 @@ pytest tests/test_validator.py -v
 - ✅ Scheduled daily cron job (1 PM PST / 9 PM UTC)
 - ✅ Automated commits with ledger updates
 
-### 🔄 Phase 7: Risk Enhancements (In Progress)
-- [x] Trade return distribution analysis (`analyze_returns.py`)
-- [x] Increased slippage for mid-caps (10 bps)
-- [x] Reduced sector exposure (40% → 30%)
-- [x] Survivorship bias disclosure
-- [x] Ranking metrics (Spearman, Top-10%)
-- [ ] Position-level stop-loss (-8%)
+### ✅ Phase 7: Quant Risk Enhancements (Completed)
+- [x] **Portfolio Drawdown Control**: Halts buys at -20% drawdown, liquidates at -25%
+- [x] **Position-Level Stop-Loss**: Hard -8% stop from entry price
+- [x] **Z-Score Signal Normalization**: Dynamic thresholds based on daily cross-sectional rank
+- [x] **Ranking Metrics**: Added Spearman IC and Top-10% accuracy tracking
+- [x] **Survivorship Bias Disclosure**: Documented limitations of testing on current universe
 
 ---
 

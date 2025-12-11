@@ -596,7 +596,43 @@ portfolio:
   min_cash_buffer: 100.0     # Reserve cash ($)
 ```
 
-### Risk Configuration (in code)
+### Risk Configuration (`config/settings.yaml`) ✨ *Updated in Phase 7*
+
+```yaml
+portfolio:
+  initial_cash: 10000.0   # Starting capital ($)
+  min_cash_buffer: 200.0  # Reserve cash ($)
+
+risk:
+  # Position Safety
+  stop_loss_pct: 0.08     # Sell if position drops 8% from entry
+  max_position_pct: 0.15  # Max 15% per stock
+  max_sector_pct: 0.30    # Max 30% per sector
+
+  # Portfolio Safety (Drawdown Control)
+  drawdown_warning: 0.15  # At -15%: Reduce new sizes by 50%
+  drawdown_halt: 0.20     # At -20%: Stop new buys
+  drawdown_liquidate: 0.25 # At -25%: Liquidate to 50% cash
+```
+
+---
+
+## 🛡️ Quant Risk Controls (Phase 7)
+
+### 1. Cross-Sectional Z-Scores
+Instead of buying anything with >0.5% expected return, we now rank stocks daily:
+- **Normalize**: Returns are converted to Z-scores (standard deviations from mean).
+- **Signal**:
+  - **BUY**: Z-score > 1.0 (Top ~16% of predictions)
+  - **SELL**: Z-score < -1.0 (Bottom ~16%)
+- **Benefit**: Adapts to market volatility (doesn't stop trading when all returns are low, doesn't buy everything when market rallies).
+
+### 2. Double-Layer Protection
+1. **Micro (Position)**: Hard stop-loss at -8%. No matter what the model says, if you lose 8%, you're out.
+2. **Macro (Portfolio)**:
+   - **Warning (-15%)**: Cut position sizes in half.
+   - **Halt (-20%)**: Stop digging the hole. No new risk.
+   - **Liquidate (-25%)**: Emergency brake. Preserve capital.
 
 Edit `main.py` to customize risk limits:
 
