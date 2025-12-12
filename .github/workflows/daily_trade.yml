@@ -63,8 +63,14 @@ jobs:
         git config --global user.email '69978508+PAT0216@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         
+        # Debug: List model files to verify they exist
+        echo "📂 Model files after training:"
+        ls -la models/ || echo "models/ directory not found"
+        echo ""
+        
         # Force-add model files (quant standard: ensure model persistence)
         git add -f ledger.csv 2>/dev/null || true
+
         git add -f models/xgb_model.json 2>/dev/null || true
         git add -f models/model_metadata.json 2>/dev/null || true
         git add -f models/xgb_model.joblib 2>/dev/null || true

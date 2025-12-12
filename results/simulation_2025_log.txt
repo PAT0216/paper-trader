@@ -1,0 +1,2 @@
+/Users/pat0216/Documents/codin/paper-trader/src/data/universe.py:61: FutureWarning: Passing literal html to 'read_html' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+  tables = pd.read_html(response.text)
