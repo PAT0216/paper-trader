@@ -5,12 +5,31 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-12-11
+
+### 🧪 Phase 8: Comprehensive Testing & Validation
+
+#### Test Results
+- **Pytest Suite**: 48 tests passed, 2 skipped (optional deps)
+- **Walk-Forward (2023-2024)**: 80.2% return, 34.2% CAGR beat SPY (58%)
+- **Backtest (2023-2024)**: 59.4% return, 1.63 Sharpe, 10.6% max drawdown
+
+### Fixed
+- **Predictor API**: Fixed `model_path` argument (use `__new__` bypass)
+- **BacktestConfig**: Added missing `use_dated_folders` attribute
+- **Backtester API**: Moved `signal_generator` from `__init__` to `run()`
+- **run_walkforward.py**: Added missing `json` import
+- **test_explainability.py**: Added `pytest.importorskip` for `shap` module
+
+---
+
 ## [1.7.1] - 2025-12-11
 
 ### Fixed
 - **Workflow Crash**: Fixed `AttributeError: 'Portfolio' object has no attribute 'get_positions'` in `record_trade` by implementing the missing method and improving trade recording logic.
 - **Ledger Calculation**: Fixed `total_value` double-counting bug on SELL orders (was adding sold value instead of subtracting).
 - **Ledger Repair**: Added `repair_ledger.py` utility and repaired historical `total_value` column in `ledger.csv`.
+
 
 ## [1.7.0] - 2025-12-10
 
