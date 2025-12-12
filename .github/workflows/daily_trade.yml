@@ -70,14 +70,35 @@ jobs:
         [ -f results/metrics.txt ] && git add results/metrics.txt
         [ -f results/feature_importance.png ] && git add results/feature_importance.png
         [ -f results/selected_features.txt ] && git add results/selected_features.txt
+        [ -f results/live/metrics.txt ] && git add results/live/metrics.txt
+        [ -f results/live/feature_importance.png ] && git add results/live/feature_importance.png
+        [ -f results/live/selected_features.txt ] && git add results/live/selected_features.txt
         
-        # Get current branch name (works for both push and workflow_dispatch)
+        # Get current branch name
         BRANCH_NAME="${GITHUB_REF_NAME}"
         echo "📌 Pushing to branch: $BRANCH_NAME"
         
-        # Fetch and rebase on current branch (not hardcoded main)
+        # Fetch latest from remote
         git fetch origin "$BRANCH_NAME" || true
-        git pull --rebase --autostash origin "$BRANCH_NAME" || true
         
-        # Commit and push if there are staged changes
+        # Stash any uncommitted changes
+        git stash --include-untracked || true
+        
+        # Pull with rebase, but if conflicts, prefer ours (CI-generated files are newer)
+        if ! git pull --rebase origin "$BRANCH_NAME"; then
+          echo "⚠️  Rebase conflict detected, resolving by keeping our changes..."
+          # For generated files, accept CI version (ours during rebase)
+          git checkout --ours ledger.csv models/xgb_model.joblib results/live/* 2>/dev/null || true
+          git add -A
+          git rebase --continue || git rebase --abort
+        fi
+        
+        # Pop stash if exists
+        git stash pop 2>/dev/null || true
+        
+        # Re-add in case stash pop created conflicts
+        [ -f ledger.csv ] && git add ledger.csv
+        [ -f models/xgb_model.joblib ] && git add models/xgb_model.joblib
+        
+        # Commit and push if there are changes
         git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push origin HEAD:"$BRANCH_NAME" --force-with-lease)

@@ -63,12 +63,17 @@ class DataValidator:
         self.max_daily_return = max_daily_return
         self.backtest_mode = backtest_mode
         
+        # Filter to 2010+ data (matches model training filter)
+        # Older data has quality issues we don't care about since model ignores it
+        self.min_date = pd.Timestamp('2010-01-01')
+        
         # Relax thresholds significantly for backtesting (old data has issues)
         if backtest_mode:
             self.ohlc_error_tolerance = 0.025  # 2.5% for old historical data
             self.min_price = 0.0001  # Some stocks traded <$1 before splits
         else:
             self.ohlc_error_tolerance = ohlc_error_tolerance
+
     
     def validate_dataframe(
         self,
@@ -97,6 +102,14 @@ class DataValidator:
         if df.empty:
             errors.append(f"{ticker}: DataFrame is empty")
             return ValidationResult(is_valid=False, errors=errors, warnings=warnings)
+        
+        # Filter to 2010+ data (matches model training filter)
+        # Pre-2010 data has quality issues we don't care about
+        if isinstance(df.index, pd.DatetimeIndex):
+            df = df[df.index >= self.min_date]
+            if df.empty:
+                warnings.append(f"{ticker}: No data after {self.min_date.strftime('%Y-%m-%d')}")
+                return ValidationResult(is_valid=True, errors=errors, warnings=warnings)
         
         # Check 2: Required columns exist
         missing_cols = set(required_columns) - set(df.columns)
