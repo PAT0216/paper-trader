@@ -83,15 +83,14 @@ def main():
         signals = {}
         expected_returns = {}
         
-        # ==================== QUANT STRATEGY: CROSS-SECTIONAL RANKING ====================
-        # Instead of absolute thresholds (which fail when model predicts close to mean),
-        # use RELATIVE ranking: BUY top 10%, SELL bottom 10%
-        # This works because predicting rankings is easier than predicting returns
-        # Reference: Jegadeesh & Titman (1993), AQR, Two Sigma
+        # ==================== QUANT STRATEGY: CONCENTRATED TOP 5 PICKS ====================
+        # Research shows: Dilution kills alpha. Focus on highest-conviction picks only.
+        # Top 5 instead of top 10% (50 stocks) concentrates capital in best opportunities.
+        # Reference: AQR "How Can a Strategy Still Work If Everyone Knows About It?"
         
         # Config
-        BUY_PERCENTILE = 0.10   # Top 10%
-        SELL_PERCENTILE = 0.10  # Bottom 10%
+        TOP_N_BUY = 5     # Only buy top 5 stocks
+        TOP_N_SELL = 5    # Only sell bottom 5 stocks
         
         for ticker in tickers:
             if ticker not in data_dict:
@@ -105,29 +104,30 @@ def main():
         # Sort by predicted return (descending)
         sorted_preds = sorted(expected_returns.items(), key=lambda x: x[1], reverse=True)
         n_tickers = len(sorted_preds)
-        n_buy = max(1, int(n_tickers * BUY_PERCENTILE))
-        n_sell = max(1, int(n_tickers * SELL_PERCENTILE))
         
-        buy_tickers = set([t for t, _ in sorted_preds[:n_buy]])
-        sell_tickers = set([t for t, _ in sorted_preds[-n_sell:]])
+        # Take absolute top N, not percentage
+        buy_tickers = set([t for t, _ in sorted_preds[:TOP_N_BUY]])
+        sell_tickers = set([t for t, _ in sorted_preds[-TOP_N_SELL:]])
         
-        print(f"\n📊 Cross-Sectional Ranking:")
+        print(f"\n📊 Concentrated Top-{TOP_N_BUY} Strategy:")
         print(f"   Universe: {n_tickers} stocks")
-        print(f"   Top {n_buy} → BUY, Bottom {n_sell} → SELL")
-        print(f"   Prediction range: [{sorted_preds[-1][1]*100:.2f}%, {sorted_preds[0][1]*100:.2f}%]")
+        print(f"   Top {TOP_N_BUY} → BUY, Bottom {TOP_N_SELL} → SELL")
+        print(f"   Best prediction: {sorted_preds[0][0]} at {sorted_preds[0][1]*100:+.2f}%")
+        print(f"   Worst prediction: {sorted_preds[-1][0]} at {sorted_preds[-1][1]*100:+.2f}%")
         
         # Generate signals based on ranking
         for ticker, expected_ret in sorted_preds:
             if ticker in buy_tickers:
                 action = "BUY"
-                print(f"🟢 {ticker}: BUY  (Rank: Top {BUY_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
+                rank = [t for t, _ in sorted_preds[:TOP_N_BUY]].index(ticker) + 1
+                print(f"🟢 {ticker}: BUY  (Rank #{rank}/{TOP_N_BUY}, Pred: {expected_ret*100:+.2f}%)")
             elif ticker in sell_tickers:
                 action = "SELL"
-                print(f"🔴 {ticker}: SELL (Rank: Bottom {SELL_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
+                print(f"🔴 {ticker}: SELL (Bottom {TOP_N_SELL}, Pred: {expected_ret*100:+.2f}%)")
             else:
                 action = "HOLD"
             signals[ticker] = action
-        # ==================== END CROSS-SECTIONAL RANKING ====================
+        # ==================== END CONCENTRATED TOP 5 ====================
         
         # ==================== MODEL VALIDATION GATE (Quant Standard) ====================
         # If >80% of predictions are extreme (>3% expected return), model is likely corrupted

@@ -767,6 +767,63 @@ def create_cross_sectional_signal_generator(predictor, buy_pct: float = 0.10, se
     return generate_signal
 
 
+def create_concentrated_signal_generator(predictor, top_n_buy: int = 5, top_n_sell: int = 5):
+    """
+    Create a signal generator that focuses on absolute top N picks.
+    
+    Key insight: Dilution kills alpha. Instead of top 10% (50 stocks),
+    concentrate capital in the top 5 highest-conviction picks.
+    
+    Reference: AQR research on concentrated portfolios
+    
+    Args:
+        predictor: Predictor instance with predict() method  
+        top_n_buy: Number of top stocks to buy (default 5)
+        top_n_sell: Number of bottom stocks to sell (default 5)
+        
+    Returns:
+        Signal generator function that returns (signal, expected_return)
+    """
+    # Cache for storing predictions across tickers for current date
+    _cache = {'predictions': {}, 'current_date': None}
+    
+    def generate_signal(ticker: str, df: pd.DataFrame, portfolio_state: Dict) -> tuple:
+        try:
+            # Get current date
+            current_date = df.index[-1] if len(df) > 0 else None
+            
+            # Reset cache on new date
+            if _cache['current_date'] != current_date:
+                _cache['predictions'] = {}
+                _cache['current_date'] = current_date
+            
+            # Get prediction for this ticker
+            pred = predictor.predict(df)
+            _cache['predictions'][ticker] = pred
+            
+            # Sort and assign signals
+            preds = _cache['predictions']
+            sorted_tickers = sorted(preds.items(), key=lambda x: x[1], reverse=True)
+            n_total = len(sorted_tickers)
+            
+            # Use absolute numbers, not percentages
+            buy_set = set([t for t, _ in sorted_tickers[:top_n_buy]])
+            sell_set = set([t for t, _ in sorted_tickers[-top_n_sell:]])
+            
+            if ticker in buy_set:
+                signal = 'BUY'
+            elif ticker in sell_set:
+                signal = 'SELL'
+            else:
+                signal = 'HOLD'
+            
+            return (signal, pred)
+        except Exception:
+            return ('HOLD', 0.0)
+    
+    return generate_signal
+
+
 def create_simple_signal_generator():
     """
     Create a simple SMA crossover signal generator for testing.

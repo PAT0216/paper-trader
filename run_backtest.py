@@ -210,15 +210,15 @@ def run_backtest(
             signal_generator = create_simple_signal_generator()
             strategy_name = "Simple SMA Crossover (fallback)"
         else:
-            # Use cross-sectional ranking: BUY top 10%, SELL bottom 10%
-            # This works better than fixed thresholds when model predicts close to mean
-            from src.backtesting import create_cross_sectional_signal_generator
-            signal_generator = create_cross_sectional_signal_generator(
+            # Use concentrated top-5 ranking: Focus on highest-conviction picks
+            # Research shows: Dilution kills alpha
+            from src.backtesting import create_concentrated_signal_generator
+            signal_generator = create_concentrated_signal_generator(
                 predictor, 
-                buy_pct=0.10,   # Top 10%
-                sell_pct=0.10  # Bottom 10%
+                top_n_buy=5,    # Only top 5
+                top_n_sell=5    # Only bottom 5
             )
-            strategy_name = "ML XGBoost + Cross-Sectional Ranking (Top/Bottom 10%)"
+            strategy_name = "ML XGBoost + Concentrated Top 5 (High Conviction)"
     else:
         signal_generator = create_simple_signal_generator()
         strategy_name = "Simple SMA Crossover"

@@ -162,10 +162,13 @@ def run_year_with_backtester(model, data_dict, year, config_template, cumulative
     predictor.is_regression = True
     predictor.selected_features = FEATURE_COLUMNS  # Use all features
     
-    signal_generator = create_ml_signal_generator(
+    # Use cross-sectional ranking: BUY top 10%, SELL bottom 10%
+    # This works because predicting rankings is easier than predicting returns
+    from src.backtesting import create_cross_sectional_signal_generator
+    signal_generator = create_cross_sectional_signal_generator(
         predictor=predictor,
-        threshold_buy=0.005,  # 0.5% expected return (regression model, not classification)
-        threshold_sell=-0.005
+        buy_pct=0.10,   # Top 10%
+        sell_pct=0.10   # Bottom 10%
     )
     
     # Run backtest for this year
@@ -318,12 +321,20 @@ def run_walkforward(start_year=2015, end_year=2024, initial_cash=100000, use_ful
     years = end_year - start_year + 1
     cagr = (1 + total_return) ** (1/years) - 1 if years > 0 else 0
     
-    # Calculate Sharpe from yearly returns
-    yearly_returns = [y['return'] for y in cumulative_portfolio['yearly_values']]
-    if yearly_returns:
+    # Calculate Sharpe from yearly returns (properly computed from values)
+    yearly_values = [initial_cash] + [y['value'] for y in cumulative_portfolio['yearly_values']]
+    yearly_returns = []
+    for i in range(1, len(yearly_values)):
+        ret = (yearly_values[i] / yearly_values[i-1]) - 1
+        yearly_returns.append(ret)
+    
+    if len(yearly_returns) >= 2:
         avg_return = np.mean(yearly_returns)
-        volatility = np.std(yearly_returns)
-        sharpe = (avg_return - 0.04) / volatility if volatility > 0 else 0
+        volatility = np.std(yearly_returns, ddof=1)  # Sample std
+        risk_free_rate = 0.04  # 4% annual risk-free rate
+        sharpe = (avg_return - risk_free_rate) / volatility if volatility > 0 else 0
+    elif len(yearly_returns) == 1:
+        sharpe = (yearly_returns[0] - 0.04) / 0.15  # Assume 15% vol if only 1 year
     else:
         sharpe = 0
     
