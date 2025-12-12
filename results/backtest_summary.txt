@@ -3,33 +3,33 @@ BACKTEST PERFORMANCE SUMMARY
 ============================================================
 
 📈 RETURNS
-   Total Return: 59.44%
-   CAGR: 27.30%
+   Total Return: 47.65%
+   CAGR: 22.70%
 
 ⚖️ RISK-ADJUSTED
-   Sharpe Ratio: 1.633
-   Sortino Ratio: 2.772
-   Calmar Ratio: 2.577
-   Information Ratio: -0.114
+   Sharpe Ratio: 1.513
+   Sortino Ratio: 2.668
+   Calmar Ratio: 2.580
+   Information Ratio: -0.542
 
 🎯 RISK
-   Volatility (Ann.): 12.84%
-   Max Drawdown: 10.60%
-   VaR (95%): 1.28%
-   CVaR (95%): 1.73%
+   Volatility (Ann.): 11.31%
+   Max Drawdown: 8.80%
+   VaR (95%): 1.12%
+   CVaR (95%): 1.46%
 
 📊 MARKET EXPOSURE
-   Beta: 0.833
-   Alpha: 2.94%
+   Beta: 0.622
+   Alpha: 3.22%
 
 💼 TRADE QUALITY
-   Win Rate: 0.0%
-   Profit Factor: 0.00
-   Total Trades: 0
+   Win Rate: 69.6%
+   Profit Factor: 3.55
+   Total Trades: 69
    Annual Turnover: 0.0%
 
 🌍 REGIME PERFORMANCE
-   BEAR: Sharpe=-4.25, Return=-4.56%, MaxDD=8.75%
-   BULL: Sharpe=1.92, Return=67.06%, MaxDD=7.46%
+   BEAR: Sharpe=-0.23, Return=-0.12%, MaxDD=4.74%
+   BULL: Sharpe=1.61, Return=47.82%, MaxDD=8.19%
 
 ============================================================
