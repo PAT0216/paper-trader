@@ -3,24 +3,21 @@ ML MODEL METRICS (Phase 3.5 - Dynamic Feature Selection)
 ==================================================
 
 Cross-Validation Results:
-  Fold 1: RMSE=0.0171, MAE=0.0114, Dir.Acc=51.13%
-  Fold 2: RMSE=0.0172, MAE=0.0113, Dir.Acc=52.80%
-  Fold 3: RMSE=0.0262, MAE=0.0164, Dir.Acc=53.06%
-  Fold 4: RMSE=0.0225, MAE=0.0156, Dir.Acc=51.44%
-  Fold 5: RMSE=0.0215, MAE=0.0138, Dir.Acc=52.08%
+  Fold 1: RMSE=0.0183, MAE=0.0120, Dir.Acc=52.66%
+  Fold 2: RMSE=0.0186, MAE=0.0133, Dir.Acc=51.86%
 
 Average Metrics:
-  RMSE: 0.0209
-  MAE:  0.0137
-  R²:   -0.0047
-  Directional Accuracy: 52.10%
+  RMSE: 0.0184
+  MAE:  0.0127
+  R²:   -0.0460
+  Directional Accuracy: 52.26%
 
   --- RANKING METRICS ---
-  Spearman Rank Corr: 0.0221
-  Top-10% Accuracy: 2.00%
+  Spearman Rank Corr: 0.0290
+  Top-10% Accuracy: 15.00%
 
-  Training Samples: 1,132,993
-  CV Folds: 5
+  Training Samples: 20,045
+  CV Folds: 2
 
 Feature Selection:
   Threshold: 3.0%

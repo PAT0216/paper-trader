@@ -15,6 +15,12 @@ from src.features.indicators import generate_features, FEATURE_COLUMNS
 
 MODEL_PATH = "models"
 MODEL_FILE = os.path.join(MODEL_PATH, "xgb_model.joblib")
+MODEL_JSON = os.path.join(MODEL_PATH, "xgb_model.json")
+METADATA_FILE = os.path.join(MODEL_PATH, "model_metadata.json")
+
+# Quant Standard: Expected prediction range for returns
+PREDICTION_MIN = -0.20  # -20% return
+PREDICTION_MAX = 0.20   # +20% return
 
 
 class Predictor:
@@ -24,34 +30,75 @@ class Predictor:
     The model was trained to predict next-day percentage returns.
     Higher predicted returns → Stronger BUY signal
     Lower (negative) predicted returns → SELL signal
+    
+    Quant Standards:
+    - Loads from portable JSON format (preferred) or legacy pickle
+    - Validates predictions are in expected range
+    - Logs warnings if model outputs are suspicious
     """
     
     def __init__(self):
         self.model = None
         self.is_regression = True  # Phase 3: regression model
         self.selected_features = FEATURE_COLUMNS  # Default: use all features
+        self.metadata = None
+        self.prediction_bounds = (PREDICTION_MIN, PREDICTION_MAX)
         
-        if os.path.exists(MODEL_FILE):
-            model_data = joblib.load(MODEL_FILE)
-            
-            # Handle new model format with metadata
-            if isinstance(model_data, dict) and 'model' in model_data:
-                self.model = model_data['model']
-                self.selected_features = model_data.get('selected_features', FEATURE_COLUMNS)
-                print(f"✅ Loaded XGBoost regression model.")
-                print(f"   Selected features: {len(self.selected_features)}/{len(FEATURE_COLUMNS)}")
-            else:
-                # Legacy format: model only
-                self.model = model_data
-                print("✅ Loaded XGBoost regression model.")
-                print("   (Legacy model format - using all features)")
-            
-            # Detect model type
-            if hasattr(self.model, 'predict_proba'):
-                self.is_regression = False
-                print("   (Legacy classification model detected)")
+        # Try JSON format first (portable), then fall back to pickle
+        if os.path.exists(MODEL_JSON):
+            self._load_from_json()
+        elif os.path.exists(MODEL_FILE):
+            self._load_from_pickle()
         else:
             print("⚠️ Warning: No model found. Run training first.")
+    
+    def _load_from_json(self):
+        """Load model from portable XGBoost JSON format."""
+        import json
+        import xgboost as xgb
+        
+        # Load model
+        self.model = xgb.XGBRegressor()
+        self.model.load_model(MODEL_JSON)
+        
+        # Load metadata
+        if os.path.exists(METADATA_FILE):
+            with open(METADATA_FILE, 'r') as f:
+                self.metadata = json.load(f)
+            self.selected_features = self.metadata.get('selected_features', FEATURE_COLUMNS)
+            
+            # Set prediction bounds from training stats
+            pred_stats = self.metadata.get('prediction_stats', {})
+            expected_range = pred_stats.get('expected_range', [-0.10, 0.10])
+            self.prediction_bounds = tuple(expected_range)
+            
+            print(f"✅ Loaded XGBoost model (JSON format).")
+            print(f"   Selected features: {len(self.selected_features)}/{len(FEATURE_COLUMNS)}")
+            print(f"   Training samples: {self.metadata.get('training_samples', 'unknown'):,}")
+            print(f"   Expected prediction range: [{expected_range[0]:.2f}, {expected_range[1]:.2f}]")
+        else:
+            print(f"✅ Loaded XGBoost model (JSON format, no metadata).")
+    
+    def _load_from_pickle(self):
+        """Load model from legacy pickle format."""
+        model_data = joblib.load(MODEL_FILE)
+        
+        # Handle new model format with metadata
+        if isinstance(model_data, dict) and 'model' in model_data:
+            self.model = model_data['model']
+            self.selected_features = model_data.get('selected_features', FEATURE_COLUMNS)
+            print(f"✅ Loaded XGBoost regression model (pickle).")
+            print(f"   Selected features: {len(self.selected_features)}/{len(FEATURE_COLUMNS)}")
+        else:
+            # Legacy format: model only
+            self.model = model_data
+            print("✅ Loaded XGBoost regression model (legacy pickle).")
+        
+        # Detect model type
+        if hasattr(self.model, 'predict_proba'):
+            self.is_regression = False
+            print("   (Legacy classification model detected)")
+
     
     def predict(self, df):
         """
@@ -83,11 +130,22 @@ class Predictor:
         if self.is_regression:
             # Regression model: predict expected return
             prediction = self.model.predict(last_row)[0]
+            
+            # Quant Standard: Sanity check on predictions
+            # Expected returns should be in reasonable range (-20% to +20%)
+            min_bound, max_bound = self.prediction_bounds
+            if prediction < min_bound or prediction > max_bound:
+                print(f"⚠️ SANITY CHECK FAILED: Prediction {prediction:.4f} outside expected range [{min_bound}, {max_bound}]")
+                print(f"   This may indicate model corruption or version mismatch.")
+                print(f"   Clamping to bounds.")
+                prediction = max(min_bound, min(max_bound, prediction))
+            
             return float(prediction)
         else:
             # Legacy classifier: return probability of up move
             proba = self.model.predict_proba(last_row)[0][1]
             return float(proba)
+
     
     def predict_with_signal(self, df, buy_threshold=0.005, sell_threshold=-0.005):
         """

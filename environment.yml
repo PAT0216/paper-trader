@@ -8,7 +8,8 @@ dependencies:
   - numpy
   - scikit-learn
   - scipy
-  - xgboost
+  - xgboost=2.0.3  # Pinned for cross-platform model compatibility
+
   - yfinance
   - matplotlib
   - mplfinance

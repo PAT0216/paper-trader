@@ -282,23 +282,68 @@ def train_model(data_dict, n_splits=5, save_model=True):
             imp = feature_importance[feature_importance['feature'] == feat]['importance'].values[0]
             f.write(f"{feat}: {imp:.4f}\n")
     
-    # Save model with metadata
-    model_data = {
-        'model': final_model,
+    # Save model with metadata - USE PORTABLE FORMAT
+    # Quant Standard: Include training stats for inference validation
+    import json
+    from datetime import datetime
+    
+    # Calculate expected prediction range from training data
+    train_predictions = final_model.predict(X if 'X_selected' not in dir() else X_selected)
+    pred_mean = float(np.mean(train_predictions))
+    pred_std = float(np.std(train_predictions))
+    
+    model_metadata = {
         'selected_features': selected_features,
-        'all_features': FEATURE_COLUMNS
+        'all_features': list(FEATURE_COLUMNS),
+        'training_date': datetime.now().isoformat(),
+        'training_samples': len(X),
+        'xgboost_version': xgb.__version__,
+        'prediction_stats': {
+            'mean': pred_mean,
+            'std': pred_std,
+            'min': float(np.min(train_predictions)),
+            'max': float(np.max(train_predictions)),
+            'expected_range': [-0.10, 0.10]  # Sanity bounds
+        },
+        'cv_metrics': {
+            'avg_rmse': avg_rmse,
+            'avg_dir_accuracy': avg_dir,
+            'avg_spearman': avg_spearman
+        }
     }
     
     if save_model:
         os.makedirs(MODEL_PATH, exist_ok=True)
+        
+        # Save model in portable JSON format (XGBoost native)
+        model_json_path = os.path.join(MODEL_PATH, "xgb_model.json")
+        final_model.save_model(model_json_path)
+        
+        # Save metadata separately
+        metadata_path = os.path.join(MODEL_PATH, "model_metadata.json")
+        with open(metadata_path, 'w') as f:
+            json.dump(model_metadata, f, indent=2)
+        
+        # Also keep legacy pickle for backward compatibility (temporary)
+        model_data = {
+            'model': final_model,
+            'selected_features': selected_features,
+            'all_features': FEATURE_COLUMNS
+        }
         joblib.dump(model_data, MODEL_FILE)
-        print(f"\n💾 Model saved to {MODEL_FILE}")
+        
+        print(f"\n💾 Model saved:")
+        print(f"   JSON (portable): {model_json_path}")
+        print(f"   Metadata: {metadata_path}")
+        print(f"   Legacy pickle: {MODEL_FILE}")
         print(f"   Selected features: {selected_features}")
+        print(f"   Prediction range: [{np.min(train_predictions):.4f}, {np.max(train_predictions):.4f}]")
     
     print(f"📊 Metrics saved to {RESULTS_LIVE_DIR}/metrics.txt")
     print(f"📈 Feature importance saved to {RESULTS_LIVE_DIR}/feature_importance.png")
     
     return final_model
+
 
 
 def evaluate_model(model, test_df):
