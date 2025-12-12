@@ -109,9 +109,14 @@ jobs:
         # Pop stash if exists
         git stash pop 2>/dev/null || true
         
-        # Re-add in case stash pop created conflicts
+        # Re-add in case stash pop created conflicts (MUST re-add ALL model files!)
         [ -f ledger.csv ] && git add ledger.csv
         [ -f models/xgb_model.joblib ] && git add models/xgb_model.joblib
+        [ -f models/xgb_model.json ] && git add models/xgb_model.json
+        [ -f models/model_metadata.json ] && git add models/model_metadata.json
+        [ -f results/live/metrics.txt ] && git add results/live/metrics.txt
+        [ -f results/live/feature_importance.png ] && git add results/live/feature_importance.png
+        [ -f results/live/selected_features.txt ] && git add results/live/selected_features.txt
         
         # Commit and push if there are changes
         git diff --staged --quiet || (git commit -m "🤖 AI Trade & Model Update $(date +'%Y-%m-%d')" && git push origin HEAD:"$BRANCH_NAME" --force-with-lease)

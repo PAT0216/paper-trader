@@ -1,2 +1,1289 @@
 /Users/pat0216/Documents/codin/paper-trader/src/data/universe.py:61: FutureWarning: Passing literal html to 'read_html' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
   tables = pd.read_html(response.text)
+============================================================
+2025 WALK-FORWARD TRADING SIMULATION
+============================================================
+Period: 2025-01-02 to 2025-12-11
+Initial Capital: $10,000.00
+
+📊 Fetching S&P 500 universe...
+📊 Fetched 502 S&P 500 tickers from Wikipedia
+   Loaded 502 tickers
+
+📈 Fetching historical data (this may take a while)...
+Fetching data for: ['MMM', 'AOS', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AMD', 'AES', 'AFL', 'A', 'APD', 'ABNB', 'AKAM', 'ALB', 'ARE', 'ALGN', 'ALLE', 'LNT', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCR', 'AEE', 'AEP', 'AXP', 'AIG', 'AMT', 'AWK', 'AMP', 'AME', 'AMGN', 'APH', 'ADI', 'AON', 'APA', 'APO', 'AAPL', 'AMAT', 'APP', 'APTV', 'ACGL', 'ADM', 'ANET', 'AJG', 'AIZ', 'T', 'ATO', 'ADSK', 'ADP', 'AZO', 'AVB', 'AVY', 'AXON', 'BKR', 'BALL', 'BAC', 'BAX', 'BDX', 'BRK-B', 'BBY', 'TECH', 'BIIB', 'BLK', 'BX', 'XYZ', 'BK', 'BA', 'BKNG', 'BSX', 'BMY', 'AVGO', 'BR', 'BRO', 'BF-B', 'BLDR', 'BG', 'BXP', 'CHRW', 'CDNS', 'CPT', 'CPB', 'COF', 'CAH', 'CCL', 'CARR', 'CAT', 'CBOE', 'CBRE', 'CDW', 'COR', 'CNC', 'CNP', 'CF', 'CRL', 'SCHW', 'CHTR', 'CVX', 'CMG', 'CB', 'CHD', 'CI', 'CINF', 'CTAS', 'CSCO', 'C', 'CFG', 'CLX', 'CME', 'CMS', 'KO', 'CTSH', 'COIN', 'CL', 'CMCSA', 'CAG', 'COP', 'ED', 'STZ', 'CEG', 'COO', 'CPRT', 'GLW', 'CPAY', 'CTVA', 'CSGP', 'COST', 'CTRA', 'CRWD', 'CCI', 'CSX', 'CMI', 'CVS', 'DHR', 'DRI', 'DDOG', 'DVA', 'DAY', 'DECK', 'DE', 'DELL', 'DAL', 'DVN', 'DXCM', 'FANG', 'DLR', 'DG', 'DLTR', 'D', 'DPZ', 'DASH', 'DOV', 'DOW', 'DHI', 'DTE', 'DUK', 'DD', 'ETN', 'EBAY', 'ECL', 'EIX', 'EW', 'EA', 'ELV', 'EME', 'EMR', 'ETR', 'EOG', 'EPAM', 'EQT', 'EFX', 'EQIX', 'EQR', 'ERIE', 'ESS', 'EL', 'EG', 'EVRG', 'ES', 'EXC', 'EXE', 'EXPE', 'EXPD', 'EXR', 'XOM', 'FFIV', 'FDS', 'FICO', 'FAST', 'FRT', 'FDX', 'FIS', 'FITB', 'FSLR', 'FE', 'FISV', 'F', 'FTNT', 'FTV', 'FOXA', 'FOX', 'BEN', 'FCX', 'GRMN', 'IT', 'GE', 'GEHC', 'GEV', 'GEN', 'GNRC', 'GD', 'GIS', 'GM', 'GPC', 'GILD', 'GPN', 'GL', 'GDDY', 'GS', 'HAL', 'HIG', 'HAS', 'HCA', 'DOC', 'HSIC', 'HSY', 'HPE', 'HLT', 'HOLX', 'HD', 'HON', 'HRL', 'HST', 'HWM', 'HPQ', 'HUBB', 'HUM', 'HBAN', 'HII', 'IBM', 'IEX', 'IDXX', 'ITW', 'INCY', 'IR', 'PODD', 'INTC', 'IBKR', 'ICE', 'IFF', 'IP', 'INTU', 'ISRG', 'IVZ', 'INVH', 'IQV', 'IRM', 'JBHT', 'JBL', 'JKHY', 'J', 'JNJ', 'JCI', 'JPM', 'KVUE', 'KDP', 'KEY', 'KEYS', 'KMB', 'KIM', 'KMI', 'KKR', 'KLAC', 'KHC', 'KR', 'LHX', 'LH', 'LRCX', 'LW', 'LVS', 'LDOS', 'LEN', 'LII', 'LLY', 'LIN', 'LYV', 'LKQ', 'LMT', 'L', 'LOW', 'LULU', 'LYB', 'MTB', 'MPC', 'MAR', 'MMC', 'MLM', 'MAS', 'MA', 'MTCH', 'MKC', 'MCD', 'MCK', 'MDT', 'MRK', 'META', 'MET', 'MTD', 'MGM', 'MCHP', 'MU', 'MSFT', 'MAA', 'MRNA', 'MHK', 'MOH', 'TAP', 'MDLZ', 'MPWR', 'MNST', 'MCO', 'MS', 'MOS', 'MSI', 'MSCI', 'NDAQ', 'NTAP', 'NFLX', 'NEM', 'NWSA', 'NWS', 'NEE', 'NKE', 'NI', 'NDSN', 'NSC', 'NTRS', 'NOC', 'NCLH', 'NRG', 'NUE', 'NVDA', 'NVR', 'NXPI', 'ORLY', 'OXY', 'ODFL', 'OMC', 'ON', 'OKE', 'ORCL', 'OTIS', 'PCAR', 'PKG', 'PLTR', 'PANW', 'PSKY', 'PH', 'PAYX', 'PAYC', 'PYPL', 'PNR', 'PEP', 'PFE', 'PCG', 'PM', 'PSX', 'PNW', 'PNC', 'POOL', 'PPG', 'PPL', 'PFG', 'PG', 'PGR', 'PLD', 'PRU', 'PEG', 'PTC', 'PSA', 'PHM', 'PWR', 'QCOM', 'DGX', 'Q', 'RL', 'RJF', 'RTX', 'O', 'REG', 'REGN', 'RF', 'RSG', 'RMD', 'RVTY', 'HOOD', 'ROK', 'ROL', 'ROP', 'ROST', 'RCL', 'SPGI', 'CRM', 'SNDK', 'SBAC', 'SLB', 'STX', 'SRE', 'NOW', 'SHW', 'SPG', 'SWKS', 'SJM', 'SW', 'SNA', 'SOLS', 'SOLV', 'SO', 'LUV', 'SWK', 'SBUX', 'STT', 'STLD', 'STE', 'SYK', 'SMCI', 'SYF', 'SNPS', 'SYY', 'TMUS', 'TROW', 'TTWO', 'TPR', 'TRGP', 'TGT', 'TEL', 'TDY', 'TER', 'TSLA', 'TXN', 'TPL', 'TXT', 'TMO', 'TJX', 'TKO', 'TTD', 'TSCO', 'TT', 'TDG', 'TRV', 'TRMB', 'TFC', 'TYL', 'TSN', 'USB', 'UBER', 'UDR', 'ULTA', 'UNP', 'UAL', 'UPS', 'URI', 'UNH', 'UHS', 'VLO', 'VTR', 'VLTO', 'VRSN', 'VRSK', 'VZ', 'VRTX', 'VTRS', 'VICI', 'V', 'VST', 'VMC', 'WRB', 'GWW', 'WAB', 'WMT', 'DIS', 'WBD', 'WM', 'WAT', 'WEC', 'WFC', 'WELL', 'WST', 'WDC', 'WY', 'WSM', 'WMB', 'WTW', 'WDAY', 'WYNN', 'XEL', 'XYL', 'YUM', 'ZBRA', 'ZBH', 'ZTS']
+   Cache enabled: data/market.db
+   ❌ Error fetching BMY: UNIQUE constraint failed: price_data.ticker, price_data.date
+   ✅ Loaded 501 tickers
+   Loaded data for 501 tickers
+   498 tickers have sufficient history
+
+🚀 Starting simulation (retraining every 5 days)...
+------------------------------------------------------------
+
+📅 2025-01-02 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 816,990
+   Date range: 1962-10-15 00:00:00 to 2024-12-30 00:00:00
+   After date filter (>= 2010-01-01): 359,439 samples
+   Final samples: 359,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0178, MAE=0.0114, R²=-0.0124, Dir.Acc=52.26%
+   Fold 2: RMSE=0.0228, MAE=0.0150, R²=-0.0071, Dir.Acc=52.06%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0098
+   Avg Directional Accuracy: 52.16%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0194
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 359,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-01-07 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 817,290
+   Date range: 1962-10-15 00:00:00 to 2025-01-03 00:00:00
+   After date filter (>= 2010-01-01): 359,739 samples
+   Final samples: 359,739
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0183, MAE=0.0116, R²=-0.0004, Dir.Acc=52.36%
+   Fold 2: RMSE=0.0227, MAE=0.0149, R²=-0.0510, Dir.Acc=52.15%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0205 (2.05% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0257
+   Avg Directional Accuracy: 52.26%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0220
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 359,739 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-01-13 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 817,590
+   Date range: 1962-10-15 00:00:00 to 2025-01-08 00:00:00
+   After date filter (>= 2010-01-01): 360,039 samples
+   Final samples: 360,039
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0186, MAE=0.0117, R²=0.0029, Dir.Acc=52.28%
+   Fold 2: RMSE=0.0224, MAE=0.0148, R²=-0.0487, Dir.Acc=52.20%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0205 (2.05% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0229
+   Avg Directional Accuracy: 52.24%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0210
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 360,039 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-01-20 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 818,090
+   Date range: 1962-10-15 00:00:00 to 2025-01-16 00:00:00
+   After date filter (>= 2010-01-01): 360,539 samples
+   Final samples: 360,539
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0190, MAE=0.0118, R²=0.0041, Dir.Acc=52.40%
+   Fold 2: RMSE=0.0217, MAE=0.0146, R²=-0.0165, Dir.Acc=52.06%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0062
+   Avg Directional Accuracy: 52.23%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0179
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 360,539 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-01-21: $10,019.91 (+0.2%) | 1 positions
+
+📅 2025-01-27 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 818,490
+   Date range: 1962-10-15 00:00:00 to 2025-01-23 00:00:00
+   After date filter (>= 2010-01-01): 360,939 samples
+   Final samples: 360,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0193, MAE=0.0119, R²=0.0004, Dir.Acc=52.46%
+   Fold 2: RMSE=0.0213, MAE=0.0145, R²=-0.0058, Dir.Acc=52.20%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0027
+   Avg Directional Accuracy: 52.33%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0212
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 360,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-02-03 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 818,990
+   Date range: 1962-10-15 00:00:00 to 2025-01-30 00:00:00
+   After date filter (>= 2010-01-01): 361,439 samples
+   Final samples: 361,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0195, MAE=0.0120, R²=-0.0005, Dir.Acc=52.46%
+   Fold 2: RMSE=0.0213, MAE=0.0144, R²=-0.0215, Dir.Acc=52.01%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0110
+   Avg Directional Accuracy: 52.23%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0200
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 361,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-02-10 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 819,490
+   Date range: 1962-10-15 00:00:00 to 2025-02-06 00:00:00
+   After date filter (>= 2010-01-01): 361,939 samples
+   Final samples: 361,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0197, MAE=0.0121, R²=0.0007, Dir.Acc=52.49%
+   Fold 2: RMSE=0.0209, MAE=0.0143, R²=-0.0058, Dir.Acc=52.37%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0025
+   Avg Directional Accuracy: 52.43%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0232
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 361,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-02-10: $10,090.88 (+0.9%) | 1 positions
+
+📅 2025-02-17 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 819,990
+   Date range: 1962-10-15 00:00:00 to 2025-02-13 00:00:00
+   After date filter (>= 2010-01-01): 362,439 samples
+   Final samples: 362,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0198, MAE=0.0121, R²=0.0014, Dir.Acc=52.51%
+   Fold 2: RMSE=0.0209, MAE=0.0143, R²=-0.0073, Dir.Acc=52.21%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0029
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0216
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 362,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-02-24 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 820,390
+   Date range: 1962-10-15 00:00:00 to 2025-02-20 00:00:00
+   After date filter (>= 2010-01-01): 362,839 samples
+   Final samples: 362,839
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0198, MAE=0.0122, R²=0.0032, Dir.Acc=52.58%
+   Fold 2: RMSE=0.0208, MAE=0.0142, R²=-0.0062, Dir.Acc=52.14%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0203 (2.03% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0015
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0218
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 362,839 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-03-03 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 820,890
+   Date range: 1962-10-15 00:00:00 to 2025-02-27 00:00:00
+   After date filter (>= 2010-01-01): 363,339 samples
+   Final samples: 363,339
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0199, MAE=0.0122, R²=-0.0008, Dir.Acc=52.48%
+   Fold 2: RMSE=0.0208, MAE=0.0142, R²=-0.0067, Dir.Acc=52.29%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0037
+   Avg Directional Accuracy: 52.38%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0217
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 363,339 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-03-10 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 821,390
+   Date range: 1962-10-15 00:00:00 to 2025-03-06 00:00:00
+   After date filter (>= 2010-01-01): 363,839 samples
+   Final samples: 363,839
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0199, MAE=0.0123, R²=0.0013, Dir.Acc=52.60%
+   Fold 2: RMSE=0.0208, MAE=0.0142, R²=-0.0067, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0027
+   Avg Directional Accuracy: 52.35%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0211
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 363,839 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-03-17 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 821,890
+   Date range: 1962-10-15 00:00:00 to 2025-03-13 00:00:00
+   After date filter (>= 2010-01-01): 364,339 samples
+   Final samples: 364,339
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0200, MAE=0.0123, R²=0.0010, Dir.Acc=52.59%
+   Fold 2: RMSE=0.0207, MAE=0.0142, R²=-0.0067, Dir.Acc=52.11%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0028
+   Avg Directional Accuracy: 52.35%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0213
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 364,339 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-03-24 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 822,390
+   Date range: 1962-10-15 00:00:00 to 2025-03-20 00:00:00
+   After date filter (>= 2010-01-01): 364,839 samples
+   Final samples: 364,839
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0201, MAE=0.0123, R²=0.0011, Dir.Acc=52.47%
+   Fold 2: RMSE=0.0207, MAE=0.0141, R²=-0.0071, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0030
+   Avg Directional Accuracy: 52.28%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0228
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 364,839 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-03-31 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 822,890
+   Date range: 1962-10-15 00:00:00 to 2025-03-27 00:00:00
+   After date filter (>= 2010-01-01): 365,339 samples
+   Final samples: 365,339
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0201, MAE=0.0124, R²=0.0021, Dir.Acc=52.50%
+   Fold 2: RMSE=0.0206, MAE=0.0141, R²=-0.0045, Dir.Acc=52.07%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0132
+   Avg R²:   -0.0012
+   Avg Directional Accuracy: 52.29%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0227
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 365,339 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-04-07 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 823,390
+   Date range: 1962-10-15 00:00:00 to 2025-04-03 00:00:00
+   After date filter (>= 2010-01-01): 365,839 samples
+   Final samples: 365,839
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0201, MAE=0.0124, R²=0.0023, Dir.Acc=52.53%
+   Fold 2: RMSE=0.0207, MAE=0.0141, R²=-0.0049, Dir.Acc=52.08%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0204 (2.04% return)
+   Avg MAE:  0.0133
+   Avg R²:   -0.0013
+   Avg Directional Accuracy: 52.30%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0233
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 365,839 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-04-11: $10,023.34 (+0.2%) | 7 positions
+
+📅 2025-04-14 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 823,890
+   Date range: 1962-10-15 00:00:00 to 2025-04-10 00:00:00
+   After date filter (>= 2010-01-01): 366,339 samples
+   Final samples: 366,339
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0202, MAE=0.0124, R²=0.0013, Dir.Acc=52.56%
+   Fold 2: RMSE=0.0209, MAE=0.0142, R²=-0.0032, Dir.Acc=52.16%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0133
+   Avg R²:   -0.0010
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0229
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 366,339 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-04-21 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 824,290
+   Date range: 1962-10-15 00:00:00 to 2025-04-16 00:00:00
+   After date filter (>= 2010-01-01): 366,739 samples
+   Final samples: 366,739
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0202, MAE=0.0125, R²=0.0015, Dir.Acc=52.55%
+   Fold 2: RMSE=0.0209, MAE=0.0142, R²=-0.0039, Dir.Acc=52.17%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0133
+   Avg R²:   -0.0012
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0234
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 366,739 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-04-28 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 824,790
+   Date range: 1962-10-15 00:00:00 to 2025-04-24 00:00:00
+   After date filter (>= 2010-01-01): 367,239 samples
+   Final samples: 367,239
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0202, MAE=0.0125, R²=0.0050, Dir.Acc=52.62%
+   Fold 2: RMSE=0.0209, MAE=0.0142, R²=-0.0044, Dir.Acc=52.15%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0133
+   Avg R²:   0.0003
+   Avg Directional Accuracy: 52.39%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0252
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 367,239 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-05-01: $10,679.75 (+6.8%) | 22 positions
+
+📅 2025-05-05 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 825,290
+   Date range: 1962-10-15 00:00:00 to 2025-05-01 00:00:00
+   After date filter (>= 2010-01-01): 367,739 samples
+   Final samples: 367,739
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0203, MAE=0.0125, R²=0.0027, Dir.Acc=52.63%
+   Fold 2: RMSE=0.0209, MAE=0.0142, R²=-0.0045, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0133
+   Avg R²:   -0.0009
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0232
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 367,739 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-05-12 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 825,790
+   Date range: 1962-10-15 00:00:00 to 2025-05-08 00:00:00
+   After date filter (>= 2010-01-01): 368,239 samples
+   Final samples: 368,239
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0204, MAE=0.0125, R²=0.0032, Dir.Acc=52.59%
+   Fold 2: RMSE=0.0208, MAE=0.0142, R²=-0.0066, Dir.Acc=52.04%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0133
+   Avg R²:   -0.0017
+   Avg Directional Accuracy: 52.32%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0226
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 368,239 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-05-19 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 826,290
+   Date range: 1962-10-15 00:00:00 to 2025-05-15 00:00:00
+   After date filter (>= 2010-01-01): 368,739 samples
+   Final samples: 368,739
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0126, R²=0.0041, Dir.Acc=52.58%
+   Fold 2: RMSE=0.0208, MAE=0.0141, R²=-0.0069, Dir.Acc=52.21%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0014
+   Avg Directional Accuracy: 52.39%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0240
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 368,739 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-05-21: $11,205.18 (+12.1%) | 20 positions
+
+📅 2025-05-26 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 826,790
+   Date range: 1962-10-15 00:00:00 to 2025-05-22 00:00:00
+   After date filter (>= 2010-01-01): 369,239 samples
+   Final samples: 369,239
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0126, R²=0.0050, Dir.Acc=52.69%
+   Fold 2: RMSE=0.0207, MAE=0.0141, R²=-0.0054, Dir.Acc=52.04%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0002
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0236
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 369,239 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-06-02 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 827,190
+   Date range: 1962-10-15 00:00:00 to 2025-05-29 00:00:00
+   After date filter (>= 2010-01-01): 369,639 samples
+   Final samples: 369,639
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0126, R²=0.0048, Dir.Acc=52.68%
+   Fold 2: RMSE=0.0207, MAE=0.0141, R²=-0.0043, Dir.Acc=52.05%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0002
+   Avg Directional Accuracy: 52.37%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0232
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 369,639 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-06-09 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 827,690
+   Date range: 1962-10-15 00:00:00 to 2025-06-05 00:00:00
+   After date filter (>= 2010-01-01): 370,139 samples
+   Final samples: 370,139
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0126, R²=0.0023, Dir.Acc=52.65%
+   Fold 2: RMSE=0.0207, MAE=0.0141, R²=-0.0030, Dir.Acc=52.14%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0003
+   Avg Directional Accuracy: 52.39%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0246
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 370,139 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-06-10: $12,139.33 (+21.4%) | 22 positions
+
+📅 2025-06-16 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 828,190
+   Date range: 1962-10-15 00:00:00 to 2025-06-12 00:00:00
+   After date filter (>= 2010-01-01): 370,639 samples
+   Final samples: 370,639
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0127, R²=0.0047, Dir.Acc=52.68%
+   Fold 2: RMSE=0.0207, MAE=0.0140, R²=-0.0036, Dir.Acc=52.10%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0005
+   Avg Directional Accuracy: 52.39%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0253
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 370,639 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-06-23 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 828,590
+   Date range: 1962-10-15 00:00:00 to 2025-06-18 00:00:00
+   After date filter (>= 2010-01-01): 371,039 samples
+   Final samples: 371,039
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0127, R²=0.0034, Dir.Acc=52.67%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0031, Dir.Acc=52.05%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0002
+   Avg Directional Accuracy: 52.36%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0258
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 371,039 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-06-30 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 829,090
+   Date range: 1962-10-15 00:00:00 to 2025-06-26 00:00:00
+   After date filter (>= 2010-01-01): 371,539 samples
+   Final samples: 371,539
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0127, R²=0.0061, Dir.Acc=52.74%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0034, Dir.Acc=52.13%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0014
+   Avg Directional Accuracy: 52.44%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0263
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 371,539 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+   2025-06-30: $12,244.54 (+22.4%) | 23 positions
+
+📅 2025-07-07 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 829,490
+   Date range: 1962-10-15 00:00:00 to 2025-07-02 00:00:00
+   After date filter (>= 2010-01-01): 371,939 samples
+   Final samples: 371,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0205, MAE=0.0127, R²=0.0055, Dir.Acc=52.86%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0040, Dir.Acc=52.17%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0008
+   Avg Directional Accuracy: 52.52%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0271
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 371,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-07-14 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 829,990
+   Date range: 1962-10-15 00:00:00 to 2025-07-10 00:00:00
+   After date filter (>= 2010-01-01): 372,439 samples
+   Final samples: 372,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0127, R²=0.0042, Dir.Acc=52.83%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0029, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0006
+   Avg Directional Accuracy: 52.46%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0267
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 372,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-07-21 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 830,490
+   Date range: 1962-10-15 00:00:00 to 2025-07-17 00:00:00
+   After date filter (>= 2010-01-01): 372,939 samples
+   Final samples: 372,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0127, R²=0.0042, Dir.Acc=52.77%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0045, Dir.Acc=52.04%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0002
+   Avg Directional Accuracy: 52.41%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0264
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 372,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-07-28 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 830,990
+   Date range: 1962-10-15 00:00:00 to 2025-07-24 00:00:00
+   After date filter (>= 2010-01-01): 373,439 samples
+   Final samples: 373,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0127, R²=0.0049, Dir.Acc=52.83%
+   Fold 2: RMSE=0.0206, MAE=0.0140, R²=-0.0040, Dir.Acc=52.15%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0004
+   Avg Directional Accuracy: 52.49%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0251
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 373,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-08-04 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 831,490
+   Date range: 1962-10-15 00:00:00 to 2025-07-31 00:00:00
+   After date filter (>= 2010-01-01): 373,939 samples
+   Final samples: 373,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0127, R²=0.0055, Dir.Acc=52.77%
+   Fold 2: RMSE=0.0207, MAE=0.0140, R²=-0.0036, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0206 (2.06% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0009
+   Avg Directional Accuracy: 52.43%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0270
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 373,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-08-11 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 831,990
+   Date range: 1962-10-15 00:00:00 to 2025-08-07 00:00:00
+   After date filter (>= 2010-01-01): 374,439 samples
+   Final samples: 374,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0127, R²=0.0039, Dir.Acc=52.85%
+   Fold 2: RMSE=0.0207, MAE=0.0140, R²=-0.0045, Dir.Acc=52.06%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0207 (2.07% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0003
+   Avg Directional Accuracy: 52.45%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0264
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 374,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-08-18 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 832,490
+   Date range: 1962-10-15 00:00:00 to 2025-08-14 00:00:00
+   After date filter (>= 2010-01-01): 374,939 samples
+   Final samples: 374,939
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0128, R²=0.0040, Dir.Acc=52.88%
+   Fold 2: RMSE=0.0207, MAE=0.0140, R²=-0.0040, Dir.Acc=52.10%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0207 (2.07% return)
+   Avg MAE:  0.0134
+   Avg R²:   0.0000
+   Avg Directional Accuracy: 52.49%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0261
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 374,939 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
+
+📅 2025-08-25 - Retraining model...
+============================================================
+ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)
+============================================================
+
+📊 Preparing training data...
+   Total samples: 832,990
+   Date range: 1962-10-15 00:00:00 to 2025-08-21 00:00:00
+   After date filter (>= 2010-01-01): 375,439 samples
+   Final samples: 375,439
+   Features: 15
+   Target: Next-day return (regression)
+
+⏱️  Running 2-fold Time-Series Cross-Validation...
+   Fold 1: RMSE=0.0206, MAE=0.0128, R²=0.0045, Dir.Acc=52.83%
+   Fold 2: RMSE=0.0207, MAE=0.0140, R²=-0.0055, Dir.Acc=52.09%
+
+📈 Cross-Validation Summary:
+   Avg RMSE: 0.0207 (2.07% return)
+   Avg MAE:  0.0134
+   Avg R²:   -0.0005
+   Avg Directional Accuracy: 52.46%
+
+   --- RANKING METRICS (explains R² paradox) ---
+   Avg Spearman Rank Corr: 0.0268
+   Avg Top-10% Accuracy:   0.00%
+
+🏋️ Training final model on all 375,439 samples...
+
+🔍 Feature Selection (threshold: 3.0%):
+   Keeping: 15 features
+   ✅ All features above threshold - keeping all
+   Feature order: ['RSI', 'MACD', 'MACD_signal']... (preserved training order)
+📊 Metrics saved to results/live/metrics.txt
+📈 Feature importance saved to results/live/feature_importance.png
