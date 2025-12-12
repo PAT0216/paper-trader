@@ -210,15 +210,17 @@ def run_backtest(
             signal_generator = create_simple_signal_generator()
             strategy_name = "Simple SMA Crossover (fallback)"
         else:
-            # Use cross-sectional ranking: BUY top 10%, SELL bottom 10%
-            # This works better than fixed thresholds when model predicts close to mean
-            from src.backtesting import create_cross_sectional_signal_generator
-            signal_generator = create_cross_sectional_signal_generator(
+            # Use momentum-enhanced ranking: ML (50%) + 12-1 month momentum (50%)
+            # Phase 2: Combines ML predictions with proven momentum factor
+            from src.backtesting import create_momentum_enhanced_signal_generator
+            signal_generator = create_momentum_enhanced_signal_generator(
                 predictor, 
                 buy_pct=0.10,   # Top 10%
-                sell_pct=0.10  # Bottom 10%
+                sell_pct=0.10,  # Bottom 10%
+                ml_weight=0.5,
+                momentum_weight=0.5
             )
-            strategy_name = "ML XGBoost + Cross-Sectional Ranking (Top/Bottom 10%)"
+            strategy_name = "ML XGBoost + Momentum (50/50 blend, Top/Bottom 10%)"
     else:
         signal_generator = create_simple_signal_generator()
         strategy_name = "Simple SMA Crossover"

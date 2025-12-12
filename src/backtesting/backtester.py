@@ -767,6 +767,95 @@ def create_cross_sectional_signal_generator(predictor, buy_pct: float = 0.10, se
     return generate_signal
 
 
+def create_momentum_enhanced_signal_generator(predictor, buy_pct: float = 0.10, sell_pct: float = 0.10,
+                                               ml_weight: float = 0.5, momentum_weight: float = 0.5):
+    """
+    Create a signal generator that combines ML predictions with 12-1 month momentum.
+    
+    Phase 2 enhancement: Adds documented momentum factor to improve ranking.
+    Momentum is the most documented alpha source (Jegadeesh-Titman 1993).
+    12-1 skips last month to avoid short-term reversal.
+    
+    Args:
+        predictor: Predictor instance with predict() method  
+        buy_pct: Percentage of top stocks to buy (default 10%)
+        sell_pct: Percentage of bottom stocks to sell (default 10%)
+        ml_weight: Weight for ML predictions (default 0.5)
+        momentum_weight: Weight for momentum factor (default 0.5)
+        
+    Returns:
+        Signal generator function that returns (signal, composite_score)
+    """
+    import numpy as np
+    from scipy.stats import zscore
+    
+    # Cache for storing predictions across tickers for current date
+    _cache = {'ml_preds': {}, 'momentum': {}, 'current_date': None}
+    
+    def generate_signal(ticker: str, df: pd.DataFrame, portfolio_state: Dict) -> tuple:
+        try:
+            # Get current date
+            current_date = df.index[-1] if len(df) > 0 else None
+            
+            # Reset cache on new date
+            if _cache['current_date'] != current_date:
+                _cache['ml_preds'] = {}
+                _cache['momentum'] = {}
+                _cache['current_date'] = current_date
+            
+            # Get ML prediction
+            pred = predictor.predict(df)
+            _cache['ml_preds'][ticker] = pred
+            
+            # Calculate 12-1 month momentum
+            if len(df) >= 273:
+                close = df['Close']
+                momentum_12_1 = (close.iloc[-22] / close.iloc[-273] - 1) if close.iloc[-273] != 0 else 0
+                _cache['momentum'][ticker] = momentum_12_1
+            else:
+                _cache['momentum'][ticker] = 0.0
+            
+            # Z-score normalize and combine
+            tickers_list = list(_cache['ml_preds'].keys())
+            ml_values = np.array([_cache['ml_preds'][t] for t in tickers_list])
+            mom_values = np.array([_cache['momentum'].get(t, 0) for t in tickers_list])
+            
+            if len(ml_values) > 1 and ml_values.std() > 0:
+                ml_z = zscore(ml_values)
+            else:
+                ml_z = np.zeros_like(ml_values)
+                
+            if len(mom_values) > 1 and mom_values.std() > 0:
+                mom_z = zscore(mom_values)
+            else:
+                mom_z = np.zeros_like(mom_values)
+            
+            composite = ml_weight * ml_z + momentum_weight * mom_z
+            composite_dict = {tickers_list[i]: composite[i] for i in range(len(tickers_list))}
+            
+            # Sort and assign signals
+            sorted_tickers = sorted(composite_dict.items(), key=lambda x: x[1], reverse=True)
+            n_total = len(sorted_tickers)
+            n_buy = max(1, int(n_total * buy_pct))
+            n_sell = max(1, int(n_total * sell_pct))
+            
+            buy_set = set([t for t, _ in sorted_tickers[:n_buy]])
+            sell_set = set([t for t, _ in sorted_tickers[-n_sell:]])
+            
+            if ticker in buy_set:
+                signal = 'BUY'
+            elif ticker in sell_set:
+                signal = 'SELL'
+            else:
+                signal = 'HOLD'
+            
+            return (signal, composite_dict.get(ticker, 0.0))
+        except Exception:
+            return ('HOLD', 0.0)
+    
+    return generate_signal
+
+
 def create_simple_signal_generator():
     """
     Create a simple SMA crossover signal generator for testing.

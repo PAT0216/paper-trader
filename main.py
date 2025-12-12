@@ -83,51 +83,91 @@ def main():
         signals = {}
         expected_returns = {}
         
-        # ==================== QUANT STRATEGY: CROSS-SECTIONAL RANKING ====================
-        # Instead of absolute thresholds (which fail when model predicts close to mean),
-        # use RELATIVE ranking: BUY top 10%, SELL bottom 10%
-        # This works because predicting rankings is easier than predicting returns
-        # Reference: Jegadeesh & Titman (1993), AQR, Two Sigma
+        # ==================== QUANT STRATEGY: MOMENTUM-ENHANCED RANKING ====================
+        # Phase 2: Combine ML predictions with 12-1 month momentum factor
+        # Momentum is the most documented alpha source (Jegadeesh-Titman 1993)
+        # 12-1 skips last month to avoid short-term reversal
         
         # Config
         BUY_PERCENTILE = 0.10   # Top 10%
         SELL_PERCENTILE = 0.10  # Bottom 10%
+        ML_WEIGHT = 0.5         # 50% ML, 50% Momentum
+        MOMENTUM_WEIGHT = 0.5
+        
+        momentum_scores = {}
+        composite_scores = {}
         
         for ticker in tickers:
             if ticker not in data_dict:
                  continue
             df = data_dict[ticker]
             
-            # Get expected return from regression model
+            # Get ML prediction
             expected_ret = ai_predictor.predict(df)
             expected_returns[ticker] = expected_ret
+            
+            # Calculate 12-1 month momentum (skip last 21 days, use 252 days before that)
+            if len(df) >= 273:  # Need at least 12 months + 1 month
+                close = df['Close']
+                # 12 month return ending 1 month ago
+                momentum_12_1 = (close.iloc[-22] / close.iloc[-273] - 1) if close.iloc[-273] != 0 else 0
+                momentum_scores[ticker] = momentum_12_1
+            else:
+                momentum_scores[ticker] = 0.0
         
-        # Sort by predicted return (descending)
-        sorted_preds = sorted(expected_returns.items(), key=lambda x: x[1], reverse=True)
-        n_tickers = len(sorted_preds)
+        # Z-score normalize both signals for fair combination
+        import numpy as np
+        from scipy.stats import zscore
+        
+        # Convert to arrays for z-scoring
+        tickers_list = list(expected_returns.keys())
+        ml_values = np.array([expected_returns[t] for t in tickers_list])
+        mom_values = np.array([momentum_scores.get(t, 0) for t in tickers_list])
+        
+        # Z-score (handle edge cases)
+        if len(ml_values) > 1 and ml_values.std() > 0:
+            ml_z = zscore(ml_values)
+        else:
+            ml_z = np.zeros_like(ml_values)
+            
+        if len(mom_values) > 1 and mom_values.std() > 0:
+            mom_z = zscore(mom_values)
+        else:
+            mom_z = np.zeros_like(mom_values)
+        
+        # Combine signals
+        composite = ML_WEIGHT * ml_z + MOMENTUM_WEIGHT * mom_z
+        composite_scores = {tickers_list[i]: composite[i] for i in range(len(tickers_list))}
+        
+        # Sort by composite score (descending)
+        sorted_composite = sorted(composite_scores.items(), key=lambda x: x[1], reverse=True)
+        n_tickers = len(sorted_composite)
         n_buy = max(1, int(n_tickers * BUY_PERCENTILE))
         n_sell = max(1, int(n_tickers * SELL_PERCENTILE))
         
-        buy_tickers = set([t for t, _ in sorted_preds[:n_buy]])
-        sell_tickers = set([t for t, _ in sorted_preds[-n_sell:]])
+        buy_tickers = set([t for t, _ in sorted_composite[:n_buy]])
+        sell_tickers = set([t for t, _ in sorted_composite[-n_sell:]])
         
-        print(f"\n📊 Cross-Sectional Ranking:")
+        print(f"\n📊 Momentum-Enhanced Ranking (50% ML + 50% Momentum):")
         print(f"   Universe: {n_tickers} stocks")
         print(f"   Top {n_buy} → BUY, Bottom {n_sell} → SELL")
-        print(f"   Prediction range: [{sorted_preds[-1][1]*100:.2f}%, {sorted_preds[0][1]*100:.2f}%]")
         
-        # Generate signals based on ranking
-        for ticker, expected_ret in sorted_preds:
+        # Generate signals based on composite ranking
+        for ticker, score in sorted_composite:
             if ticker in buy_tickers:
                 action = "BUY"
-                print(f"🟢 {ticker}: BUY  (Rank: Top {BUY_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
+                mom_pct = momentum_scores.get(ticker, 0) * 100
+                ml_pct = expected_returns.get(ticker, 0) * 100
+                print(f"🟢 {ticker}: BUY  (Composite: {score:+.2f}, ML: {ml_pct:+.2f}%, Mom: {mom_pct:+.1f}%)")
             elif ticker in sell_tickers:
                 action = "SELL"
-                print(f"🔴 {ticker}: SELL (Rank: Bottom {SELL_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
+                mom_pct = momentum_scores.get(ticker, 0) * 100
+                ml_pct = expected_returns.get(ticker, 0) * 100
+                print(f"🔴 {ticker}: SELL (Composite: {score:+.2f}, ML: {ml_pct:+.2f}%, Mom: {mom_pct:+.1f}%)")
             else:
                 action = "HOLD"
             signals[ticker] = action
-        # ==================== END CROSS-SECTIONAL RANKING ====================
+        # ==================== END MOMENTUM-ENHANCED RANKING ====================
         
         # ==================== MODEL VALIDATION GATE (Quant Standard) ====================
         # If >80% of predictions are extreme (>3% expected return), model is likely corrupted
