@@ -63,23 +63,27 @@ jobs:
         git config --global user.email '69978508+PAT0216@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         
-        # Add files only if they exist
-        [ -f ledger.csv ] && git add ledger.csv
-        [ -f models/xgb_model.joblib ] && git add models/xgb_model.joblib
-        [ -f models/xgb_model.json ] && git add models/xgb_model.json
-        [ -f models/model_metadata.json ] && git add models/model_metadata.json
-        [ -f models/xgb_ensemble.joblib ] && git add models/xgb_ensemble.joblib
-        [ -f results/metrics.txt ] && git add results/metrics.txt
-        [ -f results/feature_importance.png ] && git add results/feature_importance.png
-        [ -f results/selected_features.txt ] && git add results/selected_features.txt
-        [ -f results/live/metrics.txt ] && git add results/live/metrics.txt
-        [ -f results/live/feature_importance.png ] && git add results/live/feature_importance.png
-        [ -f results/live/selected_features.txt ] && git add results/live/selected_features.txt
-
+        # Force-add model files (quant standard: ensure model persistence)
+        git add -f ledger.csv 2>/dev/null || true
+        git add -f models/xgb_model.json 2>/dev/null || true
+        git add -f models/model_metadata.json 2>/dev/null || true
+        git add -f models/xgb_model.joblib 2>/dev/null || true
+        git add -f models/xgb_ensemble.joblib 2>/dev/null || true
+        git add -f results/metrics.txt 2>/dev/null || true
+        git add -f results/feature_importance.png 2>/dev/null || true
+        git add -f results/selected_features.txt 2>/dev/null || true
+        git add -f results/live/metrics.txt 2>/dev/null || true
+        git add -f results/live/feature_importance.png 2>/dev/null || true
+        git add -f results/live/selected_features.txt 2>/dev/null || true
+        
+        # Verify what we're committing
+        echo "📋 Files staged for commit:"
+        git diff --cached --stat
         
         # Get current branch name
         BRANCH_NAME="${GITHUB_REF_NAME}"
         echo "📌 Pushing to branch: $BRANCH_NAME"
+
         
         # Fetch latest from remote
         git fetch origin "$BRANCH_NAME" || true
