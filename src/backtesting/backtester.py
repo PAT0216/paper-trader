@@ -707,6 +707,66 @@ def create_ml_signal_generator(predictor, threshold_buy: float = 0.55, threshold
     return generate_signal
 
 
+def create_cross_sectional_signal_generator(predictor, buy_pct: float = 0.10, sell_pct: float = 0.10):
+    """
+    Create a signal generator that uses cross-sectional ranking.
+    
+    Instead of absolute thresholds, ranks all tickers by predicted return
+    and generates BUY for top X%, SELL for bottom X%.
+    
+    This approach works because predicting rankings is easier than 
+    predicting returns. Reference: Jegadeesh & Titman (1993)
+    
+    Args:
+        predictor: Predictor instance with predict() method  
+        buy_pct: Percentage of top stocks to buy (default 10%)
+        sell_pct: Percentage of bottom stocks to sell (default 10%)
+        
+    Returns:
+        Signal generator function that returns (signal, expected_return)
+    """
+    # Cache for storing predictions across tickers for current date
+    _cache = {'predictions': {}, 'current_date': None, 'ranked': False}
+    
+    def generate_signal(ticker: str, df: pd.DataFrame, portfolio_state: Dict) -> tuple:
+        try:
+            # Get current date
+            current_date = df.index[-1] if len(df) > 0 else None
+            
+            # Reset cache on new date
+            if _cache['current_date'] != current_date:
+                _cache['predictions'] = {}
+                _cache['current_date'] = current_date
+                _cache['ranked'] = False
+            
+            # Get prediction for this ticker
+            pred = predictor.predict(df)
+            _cache['predictions'][ticker] = pred
+            
+            # Sort and assign signals
+            preds = _cache['predictions']
+            sorted_tickers = sorted(preds.items(), key=lambda x: x[1], reverse=True)
+            n_total = len(sorted_tickers)
+            n_buy = max(1, int(n_total * buy_pct))
+            n_sell = max(1, int(n_total * sell_pct))
+            
+            buy_set = set([t for t, _ in sorted_tickers[:n_buy]])
+            sell_set = set([t for t, _ in sorted_tickers[-n_sell:]])
+            
+            if ticker in buy_set:
+                signal = 'BUY'
+            elif ticker in sell_set:
+                signal = 'SELL'
+            else:
+                signal = 'HOLD'
+            
+            return (signal, pred)
+        except Exception:
+            return ('HOLD', 0.0)
+    
+    return generate_signal
+
+
 def create_simple_signal_generator():
     """
     Create a simple SMA crossover signal generator for testing.

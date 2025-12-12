@@ -83,11 +83,15 @@ def main():
         signals = {}
         expected_returns = {}
         
-        # Thresholds for return-based decisions (Phase 3)
-        # BUY if expected return > 0.5%, SELL if < -0.5%
-        # A/B Test Result: Fixed thresholds (Sharpe 0.26) beat Z-Score (-0.43) and Hybrid (0.19)
-        return_buy_thresh = 0.005   # 0.5% expected return
-        return_sell_thresh = -0.005  # -0.5% expected return
+        # ==================== QUANT STRATEGY: CROSS-SECTIONAL RANKING ====================
+        # Instead of absolute thresholds (which fail when model predicts close to mean),
+        # use RELATIVE ranking: BUY top 10%, SELL bottom 10%
+        # This works because predicting rankings is easier than predicting returns
+        # Reference: Jegadeesh & Titman (1993), AQR, Two Sigma
+        
+        # Config
+        BUY_PERCENTILE = 0.10   # Top 10%
+        SELL_PERCENTILE = 0.10  # Bottom 10%
         
         for ticker in tickers:
             if ticker not in data_dict:
@@ -97,37 +101,33 @@ def main():
             # Get expected return from regression model
             expected_ret = ai_predictor.predict(df)
             expected_returns[ticker] = expected_ret
-            
-            # Generate signals using FIXED THRESHOLDS (proven best in A/B test)
-            if ai_predictor.is_regression:
-                if expected_ret > return_buy_thresh:
-                    action = "BUY"
-                    print(f"🟢 {ticker}: BUY  (Exp.Ret: {expected_ret*100:+.2f}%)")
-                elif expected_ret < return_sell_thresh:
-                    action = "SELL"
-                    print(f"🔴 {ticker}: SELL (Exp.Ret: {expected_ret*100:+.2f}%)")
-                else:
-                    action = "HOLD"
-                    # Only print notable holds
-                    if abs(expected_ret) > 0.003:
-                        print(f"⚪️ {ticker}: HOLD (Exp.Ret: {expected_ret*100:+.2f}%)")
+        
+        # Sort by predicted return (descending)
+        sorted_preds = sorted(expected_returns.items(), key=lambda x: x[1], reverse=True)
+        n_tickers = len(sorted_preds)
+        n_buy = max(1, int(n_tickers * BUY_PERCENTILE))
+        n_sell = max(1, int(n_tickers * SELL_PERCENTILE))
+        
+        buy_tickers = set([t for t, _ in sorted_preds[:n_buy]])
+        sell_tickers = set([t for t, _ in sorted_preds[-n_sell:]])
+        
+        print(f"\n📊 Cross-Sectional Ranking:")
+        print(f"   Universe: {n_tickers} stocks")
+        print(f"   Top {n_buy} → BUY, Bottom {n_sell} → SELL")
+        print(f"   Prediction range: [{sorted_preds[-1][1]*100:.2f}%, {sorted_preds[0][1]*100:.2f}%]")
+        
+        # Generate signals based on ranking
+        for ticker, expected_ret in sorted_preds:
+            if ticker in buy_tickers:
+                action = "BUY"
+                print(f"🟢 {ticker}: BUY  (Rank: Top {BUY_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
+            elif ticker in sell_tickers:
+                action = "SELL"
+                print(f"🔴 {ticker}: SELL (Rank: Bottom {SELL_PERCENTILE*100:.0f}%, Pred: {expected_ret*100:+.2f}%)")
             else:
-                # Legacy classifier: expected_ret is probability 0-1
-                prob = expected_ret
-                thresh_buy = config['model']['threshold_buy']
-                thresh_sell = config['model']['threshold_sell']
-                
-                if prob > thresh_buy:
-                    action = "BUY"
-                    print(f"🟢 {ticker}: BUY  (Prob: {prob:.4f})")
-                elif prob < thresh_sell:
-                    action = "SELL"
-                    print(f"🔴 {ticker}: SELL (Prob: {prob:.4f})")
-                else:
-                    action = "HOLD"
-                    print(f"⚪️ {ticker}: HOLD (Prob: {prob:.4f})")
-                
+                action = "HOLD"
             signals[ticker] = action
+        # ==================== END CROSS-SECTIONAL RANKING ====================
         
         # ==================== MODEL VALIDATION GATE (Quant Standard) ====================
         # If >80% of predictions are extreme (>3% expected return), model is likely corrupted

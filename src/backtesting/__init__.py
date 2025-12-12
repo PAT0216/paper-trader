@@ -12,7 +12,8 @@ from src.backtesting.backtester import (
     BacktestTrade,
     BacktestPosition,
     create_ml_signal_generator,
-    create_simple_signal_generator
+    create_simple_signal_generator,
+    create_cross_sectional_signal_generator
 )
 from src.backtesting.performance import (
     PerformanceCalculator,
@@ -34,6 +35,7 @@ __all__ = [
     'BacktestPosition',
     'create_ml_signal_generator',
     'create_simple_signal_generator',
+    'create_cross_sectional_signal_generator',
     
     # Performance
     'PerformanceCalculator',

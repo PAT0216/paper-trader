@@ -24,6 +24,7 @@ from src.backtesting import (
     PerformanceCalculator,
     create_simple_signal_generator,
     create_ml_signal_generator,
+    create_cross_sectional_signal_generator,
     generate_performance_summary
 )
 from src.models.predictor import Predictor
@@ -209,12 +210,15 @@ def run_backtest(
             signal_generator = create_simple_signal_generator()
             strategy_name = "Simple SMA Crossover (fallback)"
         else:
-            signal_generator = create_ml_signal_generator(
+            # Use cross-sectional ranking: BUY top 10%, SELL bottom 10%
+            # This works better than fixed thresholds when model predicts close to mean
+            from src.backtesting import create_cross_sectional_signal_generator
+            signal_generator = create_cross_sectional_signal_generator(
                 predictor, 
-                threshold_buy=0.005,   # 0.5% expected return
-                threshold_sell=-0.005  # -0.5% expected return
+                buy_pct=0.10,   # Top 10%
+                sell_pct=0.10  # Bottom 10%
             )
-            strategy_name = "ML XGBoost Predictor"
+            strategy_name = "ML XGBoost + Cross-Sectional Ranking (Top/Bottom 10%)"
     else:
         signal_generator = create_simple_signal_generator()
         strategy_name = "Simple SMA Crossover"
