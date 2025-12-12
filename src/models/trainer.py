@@ -200,17 +200,20 @@ def train_model(data_dict, n_splits=5, save_model=True):
         'importance': final_model.feature_importances_
     }).sort_values('importance', ascending=False)
     
-    # Identify useful vs low-importance features
-    useful_features = feature_importance[feature_importance['importance'] >= IMPORTANCE_THRESHOLD]['feature'].tolist()
-    dropped_features = feature_importance[feature_importance['importance'] < IMPORTANCE_THRESHOLD]['feature'].tolist()
+    # Identify useful features (above threshold) - KEEP IN ORIGINAL ORDER!
+    # This is critical: model was trained with FEATURE_COLUMNS order
+    useful_features_set = set(feature_importance[feature_importance['importance'] >= IMPORTANCE_THRESHOLD]['feature'].tolist())
+    # Preserve FEATURE_COLUMNS order (not importance order)
+    useful_features = [f for f in FEATURE_COLUMNS if f in useful_features_set]
+    dropped_features = [f for f in FEATURE_COLUMNS if f not in useful_features_set]
     
     print(f"\n🔍 Feature Selection (threshold: {IMPORTANCE_THRESHOLD*100:.1f}%):")
     print(f"   Keeping: {len(useful_features)} features")
     if dropped_features:
         print(f"   ⚠️  Dropping: {dropped_features}")
         
-        # Retrain with only useful features
-        feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
+        # Retrain with only useful features (maintaining original order)
+        feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features_set]
         X_selected = X[:, feature_indices]
         
         print(f"\n🔄 Retraining with {len(useful_features)} selected features...")
@@ -231,9 +234,11 @@ def train_model(data_dict, n_splits=5, save_model=True):
     else:
         print("   ✅ All features above threshold - keeping all")
     
-    # Store selected features for inference
+    # Store selected features for inference - IN TRAINING ORDER (critical!)
     selected_features = useful_features
+    print(f"   Feature order: {selected_features[:3]}... (preserved training order)")
     # ==================== END DYNAMIC FEATURE SELECTION ====================
+
     
     # Save metrics to LIVE results directory (separate from backtest)
     os.makedirs(RESULTS_LIVE_DIR, exist_ok=True)
