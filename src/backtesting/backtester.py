@@ -52,6 +52,10 @@ class BacktestConfig:
     rebalance_frequency: str = "daily"  # daily, weekly, monthly
     use_risk_manager: bool = True
     
+    # Output settings
+    use_dated_folders: bool = False  # Save to dated subdirectories
+
+    
     def to_dict(self) -> Dict:
         """Convert to dictionary."""
         return {

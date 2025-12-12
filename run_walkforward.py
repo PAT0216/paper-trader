@@ -17,10 +17,12 @@ Usage: python run_walkforward.py [--start 2015] [--end 2024]
 import argparse
 import os
 import sys
+import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import yaml
+
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -119,9 +121,9 @@ def load_backtest_config():
             drawdown_halt=risk.get('drawdown_halt', 0.20),
             drawdown_liquidate=risk.get('drawdown_liquidate', 0.25),
             use_risk_manager=True,
-            slippage_bps=costs.get('slippage_bps', 10.0),
-            use_dated_folders=False  # Walk-forward manages own output
+            slippage_bps=costs.get('slippage_bps', 10.0)
         )
+
     except Exception as e:
         print(f"Warning: Could not load config: {e}, using defaults")
         return BacktestConfig()
@@ -154,9 +156,11 @@ def run_year_with_backtester(model, data_dict, year, config_template, cumulative
     # create_ml_signal_generator expects a Predictor object, not raw model
     from src.models.predictor import Predictor
     
-    # Create predictor wrapper for model
-    predictor = Predictor(model_path=None)  # Don't load from file
-    predictor.model = model  # Set model directly
+    # Create predictor wrapper for model (don't load from file, inject directly)
+    predictor = Predictor.__new__(Predictor)  # Bypass __init__
+    predictor.model = model
+    predictor.is_regression = True
+    predictor.selected_features = FEATURE_COLUMNS  # Use all features
     
     signal_generator = create_ml_signal_generator(
         predictor=predictor,
@@ -165,27 +169,27 @@ def run_year_with_backtester(model, data_dict, year, config_template, cumulative
     )
     
     # Run backtest for this year
-    backtester = Backtester(
-        config=year_config,
-        signal_generator=signal_generator,
-        risk_manager=None  # Let Backtester create it
-    )
+    backtester = Backtester(config=year_config)
     
     try:
-        metrics, trades_df, summary = backtester.run(data_dict)
+        metrics, trades_df, summary = backtester.run(
+            data_dict=data_dict,
+            signal_generator=signal_generator
+        )
         
         # Update cumulative portfolio
-        final_value = metrics.get('ending_value', year_config.initial_cash)
+        # metrics is a PerformanceMetrics object, access via attributes
+        final_value = summary.get('results', {}).get('final_value', year_config.initial_cash)
         cumulative_portfolio['cash'] = final_value
         cumulative_portfolio['trades'].extend(trades_df.to_dict('records') if not trades_df.empty else [])
         cumulative_portfolio['yearly_values'].append({
             'year': year,
             'value': final_value,
-            'return': metrics.get('total_return', 0.0),
-            'start_value': metrics.get('starting_value', year_config.initial_cash),
-            'sharpe': metrics.get('sharpe_ratio', 0.0),
-            'max_drawdown': metrics.get('max_drawdown', 0.0),
-            'cagr': metrics.get('cagr', 0.0)
+            'return': metrics.total_return if hasattr(metrics, 'total_return') else 0.0,
+            'start_value': year_config.initial_cash,
+            'sharpe': metrics.sharpe_ratio if hasattr(metrics, 'sharpe_ratio') else 0.0,
+            'max_drawdown': metrics.max_drawdown if hasattr(metrics, 'max_drawdown') else 0.0,
+            'cagr': metrics.cagr if hasattr(metrics, 'cagr') else 0.0
         })
         
         # Append daily portfolio history for this year
@@ -196,6 +200,7 @@ def run_year_with_backtester(model, data_dict, year, config_template, cumulative
         
     except Exception as e:
         print(f"   ⚠️  Backtest failed for {year}: {e}")
+
     
     return cumulative_portfolio
 

@@ -1,63 +1,49 @@
 {
   "returns": {
-    "total_return": "219.20%",
-    "cagr": "15.65%"
+    "total_return": "59.44%",
+    "cagr": "27.30%"
   },
   "risk_adjusted": {
-    "sharpe_ratio": 0.749,
-    "sortino_ratio": 0.94,
-    "calmar_ratio": 0.737,
-    "information_ratio": 0.031
+    "sharpe_ratio": 1.633,
+    "sortino_ratio": 2.772,
+    "calmar_ratio": 2.577,
+    "information_ratio": -0.114
   },
   "risk": {
-    "volatility": "15.74%",
-    "max_drawdown": "21.25%",
-    "avg_drawdown": "5.86%",
-    "var_95": "1.58%",
-    "var_99": "2.97%",
-    "cvar_95": "2.43%"
+    "volatility": "12.84%",
+    "max_drawdown": "10.60%",
+    "avg_drawdown": "2.42%",
+    "var_95": "1.28%",
+    "var_99": "1.96%",
+    "cvar_95": "1.73%"
   },
   "market_exposure": {
-    "beta": 0.561,
-    "alpha": "5.70%"
+    "beta": 0.833,
+    "alpha": "2.94%"
   },
   "trade_quality": {
-    "win_rate": "37.2%",
-    "profit_factor": 1.86,
-    "avg_win": "$2017.81",
-    "avg_loss": "$641.92",
-    "avg_holding_period": "11.4 days",
-    "total_trades": 535,
+    "win_rate": "0.0%",
+    "profit_factor": 0.0,
+    "avg_win": "$0.00",
+    "avg_loss": "$0.00",
+    "avg_holding_period": "0.0 days",
+    "total_trades": 0,
     "turnover": "0.0%"
   },
   "regime_performance": {
-    "bull": {
-      "days": 1592,
-      "total_return": "236.60%",
-      "sharpe": 1.13,
-      "volatility": "14.43%",
-      "max_drawdown": "13.88%"
-    },
-    "sideways": {
-      "days": 72,
-      "total_return": "9.87%",
-      "sharpe": 1.51,
-      "volatility": "20.62%",
-      "max_drawdown": "5.53%"
-    },
     "bear": {
-      "days": 270,
-      "total_return": "-19.39%",
-      "sharpe": -1.19,
-      "volatility": "18.73%",
-      "max_drawdown": "23.07%"
+      "days": 15,
+      "total_return": "-4.56%",
+      "sharpe": -4.25,
+      "volatility": "18.98%",
+      "max_drawdown": "8.75%"
     },
-    "crisis": {
-      "days": 77,
-      "total_return": "7.06%",
-      "sharpe": 0.9,
-      "volatility": "23.22%",
-      "max_drawdown": "12.30%"
+    "bull": {
+      "days": 472,
+      "total_return": "67.06%",
+      "sharpe": 1.92,
+      "volatility": "12.58%",
+      "max_drawdown": "7.46%"
     }
   }
 }

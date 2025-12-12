@@ -6,7 +6,12 @@ import pytest
 import numpy as np
 import joblib
 import os
+
+# Skip entire module if shap is not installed
+shap = pytest.importorskip("shap", reason="shap not installed")
+
 from src.explainability.shap_analyzer import ShapAnalyzer
+
 
 
 @pytest.fixture
