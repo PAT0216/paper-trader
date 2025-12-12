@@ -51,11 +51,30 @@ def train_model(data_dict, n_splits=5, save_model=True):
     print("\n📊 Preparing training data...")
     all_features = []
     
+    # ===== PHASE 4: Fetch fundamental factors for all tickers =====
+    from src.features.fundamentals import get_fundamentals_for_universe, compute_factor_scores
+    
+    tickers = list(data_dict.keys())
+    print(f"\n📈 Fetching fundamental factors for {len(tickers)} tickers...")
+    fundamentals_df = get_fundamentals_for_universe(tickers, use_cache=True)
+    factor_scores = compute_factor_scores(fundamentals_df)
+    print(f"   Computed factor scores for {len(factor_scores)} tickers")
+    # ================================================================
+    
     for ticker, df in data_dict.items():
-        # Step 1: Generate features ONLY (no target)
+        # Step 1: Generate technical features ONLY (no target)
         processed_df = generate_features(df, include_target=False)
         
-        # Step 2: Add target AFTER feature generation
+        # Step 2: Add fundamental factors
+        if ticker in factor_scores.index:
+            for col in factor_scores.columns:
+                processed_df[col] = factor_scores.loc[ticker, col]
+        else:
+            # Fill with 0 for tickers without fundamental data
+            for col in factor_scores.columns:
+                processed_df[col] = 0.0
+        
+        # Step 3: Add target AFTER feature generation
         processed_df = create_target(processed_df, target_type='regression', horizon=1)
         
         # Drop rows where target is NaN (last row since we're predicting next day)

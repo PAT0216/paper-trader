@@ -187,15 +187,40 @@ def create_target(df, target_type='regression', horizon=1):
 
 
 # Feature column list - use this for consistency
-# Phase 3.5: Expanded from 9 to 15 features
+# Phase 4: Expanded to 22 features with Fama-French fundamentals
 FEATURE_COLUMNS = [
     # Momentum (4)
     'RSI', 'MACD', 'MACD_signal', 'MACD_hist',
     # Trend (4)
     'BB_Width', 'Dist_SMA50', 'Dist_SMA200',
     'Return_1d', 'Return_5d',
-    # Volume (3) - NEW Phase 3.5
+    # Volume (3) - Phase 3.5
     'OBV_Momentum', 'Volume_Ratio', 'VWAP_Dev',
-    # Volatility (4) - NEW Phase 3.5
-    'ATR_Pct', 'BB_PctB', 'Vol_Ratio'
+    # Volatility (4) - Phase 3.5
+    'ATR_Pct', 'BB_PctB', 'Vol_Ratio',
+    # ===== FUNDAMENTAL FACTORS (7) - Phase 4 =====
+    # Fama-French 5-Factor Model + extras
+    'size_score',              # SMB: Small Minus Big (market cap)
+    'pe_score',                # HML: Value (P/E ratio)
+    'pb_score',                # HML: Value (P/B ratio)
+    'roe_score',               # RMW: Profitability (ROE)
+    'margin_score',            # RMW: Profitability (margins)
+    'earnings_growth_score',   # Growth (earnings)
+    'composite_score',         # Combined quality score
+]
+
+# Technical-only features (for backwards compatibility)
+TECHNICAL_COLUMNS = [
+    'RSI', 'MACD', 'MACD_signal', 'MACD_hist',
+    'BB_Width', 'Dist_SMA50', 'Dist_SMA200',
+    'Return_1d', 'Return_5d',
+    'OBV_Momentum', 'Volume_Ratio', 'VWAP_Dev',
+    'ATR_Pct', 'BB_PctB', 'Vol_Ratio',
+]
+
+# Fundamental factor columns (from fundamentals.py)
+FUNDAMENTAL_COLUMNS = [
+    'size_score', 'pe_score', 'pb_score', 
+    'roe_score', 'margin_score', 'earnings_growth_score',
+    'composite_score',
 ]
