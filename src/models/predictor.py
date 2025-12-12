@@ -53,13 +53,21 @@ class Predictor:
             print("⚠️ Warning: No model found. Run training first.")
     
     def _load_from_json(self):
-        """Load model from portable XGBoost JSON format."""
+        """Load model from portable XGBoost JSON format using Booster directly.
+        
+        Uses Booster instead of XGBRegressor for more reliable cross-version loading.
+        """
         import json
         import xgboost as xgb
         
-        # Load model
+        # Load model using Booster directly (more reliable than XGBRegressor wrapper)
+        self._booster = xgb.Booster()
+        self._booster.load_model(MODEL_JSON)
+        self._use_booster = True  # Flag to use Booster for predictions
+        
+        # Also create an XGBRegressor wrapper for compatibility
         self.model = xgb.XGBRegressor()
-        self.model.load_model(MODEL_JSON)
+        self.model._Booster = self._booster
         
         # Load metadata
         if os.path.exists(METADATA_FILE):
@@ -72,12 +80,13 @@ class Predictor:
             expected_range = pred_stats.get('expected_range', [-0.10, 0.10])
             self.prediction_bounds = tuple(expected_range)
             
-            print(f"✅ Loaded XGBoost model (JSON format).")
+            print(f"✅ Loaded XGBoost model (JSON/Booster format).")
             print(f"   Selected features: {len(self.selected_features)}/{len(FEATURE_COLUMNS)}")
             print(f"   Training samples: {self.metadata.get('training_samples', 'unknown'):,}")
             print(f"   Expected prediction range: [{expected_range[0]:.2f}, {expected_range[1]:.2f}]")
         else:
             print(f"✅ Loaded XGBoost model (JSON format, no metadata).")
+
     
     def _load_from_pickle(self):
         """Load model from legacy pickle format."""
@@ -129,7 +138,13 @@ class Predictor:
         
         if self.is_regression:
             # Regression model: predict expected return
-            prediction = self.model.predict(last_row)[0]
+            # Use Booster directly if available (more reliable)
+            if hasattr(self, '_use_booster') and self._use_booster:
+                import xgboost as xgb
+                dmatrix = xgb.DMatrix(last_row)
+                prediction = self._booster.predict(dmatrix)[0]
+            else:
+                prediction = self.model.predict(last_row)[0]
             
             # Quant Standard: Sanity check on predictions
             # Expected returns should be in reasonable range (-20% to +20%)
@@ -145,6 +160,7 @@ class Predictor:
             # Legacy classifier: return probability of up move
             proba = self.model.predict_proba(last_row)[0][1]
             return float(proba)
+
 
     
     def predict_with_signal(self, df, buy_threshold=0.005, sell_threshold=-0.005):
