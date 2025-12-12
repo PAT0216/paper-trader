@@ -33,22 +33,22 @@
     "BB_PctB",
     "Vol_Ratio"
   ],
-  "training_date": "2025-12-11T23:37:50.388310",
-  "training_samples": 12027,
-  "xgboost_version": "3.0.5",
+  "training_date": "2025-12-12T08:42:15.338561",
+  "training_samples": 1862999,
+  "xgboost_version": "2.0.3",
   "prediction_stats": {
-    "mean": 0.0009613164002075791,
-    "std": 0.004342705477029085,
-    "min": -0.10574780404567719,
-    "max": 0.12480555474758148,
+    "mean": 0.0007127724820747972,
+    "std": 0.002466075122356415,
+    "min": -0.12355729192495346,
+    "max": 0.30196481943130493,
     "expected_range": [
       -0.1,
       0.1
     ]
   },
   "cv_metrics": {
-    "avg_rmse": 0.018599553415813222,
-    "avg_dir_accuracy": 0.5173359940134697,
-    "avg_spearman": 0.021180989680445114
+    "avg_rmse": 0.0195757409827207,
+    "avg_dir_accuracy": 0.5216338860994721,
+    "avg_spearman": 0.023963915678009762
   }
 }
