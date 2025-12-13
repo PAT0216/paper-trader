@@ -55,8 +55,19 @@ def main():
 
     # 2. Fetch Data
     print("Fetching market data...")
-    # Fetch enough data for training or trading
-    data_dict = loader.fetch_data(tickers, period=config['model']['training_period'])
+    
+    # Momentum strategy: use cache-only (no API calls, instant)
+    # We only need historical data, which is already cached
+    if args.strategy == "momentum":
+        print("📦 Using CACHE-ONLY mode for momentum strategy (fast)")
+        data_dict = loader.fetch_from_cache_only(tickers)
+        
+        if len(data_dict) < 50:
+            print(f"⚠️  Only {len(data_dict)} tickers in cache, falling back to API fetch...")
+            data_dict = loader.fetch_data(tickers, period=config['model']['training_period'])
+    else:
+        # ML strategy may need fresh data for prediction
+        data_dict = loader.fetch_data(tickers, period=config['model']['training_period'])
     
     if not data_dict:
         print("❌ Failed to fetch data.")
