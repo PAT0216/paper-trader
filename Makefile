@@ -30,6 +30,13 @@ trade:
 	conda run -n $(ENV_NAME) python main.py --mode trade
 	@echo "$(GREEN)✅ Trading execution complete$(NC)"
 
+# 📈 Run Trading with Momentum Strategy
+.PHONY: trade-momentum
+trade-momentum:
+	@echo "$(YELLOW)📈 Running Momentum Trading Bot (Fama-French 12-1)...$(NC)"
+	conda run -n $(ENV_NAME) python main.py --mode trade --strategy momentum
+	@echo "$(GREEN)✅ Momentum trading execution complete$(NC)"
+
 # 🧪 Run Test Suite
 .PHONY: test
 test:
