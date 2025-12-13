@@ -35,7 +35,7 @@ class MomentumStrategy:
     Designed for monthly rebalancing on first trading day.
     """
     
-    def __init__(self, n_stocks: int = 10, lookback_days: int = 252, skip_days: int = 21):
+    def __init__(self, n_stocks: int = 10, lookback_days: int = 252, skip_days: int = 21, use_6mo_momentum: bool = False):
         """
         Initialize momentum strategy.
         
@@ -43,10 +43,12 @@ class MomentumStrategy:
             n_stocks: Number of stocks to hold (default 10)
             lookback_days: Days for momentum calculation (default 252 = 1 year)
             skip_days: Recent days to skip (default 21 = 1 month)
+            use_6mo_momentum: Use 6-month momentum instead of 12-month (faster regime adaptation)
         """
         self.n_stocks = n_stocks
         self.lookback_days = lookback_days
         self.skip_days = skip_days
+        self.use_6mo_momentum = use_6mo_momentum
         
         self._current_scores: Dict[str, float] = {}
         self._target_holdings: List[str] = []
@@ -79,6 +81,97 @@ class MomentumStrategy:
         except (IndexError, KeyError):
             return None
     
+    def calculate_momentum_6mo(self, df: pd.DataFrame) -> Optional[float]:
+        """
+        Calculate 6-month momentum (faster signal, better for regime changes).
+        
+        Returns:
+            Momentum as decimal, or None if insufficient data
+        """
+        if len(df) < 126:  # ~6 months
+            return None
+        
+        if isinstance(df.columns, pd.MultiIndex):
+            df = df.copy()
+            df.columns = df.columns.get_level_values(0)
+        
+        price_col = 'Adj Close' if 'Adj Close' in df.columns else 'Close'
+        
+        try:
+            price_start = df[price_col].iloc[-126]
+            price_end = df[price_col].iloc[-21]  # Skip last month
+            
+            if price_start <= 0:
+                return None
+            
+            return (price_end / price_start) - 1
+        except (IndexError, KeyError):
+            return None
+    
+    def check_stop_loss(
+        self,
+        holdings: Dict[str, int],
+        entry_prices: Dict[str, float],
+        current_prices: Dict[str, float],
+        stop_loss_pct: float = 0.15
+    ) -> List[str]:
+        """
+        Daily stop-loss check for each position.
+        
+        Args:
+            holdings: Current positions {ticker: shares}
+            entry_prices: Entry prices {ticker: price}
+            current_prices: Current prices {ticker: price}
+            stop_loss_pct: Stop loss threshold (default 15%)
+            
+        Returns:
+            List of tickers that hit stop-loss
+        """
+        triggered = []
+        
+        for ticker in holdings:
+            if ticker not in entry_prices or ticker not in current_prices:
+                continue
+            
+            entry = entry_prices[ticker]
+            current = current_prices[ticker]
+            
+            if entry > 0:
+                loss = (current - entry) / entry
+                if loss <= -stop_loss_pct:
+                    triggered.append(ticker)
+        
+        return triggered
+    
+    def check_portfolio_drawdown(
+        self,
+        current_value: float,
+        peak_value: float,
+        warning_pct: float = 0.10,
+        emergency_pct: float = 0.20
+    ) -> Tuple[bool, bool, float]:
+        """
+        Check portfolio-level drawdown for emergency exit.
+        
+        Args:
+            current_value: Current portfolio value
+            peak_value: High water mark
+            warning_pct: Warning threshold (default 10%)
+            emergency_pct: Emergency exit threshold (default 20%)
+            
+        Returns:
+            (warning_triggered, emergency_triggered, drawdown_pct)
+        """
+        if peak_value <= 0:
+            return False, False, 0.0
+        
+        drawdown = (peak_value - current_value) / peak_value
+        
+        warning = drawdown >= warning_pct
+        emergency = drawdown >= emergency_pct
+        
+        return warning, emergency, drawdown
+    
     def rank_universe(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, float]:
         """
         Calculate momentum for all stocks and rank them.
@@ -92,7 +185,12 @@ class MomentumStrategy:
         scores = {}
         
         for ticker, df in data_dict.items():
-            mom = self.calculate_momentum(df)
+            # Use 6-month momentum if enabled (faster regime adaptation)
+            if self.use_6mo_momentum:
+                mom = self.calculate_momentum_6mo(df)
+            else:
+                mom = self.calculate_momentum(df)
+            
             if mom is not None:
                 scores[ticker] = mom
         
