@@ -24,15 +24,25 @@ def main():
         universe_type = config.get('universe', {}).get('type', 'config')
         
         if universe_type == 'sp500':
-            print("📊 Fetching S&P 500 universe from Wikipedia...")
-            from src.data.universe import fetch_sp500_tickers, get_mega_caps
+            # First try cached tickers (fast, reliable)
+            cached_tickers_file = 'data/sp500_tickers.txt'
             try:
-                tickers = fetch_sp500_tickers()
-                print(f"   Loaded {len(tickers)} S&P 500 stocks")
-            except Exception as e:
-                print(f"   ⚠️ S&P 500 fetch failed: {e}")
-                print(f"   Falling back to mega-caps...")
-                tickers = get_mega_caps()
+                with open(cached_tickers_file, 'r') as f:
+                    tickers = [line.strip() for line in f if line.strip()]
+                print(f"📊 Loaded {len(tickers)} S&P 500 stocks from cache")
+            except FileNotFoundError:
+                # Fallback to Wikipedia (slow, may fail)
+                print("📊 Cache not found, fetching S&P 500 from Wikipedia...")
+                from src.data.universe import fetch_sp500_tickers, get_mega_caps
+                try:
+                    tickers = fetch_sp500_tickers()
+                    # Save to cache for next time
+                    with open(cached_tickers_file, 'w') as f:
+                        f.write('\n'.join(tickers))
+                    print(f"   Loaded {len(tickers)} stocks and saved to cache")
+                except Exception as e:
+                    print(f"   ⚠️ S&P 500 fetch failed: {e}")
+                    tickers = get_mega_caps()
         else:
             # Use tickers from config
             tickers = config['tickers']
