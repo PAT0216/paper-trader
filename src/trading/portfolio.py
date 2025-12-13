@@ -9,25 +9,40 @@ DEFAULT_STOP_LOSS_PCT = 0.08  # 8% stop-loss from entry price
 class Portfolio:
     def __init__(self, start_cash=10000.0):
         self.ledger_file = LEDGER_FILE
-        self.columns = ["date", "ticker", "action", "price", "shares", "amount", "cash_balance", "total_value"]
+        # Enhanced columns with strategy tracking
+        self.columns = [
+            "date", "ticker", "action", "price", "shares", "amount", 
+            "cash_balance", "total_value", "strategy", "momentum_score"
+        ]
         
         if os.path.exists(self.ledger_file):
             self.ledger = pd.read_csv(self.ledger_file)
+            # Add new columns if missing (backwards compatibility)
+            for col in ['strategy', 'momentum_score']:
+                if col not in self.ledger.columns:
+                    self.ledger[col] = ''
         else:
             self.ledger = pd.DataFrame(columns=self.columns)
             # Initialize with starting cash
-            self._add_entry(datetime.now().strftime("%Y-%m-%d"), "CASH", "DEPOSIT", 1.0, start_cash, start_cash, start_cash, start_cash)
+            self._add_entry(
+                datetime.now().strftime("%Y-%m-%d"), "CASH", "DEPOSIT", 
+                1.0, start_cash, start_cash, start_cash, start_cash,
+                strategy="", momentum_score=None
+            )
 
-    def _add_entry(self, date, ticker, action, price, shares, amount, cash_balance, total_value):
+    def _add_entry(self, date, ticker, action, price, shares, amount, 
+                   cash_balance, total_value, strategy="momentum", momentum_score=None):
         new_entry = pd.DataFrame([{
             "date": date,
             "ticker": ticker,
             "action": action,
-            "price": price,
-            "shares": shares,
-            "amount": amount,
-            "cash_balance": cash_balance,
-            "total_value": total_value
+            "price": round(price, 2),
+            "shares": int(shares),
+            "amount": round(amount, 2),
+            "cash_balance": round(cash_balance, 2),
+            "total_value": round(total_value, 2),
+            "strategy": strategy,
+            "momentum_score": round(momentum_score, 4) if momentum_score is not None else ""
         }])
         self.ledger = pd.concat([self.ledger, new_entry], ignore_index=True)
         self.ledger.to_csv(self.ledger_file, index=False)
@@ -171,9 +186,17 @@ class Portfolio:
         ]
         return not today_trades.empty
 
-    def record_trade(self, ticker, action, price, shares):
+    def record_trade(self, ticker, action, price, shares, strategy="momentum", momentum_score=None):
         """
         Records a trade and updates the ledger.
+        
+        Args:
+            ticker: Stock symbol
+            action: 'BUY' or 'SELL'
+            price: Trade price
+            shares: Number of shares
+            strategy: Strategy that generated this trade (default: 'momentum')
+            momentum_score: Momentum score if applicable
         """
         date = datetime.now().strftime("%Y-%m-%d")
         
@@ -217,5 +240,8 @@ class Portfolio:
             sold_value = shares * entry_prices.get(ticker, price)
             total_value = new_cash + position_value - sold_value
             
-        self._add_entry(date, ticker, action, price, shares, amount, new_cash, total_value) 
+        self._add_entry(
+            date, ticker, action, price, shares, amount, new_cash, total_value,
+            strategy=strategy, momentum_score=momentum_score
+        ) 
         return True
