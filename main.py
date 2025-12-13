@@ -13,7 +13,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(description="AI Paper Trader")
     parser.add_argument("--mode", choices=["trade", "train", "backtest"], default="trade", help="Mode of operation")
-    parser.add_argument("--strategy", choices=["ml", "momentum"], default="ml", help="Strategy: ml (XGBoost) or momentum (Fama-French)")
+    parser.add_argument("--strategy", choices=["ml", "momentum"], default="momentum", help="Strategy: momentum (recommended) or ml (XGBoost)")
     args = parser.parse_args()
     
     # 1. Load Configuration

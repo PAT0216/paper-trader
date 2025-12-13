@@ -33,9 +33,21 @@ class MomentumStrategy:
     
     Selects top N stocks by 12-1 month momentum.
     Designed for monthly rebalancing on first trading day.
+    
+    Default: 12-month lookback, 15% daily stop-loss
     """
     
-    def __init__(self, n_stocks: int = 10, lookback_days: int = 252, skip_days: int = 21, use_6mo_momentum: bool = False):
+    DEFAULT_CONFIG_PATH = 'config/momentum_config.yaml'
+    
+    def __init__(
+        self, 
+        n_stocks: int = 10, 
+        lookback_days: int = 252, 
+        skip_days: int = 21,
+        initial_capital: float = 100000.0,
+        stop_loss_pct: float = 0.15,
+        use_6mo_momentum: bool = False
+    ):
         """
         Initialize momentum strategy.
         
@@ -43,15 +55,56 @@ class MomentumStrategy:
             n_stocks: Number of stocks to hold (default 10)
             lookback_days: Days for momentum calculation (default 252 = 1 year)
             skip_days: Recent days to skip (default 21 = 1 month)
-            use_6mo_momentum: Use 6-month momentum instead of 12-month (faster regime adaptation)
+            initial_capital: Starting capital in USD (default $100,000)
+            stop_loss_pct: Daily stop-loss threshold (default 15%)
+            use_6mo_momentum: Use 6-month momentum instead of 12-month
         """
         self.n_stocks = n_stocks
         self.lookback_days = lookback_days
         self.skip_days = skip_days
+        self.initial_capital = initial_capital
+        self.stop_loss_pct = stop_loss_pct
         self.use_6mo_momentum = use_6mo_momentum
         
         self._current_scores: Dict[str, float] = {}
         self._target_holdings: List[str] = []
+        self._entry_prices: Dict[str, float] = {}
+    
+    @classmethod
+    def from_config(cls, config_path: str = None) -> 'MomentumStrategy':
+        """
+        Load strategy from YAML config file.
+        
+        Args:
+            config_path: Path to config file (default: config/momentum_config.yaml)
+            
+        Returns:
+            Configured MomentumStrategy instance
+        """
+        import yaml
+        
+        if config_path is None:
+            config_path = cls.DEFAULT_CONFIG_PATH
+        
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        return cls(
+            n_stocks=config.get('strategy', {}).get('n_stocks', 10),
+            lookback_days=config.get('strategy', {}).get('lookback_days', 252),
+            skip_days=config.get('strategy', {}).get('skip_days', 21),
+            initial_capital=config.get('capital', {}).get('initial', 100000),
+            stop_loss_pct=config.get('risk', {}).get('stop_loss_pct', 0.15),
+            use_6mo_momentum=False  # Always use 12-month as per testing
+        )
+    
+    def record_entry_price(self, ticker: str, price: float):
+        """Record entry price for stop-loss tracking."""
+        self._entry_prices[ticker] = price
+    
+    def get_entry_prices(self) -> Dict[str, float]:
+        """Get recorded entry prices."""
+        return self._entry_prices
     
     def calculate_momentum(self, df: pd.DataFrame) -> Optional[float]:
         """
