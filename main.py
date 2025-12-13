@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description="AI Paper Trader")
     parser.add_argument("--mode", choices=["trade", "train", "backtest"], default="trade", help="Mode of operation")
     parser.add_argument("--strategy", choices=["ml", "momentum"], default="momentum", help="Strategy: momentum (recommended) or ml (XGBoost)")
+    parser.add_argument("--portfolio", default="default", help="Portfolio ID (e.g., 'momentum', 'ml') for isolated ledgers")
     args = parser.parse_args()
     
     # 1. Load Configuration
@@ -192,7 +193,7 @@ def main():
         print("\n--- 💼 Executing Trades ---")
 
 
-        pf = portfolio.Portfolio(start_cash=config['portfolio']['initial_cash'])
+        pf = portfolio.Portfolio(portfolio_id=args.portfolio, start_cash=config['portfolio']['initial_cash'])
         current_holdings = pf.get_holdings()
         
         # Load risk settings from config (Phase 7)

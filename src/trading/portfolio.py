@@ -3,12 +3,33 @@ import os
 from datetime import datetime
 from typing import Dict, List, Tuple
 
-LEDGER_FILE = "ledger.csv"
 DEFAULT_STOP_LOSS_PCT = 0.08  # 8% stop-loss from entry price
 
+
 class Portfolio:
-    def __init__(self, start_cash=10000.0):
-        self.ledger_file = LEDGER_FILE
+    """
+    Portfolio manager with support for multiple isolated portfolios.
+    
+    Each portfolio has its own ledger file for independent tracking.
+    """
+    
+    def __init__(self, portfolio_id: str = "default", start_cash: float = 100000.0):
+        """
+        Initialize portfolio.
+        
+        Args:
+            portfolio_id: Unique identifier (e.g., 'momentum', 'ml')
+            start_cash: Starting capital (default $100k)
+        """
+        self.portfolio_id = portfolio_id
+        self.start_cash = start_cash
+        
+        # Each portfolio has its own ledger file
+        if portfolio_id == "default":
+            self.ledger_file = "ledger.csv"
+        else:
+            self.ledger_file = f"ledger_{portfolio_id}.csv"
+        
         # Enhanced columns with strategy tracking
         self.columns = [
             "date", "ticker", "action", "price", "shares", "amount", 
