@@ -150,15 +150,15 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    # Logo centered using HTML
+    # Logo - larger and blends with page
     logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
     if os.path.exists(logo_path):
         import base64
         with open(logo_path, "rb") as f:
             logo_data = base64.b64encode(f.read()).decode()
         st.markdown(
-            f'<div style="display: flex; justify-content: center; margin-bottom: 10px;">'
-            f'<img src="data:image/png;base64,{logo_data}" width="60">'
+            f'<div style="display: flex; justify-content: center; padding: 20px 0;">'
+            f'<img src="data:image/png;base64,{logo_data}" width="120" style="border-radius: 12px;">'
             f'</div>',
             unsafe_allow_html=True
         )
