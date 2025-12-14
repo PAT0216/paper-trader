@@ -58,19 +58,29 @@ jobs:
         run: |
           git config user.name "PAT0216"
           git config user.email "28152569+PAT0216@users.noreply.github.com"
+          
+          # Add files
           git add ledger_momentum.csv 2>/dev/null || true
           git add logs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "📈 Momentum: Monthly rebalance $(date +%Y-%m-%d)"
-          git pull --rebase origin main || true
-          git push || echo "Nothing to push"
+          
+          # Check if there are changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          # Commit and push with retry
+          git commit -m "📈 Momentum: Monthly rebalance $(date +%Y-%m-%d)"
+          
+          # Fetch and rebase before push
+          git fetch origin main
+          git rebase origin/main || git rebase --abort
+          
+          # Push with force-with-lease for safety
+          git push origin main || echo "Push failed, will retry on next run"
 
-      - name: Save Market Data Cache
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: data/market.db
-          key: market-data-v3-${{ github.run_id }}
-
+      # Note: Cache is managed by cache_refresh.yml workflow
+      
       - name: Move Docker cache
         if: always()
         run: |
