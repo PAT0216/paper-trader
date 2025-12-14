@@ -1,15 +1,13 @@
 """
 Paper Trader Dashboard - Strategy Comparison
+Professional Financial Dashboard
 """
 
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import os
 import sys
 
-# Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 st.set_page_config(
@@ -19,88 +17,80 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium dark theme CSS
+# Professional Finance Theme CSS
 st.markdown("""
 <style>
-    /* Main background */
+    /* Main background - dark slate */
     .stApp {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+        background: #0f172a;
     }
     
     /* Hide streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* Card styling */
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: #1e293b;
+        border-right: 1px solid #334155;
+    }
+    
+    /* Clean card styling */
     .metric-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 24px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px;
         margin: 8px 0;
     }
     
-    /* Metric values */
-    [data-testid="stMetricValue"] {
-        font-size: 2.5rem !important;
-        font-weight: 700 !important;
-    }
-    
-    /* Metric labels */
-    [data-testid="stMetricLabel"] {
-        font-size: 1rem !important;
+    /* Headers - clean white */
+    h1, h2, h3 {
+        color: #f1f5f9 !important;
         font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
     }
     
-    /* Headers */
     h1 {
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800 !important;
-        font-size: 2.5rem !important;
+        font-size: 2rem !important;
     }
     
-    h2, h3 {
-        color: #e0e0e0 !important;
-        font-weight: 600 !important;
+    /* Text */
+    p, span, div {
+        color: #cbd5e1;
     }
     
-    /* Divider */
+    /* Dividers */
     hr {
-        border-color: rgba(255, 255, 255, 0.1) !important;
+        border-color: #334155 !important;
     }
     
-    /* Dataframe styling */
+    /* Dataframes */
     .stDataFrame {
-        border-radius: 12px;
+        border-radius: 8px;
         overflow: hidden;
     }
     
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-    }
-    
-    /* Radio buttons - clean look */
-    .stRadio > div {
-        gap: 0.5rem;
-    }
-    
+    /* Radio buttons */
     .stRadio > div > label {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 8px 16px;
-        cursor: pointer;
-        transition: all 0.2s;
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        color: #e2e8f0 !important;
     }
     
     .stRadio > div > label:hover {
-        background: rgba(102, 126, 234, 0.2);
-        border-color: #667eea;
+        border-color: #10b981 !important;
+    }
+    
+    /* Positive/Negative colors */
+    .positive { color: #10b981; }
+    .negative { color: #ef4444; }
+    
+    /* Info boxes */
+    .stAlert {
+        background: #1e293b;
+        border: 1px solid #334155;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -113,7 +103,6 @@ def load_portfolio_data(portfolio_id: str) -> pd.DataFrame:
     else:
         path = f"ledger_{portfolio_id}.csv"
     
-    # Try multiple paths
     for base in ["", "../", "../../"]:
         full_path = base + path
         if os.path.exists(full_path):
@@ -123,14 +112,12 @@ def load_portfolio_data(portfolio_id: str) -> pd.DataFrame:
 
 
 def get_portfolio_value(df: pd.DataFrame) -> float:
-    """Get current portfolio value."""
     if df.empty:
         return 0
     return df.iloc[-1]['total_value']
 
 
 def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
-    """Get current holdings from ledger."""
     if df.empty:
         return pd.DataFrame()
     
@@ -152,30 +139,33 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    # Logo and branding
-    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-    if os.path.exists(logo_path):
-        st.image(logo_path, width=80)
+    # Logo centered
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+        if os.path.exists(logo_path):
+            st.image(logo_path, width=60)
     
-    st.markdown("## Paper Trader")
+    st.markdown("<h2 style='text-align: center; margin-top: 0;'>Paper Trader</h2>", unsafe_allow_html=True)
     st.markdown(
-        "[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)]"
-        "(https://github.com/PAT0216/paper-trader)"
+        "<p style='text-align: center;'>"
+        "<a href='https://github.com/PAT0216/paper-trader' style='color: #64748b;'>GitHub →</a>"
+        "</p>",
+        unsafe_allow_html=True
     )
     
     st.markdown("---")
-    st.markdown("### 🎯 Strategy Selection")
-    st.markdown("---")
     
-    # Use radio buttons instead of multiselect (no typing)
+    # Strategy selection
+    st.markdown("**Strategy**")
     strategy = st.radio(
-        "Select strategy to view:",
+        "Select strategy:",
         options=["Both", "Momentum", "ML"],
         index=0,
-        horizontal=True
+        horizontal=True,
+        label_visibility="collapsed"
     )
     
-    # Map selection to portfolio IDs
     if strategy == "Both":
         portfolios = ["momentum", "ml"]
     elif strategy == "Momentum":
@@ -184,19 +174,18 @@ with st.sidebar:
         portfolios = ["ml"]
     
     st.markdown("---")
-    st.markdown("### ℹ️ About")
+    st.markdown("**About**")
     st.markdown("""
-    **Momentum**: 12-1 month factor strategy  
-    **ML**: XGBoost ensemble predictions
-    """)
-    
-    st.markdown("---")
-    st.markdown(f"*Last refresh: {pd.Timestamp.now().strftime('%H:%M:%S')}*")
+    <small>
+    <b>Momentum</b>: 12-1 month factor<br>
+    <b>ML</b>: XGBoost ensemble
+    </small>
+    """, unsafe_allow_html=True)
 
 
 # ============ MAIN CONTENT ============
-st.markdown("# 📈 Paper Trader")
-st.markdown("##### Real-time strategy comparison dashboard")
+st.markdown("# Paper Trader")
+st.caption("Real-time strategy comparison")
 st.markdown("---")
 
 # Load data
@@ -207,16 +196,11 @@ for pid in portfolios:
         data[pid] = df
 
 if not data:
-    st.warning("⚠️ No portfolio data found. Run the trading workflows first.")
-    st.info("""
-    **Getting started:**
-    1. Run `python main.py --strategy momentum --portfolio momentum`
-    2. Or trigger GitHub Actions workflows
-    """)
+    st.warning("No portfolio data found. Run the trading workflows first.")
     st.stop()
 
-# ============ METRICS ROW ============
-st.markdown("### 📊 Portfolio Overview")
+# ============ METRICS ============
+st.markdown("### Portfolio Overview")
 
 cols = st.columns(len(data))
 for i, (pid, df) in enumerate(data.items()):
@@ -228,28 +212,27 @@ for i, (pid, df) in enumerate(data.items()):
         pnl = value - start
         pnl_pct = (pnl / start) * 100 if start > 0 else 0
         
-        # Custom metric card
         color = "#10b981" if pnl >= 0 else "#ef4444"
         arrow = "↑" if pnl >= 0 else "↓"
         
         st.markdown(f"""
         <div class="metric-card">
-            <div style="font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-                {pid.upper()} PORTFOLIO
+            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">
+                {pid.upper()}
             </div>
-            <div style="font-size: 2.5rem; font-weight: 700; color: #fff;">
+            <div style="font-size: 2rem; font-weight: 600; color: #f1f5f9; margin: 8px 0;">
                 ${value:,.0f}
             </div>
-            <div style="font-size: 1rem; color: {color}; margin-top: 4px;">
-                {arrow} {pnl_pct:+.2f}% (${pnl:+,.0f})
+            <div style="font-size: 0.9rem; color: {color};">
+                {arrow} {pnl_pct:+.2f}%
             </div>
         </div>
         """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-# ============ COMPARISON TABLE ============
-st.markdown("### 📋 Strategy Comparison")
+# ============ COMPARISON ============
+st.markdown("### Performance")
 
 comparison_data = []
 for pid, df in data.items():
@@ -263,7 +246,6 @@ for pid, df in data.items():
         'Value': f"${value:,.0f}",
         'Return': f"{pnl_pct:+.2f}%",
         'Trades': trades,
-        'Started': df['date'].iloc[0] if not df.empty else '-'
     })
 
 st.dataframe(
@@ -275,7 +257,7 @@ st.dataframe(
 st.markdown("---")
 
 # ============ HOLDINGS ============
-st.markdown("### 💼 Current Holdings")
+st.markdown("### Holdings")
 
 cols = st.columns(len(data))
 for i, (pid, df) in enumerate(data.items()):
@@ -283,60 +265,34 @@ for i, (pid, df) in enumerate(data.items()):
         st.markdown(f"**{pid.upper()}**")
         holdings = get_holdings(df)
         if holdings.empty:
-            st.info("No positions")
+            st.caption("No positions")
         else:
             st.dataframe(
                 holdings, 
                 hide_index=True, 
                 use_container_width=True,
-                height=min(400, 50 + len(holdings) * 35)
+                height=min(300, 40 + len(holdings) * 35)
             )
 
 st.markdown("---")
 
-# ============ RECENT TRADES ============
-st.markdown("### 📜 Recent Trades")
+# ============ TRADES ============
+st.markdown("### Recent Trades")
 
-# Use radio instead of selectbox (no typing/cursor)
 selected = st.radio(
-    "Select portfolio:",
+    "Portfolio:",
     options=list(data.keys()),
     format_func=lambda x: x.upper(),
-    horizontal=True
+    horizontal=True,
+    label_visibility="collapsed"
 )
 
 if selected:
-    trades_df = data[selected][data[selected]['ticker'] != 'CASH'].tail(15)
+    trades_df = data[selected][data[selected]['ticker'] != 'CASH'].tail(10)
     if trades_df.empty:
-        st.info("No trades yet")
+        st.caption("No trades yet")
     else:
-        # Style the action column
-        def style_action(val):
-            if val == 'BUY':
-                return 'color: #10b981'
-            elif val == 'SELL':
-                return 'color: #ef4444'
-            return ''
-        
-        display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares', 'amount']].copy()
+        display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares']].copy()
         display_df['price'] = display_df['price'].apply(lambda x: f"${x:.2f}")
-        display_df['amount'] = display_df['amount'].apply(lambda x: f"${x:,.0f}")
-        display_df.columns = ['Date', 'Ticker', 'Action', 'Price', 'Shares', 'Amount']
-        
-        st.dataframe(
-            display_df,
-            hide_index=True,
-            use_container_width=True
-        )
-
-# ============ FOOTER ============
-st.markdown("---")
-st.markdown(
-    """
-    <div style="text-align: center; color: #666; font-size: 0.85rem;">
-        Built with Streamlit • 
-        <a href="https://github.com/PAT0216/paper-trader" style="color: #667eea;">GitHub</a>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        display_df.columns = ['Date', 'Ticker', 'Action', 'Price', 'Shares']
+        st.dataframe(display_df, hide_index=True, use_container_width=True)
