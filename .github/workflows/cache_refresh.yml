@@ -63,9 +63,9 @@ jobs:
           cached_tickers = cache.get_cached_tickers()
           
           if len(cached_tickers) < 100:
-              # Cache is empty/broken - fetch full 2 year history
-              print(f'⚠️  Cache has only {len(cached_tickers)} tickers, fetching full 2y history...')
-              period = '2y'
+              # Cache is empty/broken - fetch full 5 year history (ML needs more data)
+              print(f'⚠️  Cache has only {len(cached_tickers)} tickers, fetching full 5y history...')
+              period = '5y'
           else:
               # Cache exists - just fetch recent updates
               print(f'✅ Cache has {len(cached_tickers)} tickers, fetching incremental updates...')
