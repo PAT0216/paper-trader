@@ -57,17 +57,12 @@ def main():
     # 2. Fetch Data
     print("Fetching market data...")
     
-    # Momentum strategy: use cache-only (no API calls, instant)
-    # We only need historical data, which is already cached
-    if args.strategy == "momentum":
-        print("📦 Using CACHE-ONLY mode for momentum strategy (fast)")
-        data_dict = loader.fetch_from_cache_only(tickers)
-        
-        if len(data_dict) < 50:
-            print(f"⚠️  Only {len(data_dict)} tickers in cache, falling back to API fetch...")
-            data_dict = loader.fetch_data(tickers, period=config['model']['training_period'])
-    else:
-        # ML strategy may need fresh data for prediction
+    # Both strategies use cache-only mode (cache is refreshed by separate workflow)
+    print("📦 Using CACHE-ONLY mode (cache refreshed daily by separate workflow)")
+    data_dict = loader.fetch_from_cache_only(tickers)
+    
+    if len(data_dict) < 50:
+        print(f"⚠️  Only {len(data_dict)} tickers in cache, falling back to API fetch...")
         data_dict = loader.fetch_data(tickers, period=config['model']['training_period'])
     
     if not data_dict:
