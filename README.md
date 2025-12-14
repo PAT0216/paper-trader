@@ -14,13 +14,16 @@
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
 
-### Performance Summary
+### Performance Summary (2022-2024 Backtest)
 
 | Metric | Momentum | ML | S&P 500 |
 |--------|----------|-----|---------|
-| **CAGR** | 37.4% | 27.0% | 13.2% |
-| **Sharpe** | 1.97 | 1.04 | 0.87 |
-| **2022 Return** | +19% | -18% | -18.6% |
+| **CAGR** | 20.3% | 15.1% | 13.2% |
+| **Sharpe** | 0.96 | 0.72 | 0.87 |
+| **Max Drawdown** | -14.5% | -22.3% | -25.4% |
+| **Win Rate** | 61.7% | 54.2% | - |
+
+> ⚠️ **Note**: Past performance does not guarantee future results. These are paper trading simulations.
 
 ---
 
