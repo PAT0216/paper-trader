@@ -74,7 +74,7 @@ jobs:
       - name: Commit Cache Status
         run: |
           git config user.name "PAT0216"
-          git config user.email "prabuddha.tamhane@gmail.com"
+          git config user.email "28152569+PAT0216@users.noreply.github.com"
           # Only commit if there are changes to track
           date > .cache_last_updated
           git add .cache_last_updated
