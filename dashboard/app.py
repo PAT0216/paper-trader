@@ -152,6 +152,18 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
 
 # ============ SIDEBAR ============
 with st.sidebar:
+    # Logo and branding
+    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    if os.path.exists(logo_path):
+        st.image(logo_path, width=80)
+    
+    st.markdown("## Paper Trader")
+    st.markdown(
+        "[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)]"
+        "(https://github.com/PAT0216/paper-trader)"
+    )
+    
+    st.markdown("---")
     st.markdown("### 🎯 Strategy Selection")
     st.markdown("---")
     
