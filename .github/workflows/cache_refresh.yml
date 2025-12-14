@@ -79,4 +79,6 @@ jobs:
           date > .cache_last_updated
           git add .cache_last_updated
           git diff --cached --quiet || git commit -m "📦 Cache refreshed $(date +%Y-%m-%d)"
+          git pull --rebase origin main || true
           git push || echo "No changes to push"
+
