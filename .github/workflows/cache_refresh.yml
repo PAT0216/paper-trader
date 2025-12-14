@@ -83,14 +83,17 @@ jobs:
           path: data/market.db
           key: market-data-v3-${{ github.run_id }}
 
-      - name: Commit Cache Status
+      - name: Compute Portfolio Snapshot
+        run: |
+          python scripts/compute_portfolio_snapshot.py
+
+      - name: Commit Updates
         run: |
           git config user.name "PAT0216"
           git config user.email "28152569+PAT0216@users.noreply.github.com"
-          # Only commit if there are changes to track
           date > .cache_last_updated
-          git add .cache_last_updated
-          git diff --cached --quiet || git commit -m "📦 Cache refreshed $(date +%Y-%m-%d)"
+          git add .cache_last_updated data/portfolio_snapshot.json
+          git diff --cached --quiet || git commit -m "📦 Cache + snapshot updated $(date +%Y-%m-%d)"
           git pull --rebase origin main || true
           git push || echo "No changes to push"
 

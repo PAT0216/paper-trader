@@ -329,6 +329,16 @@ def load_backtest_results() -> dict:
     return {}
 
 
+def load_portfolio_snapshot() -> dict:
+    """Load current portfolio snapshot for live values."""
+    for base in ["", "../", "../../"]:
+        path = base + "data/portfolio_snapshot.json"
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                return json.load(f)
+    return {}
+
+
 def get_portfolio_value(df: pd.DataFrame) -> float:
     if df.empty:
         return 0
@@ -521,17 +531,29 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# Load snapshot for live values
+snapshot = load_portfolio_snapshot()
+snapshot_portfolios = snapshot.get('portfolios', {})
+price_date = snapshot.get('price_date', '')
+
 # Metrics cards
 cols = st.columns(len(data) + 1)  # +1 for benchmark comparison
 
 for i, (pid, df) in enumerate(data.items()):
     with cols[i]:
-        value = get_portfolio_value(df)
-        start = df[df['action'] == 'DEPOSIT']['amount'].sum()
-        if start == 0:
-            start = 100000
-        pnl = value - start
-        pnl_pct = (pnl / start) * 100 if start > 0 else 0
+        # Use snapshot value if available, otherwise fallback to ledger
+        if pid in snapshot_portfolios:
+            value = snapshot_portfolios[pid]['value']
+            pnl_pct = snapshot_portfolios[pid]['return_pct']
+            start = snapshot.get('initial_capital', 10000)
+            pnl = value - start
+        else:
+            value = get_portfolio_value(df)
+            start = df[df['action'] == 'DEPOSIT']['amount'].sum()
+            if start == 0:
+                start = 10000
+            pnl = value - start
+            pnl_pct = (pnl / start) * 100 if start > 0 else 0
         
         color_class = "positive" if pnl >= 0 else "negative"
         arrow = "↑" if pnl >= 0 else "↓"
@@ -667,13 +689,20 @@ st.markdown("""
 # Create comparison table
 comparison_data = []
 for pid, df in data.items():
-    value = get_portfolio_value(df)
-    start = df[df['action'] == 'DEPOSIT']['amount'].sum() or 100000
+    # Use snapshot values if available
+    if pid in snapshot_portfolios:
+        value = snapshot_portfolios[pid]['value']
+        pnl_pct = snapshot_portfolios[pid]['return_pct']
+        holdings_count = snapshot_portfolios[pid].get('positions', 0)
+    else:
+        value = get_portfolio_value(df)
+        start = df[df['action'] == 'DEPOSIT']['amount'].sum() or 10000
+        pnl_pct = ((value / start) - 1) * 100
+        holdings_count = len(get_holdings(df))
+    
     trades = len(df[df['ticker'] != 'CASH'])
     buys = len(df[df['action'] == 'BUY'])
     sells = len(df[df['action'] == 'SELL'])
-    pnl_pct = ((value / start) - 1) * 100
-    holdings_count = len(get_holdings(df))
     
     comparison_data.append({
         'Strategy': pid.upper(),
