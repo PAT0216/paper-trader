@@ -70,19 +70,34 @@ def main():
         sys.exit(1)
     
     # 2a. Validate Data Quality
-    print("\n--- 🔍 Validating Data Quality ---")
-    validator = DataValidator()
-    validation_results = validator.validate_data_dict(data_dict)
-    
-    # Filter out invalid tickers
-    invalid_tickers = [ticker for ticker, result in validation_results.items() if not result.is_valid]
-    if invalid_tickers:
-        print(f"⚠️  Removing {len(invalid_tickers)} invalid tickers: {invalid_tickers}")
-        for ticker in invalid_tickers:
-            del data_dict[ticker]
-    
-    # Print validation summary
-    validator.print_validation_summary(validation_results)
+    # Momentum strategy: skip heavy validation (only needs 12mo of recent data)
+    if args.strategy == "momentum":
+        print("\n--- 🔍 Basic Data Check (Momentum) ---")
+        # Just check we have enough bars for momentum calculation (252 days)
+        valid_tickers = []
+        for ticker, df in list(data_dict.items()):
+            if len(df) >= 252:
+                valid_tickers.append(ticker)
+            else:
+                del data_dict[ticker]
+        print(f"✅ {len(valid_tickers)} tickers have sufficient data (252+ days)")
+        if len(data_dict) < 50:
+            print(f"⚠️  Only {len(data_dict)} tickers available, need at least 50")
+    else:
+        # ML strategy: full validation
+        print("\n--- 🔍 Validating Data Quality ---")
+        validator = DataValidator()
+        validation_results = validator.validate_data_dict(data_dict)
+        
+        # Filter out invalid tickers
+        invalid_tickers = [ticker for ticker, result in validation_results.items() if not result.is_valid]
+        if invalid_tickers:
+            print(f"⚠️  Removing {len(invalid_tickers)} invalid tickers: {invalid_tickers}")
+            for ticker in invalid_tickers:
+                del data_dict[ticker]
+        
+        # Print validation summary
+        validator.print_validation_summary(validation_results)
     
     if not data_dict:
         print("❌ No valid data after validation.")
