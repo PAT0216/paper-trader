@@ -59,9 +59,8 @@ jobs:
           git config user.name "PAT0216"
           git config user.email "28152569+PAT0216@users.noreply.github.com"
           
-          # Add files
-          git add ledger_momentum.csv 2>/dev/null || true
-          git add logs/ 2>/dev/null || true
+          # Add ALL changes (ledger + any other files created by Docker)
+          git add -A
           
           # Check if there are changes
           if git diff --cached --quiet; then
@@ -69,14 +68,17 @@ jobs:
             exit 0
           fi
           
-          # Commit and push with retry
+          # Commit changes
           git commit -m "📈 Momentum: Monthly rebalance $(date +%Y-%m-%d)"
           
-          # Fetch and rebase before push
-          git fetch origin main
-          git rebase origin/main || git rebase --abort
+          # Pull with rebase (allow unrelated histories for first push)
+          git pull --rebase origin main --allow-unrelated-histories || {
+            echo "Rebase failed, trying merge strategy..."
+            git rebase --abort 2>/dev/null || true
+            git pull origin main --no-rebase || true
+          }
           
-          # Push with force-with-lease for safety
+          # Push
           git push origin main || echo "Push failed, will retry on next run"
 
       # Note: Cache is managed by cache_refresh.yml workflow
