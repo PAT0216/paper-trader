@@ -56,8 +56,8 @@ jobs:
 
       - name: Push Ledger Changes
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
+          git config user.name "PAT0216"
+          git config user.email "prabuddha.tamhane@gmail.com"
           git add ledger_momentum.csv logs/ || true
           git diff --cached --quiet || git commit -m "📈 Momentum: Monthly rebalance $(date +%Y-%m-%d)"
           git push || echo "Nothing to push"
