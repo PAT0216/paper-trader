@@ -34,23 +34,28 @@ st.markdown("""
         font-family: 'Inter', -apple-system, sans-serif;
     }
     
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    [data-testid="stToolbar"] {display: none;}
-    [data-testid="stDecoration"] {display: none;}
-    .stDeployButton {display: none;}
+    /* Keep Streamlit header/toolbar visible (it contains the mobile sidebar hamburger). */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+
+    /* Footer only (toolbar/header is allowed and should stay visible) */
+    footer {visibility: hidden !important;}
     
-    /* Sidebar - glass morphism effect */
-    [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(20px);
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background: #0f172a !important;
         border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     
-    [data-testid="stSidebar"] > div {
+    section[data-testid="stSidebar"] > div {
+        background: #0f172a !important;
         padding-top: 1rem;
+    }
+    
+    /* Sidebar collapse button */
+    button[data-testid="baseButton-header"] {
+        color: #94a3b8 !important;
     }
     
     /* Typography */
@@ -78,7 +83,16 @@ st.markdown("""
         letter-spacing: 0.05em !important;
     }
     
-    p, span, div, label {
+    /* IMPORTANT:
+       Do NOT force fonts on all spans — Streamlit uses Material icon fonts that are spans.
+       If we override them, icons render as text like `keyboard_double_arrow_right`. */
+    p, label, li {
+        font-family: 'Inter', sans-serif !important;
+        color: #94a3b8;
+    }
+
+    /* Body text containers */
+    .stMarkdown, .stText, .stCaption, .stAlert, .stRadio, .stSelectbox, .stMultiSelect, .stCheckbox, .stDataFrame {
         font-family: 'Inter', sans-serif !important;
         color: #94a3b8;
     }
@@ -268,42 +282,9 @@ st.markdown("""
         background: rgba(100, 116, 139, 0.6);
     }
     
-    /* Expander - fix overlap */
-    .streamlit-expanderHeader {
-        background: rgba(30, 41, 59, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 10px !important;
-        color: #e2e8f0 !important;
-        font-size: 0.9rem !important;
-    }
-    
-    .streamlit-expanderHeader p {
-        font-size: 0.9rem !important;
-        margin: 0 !important;
-    }
-    
-    .streamlit-expanderHeader svg {
-        display: none !important;
-    }
-    
-    [data-testid="stExpander"] {
-        border: none !important;
-        background: transparent !important;
-    }
-    
-    [data-testid="stExpander"] details {
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 10px !important;
-        background: rgba(30, 41, 59, 0.5) !important;
-    }
-    
-    [data-testid="stExpander"] summary {
-        padding: 12px 16px !important;
-        color: #e2e8f0 !important;
-    }
-    
-    [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
-        padding: 0 16px 16px 16px !important;
+    /* Sidebar toggle button - make visible */
+    [data-testid="collapsedControl"] {
+        color: #f1f5f9 !important;
     }
     
     /* Charts container */
