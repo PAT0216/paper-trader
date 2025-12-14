@@ -12,6 +12,7 @@ import os
 import sys
 from datetime import datetime
 import json
+import sqlite3
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -364,6 +365,60 @@ def get_portfolio_history(df: pd.DataFrame) -> pd.DataFrame:
     return history
 
 
+def get_ledger_date_range(dfs: dict[str, pd.DataFrame]):
+    """Return (min_date, max_date) across all ledgers that have a date column."""
+    dates = []
+    for df in dfs.values():
+        if not df.empty and "date" in df.columns:
+            try:
+                d = pd.to_datetime(df["date"], errors="coerce")
+                d = d.dropna()
+                if not d.empty:
+                    dates.append(d.min())
+                    dates.append(d.max())
+            except Exception:
+                continue
+    if not dates:
+        return None, None
+    return min(dates), max(dates)
+
+
+def load_benchmark_series(
+    ticker: str,
+    start_date: pd.Timestamp,
+    end_date: pd.Timestamp,
+    db_path: str,
+) -> pd.DataFrame:
+    """Load benchmark adj_close series from the local SQLite cache."""
+    if not (start_date and end_date):
+        return pd.DataFrame()
+    if not os.path.exists(db_path):
+        return pd.DataFrame()
+
+    start_s = pd.to_datetime(start_date).strftime("%Y-%m-%d")
+    end_s = pd.to_datetime(end_date).strftime("%Y-%m-%d")
+
+    con = sqlite3.connect(db_path)
+    try:
+        q = """
+            SELECT date, COALESCE(adj_close, close) AS px
+            FROM price_data
+            WHERE ticker = ?
+              AND date >= ?
+              AND date <= ?
+            ORDER BY date ASC
+        """
+        df = pd.read_sql_query(q, con, params=(ticker, start_s, end_s))
+    finally:
+        con.close()
+
+    if df.empty:
+        return df
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.dropna(subset=["date", "px"])
+    return df
+
+
 # ============ SIDEBAR ============
 with st.sidebar:
     # Logo & Title
@@ -494,17 +549,46 @@ for i, (pid, df) in enumerate(data.items()):
         </div>
         """, unsafe_allow_html=True)
 
-# S&P 500 benchmark (placeholder)
+# S&P 500 benchmark (dynamic, uses SPY over the same ledger period)
 with cols[-1]:
-    st.markdown(f"""
-    <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-        <div class="metric-label">📊 S&P 500 (Benchmark)</div>
-        <div class="metric-value" style="color: #94a3b8;">$113,200</div>
-        <div class="metric-delta" style="color: #64748b;">
-            ↑ +13.2% YTD
+    min_d, max_d = get_ledger_date_range(data)
+    # Align initial capital with the first portfolio (same as PnL cards)
+    first_df = next(iter(data.values()))
+    base_start = first_df[first_df["action"] == "DEPOSIT"]["amount"].sum() if "action" in first_df.columns else 0
+    if not base_start:
+        base_start = 100000
+
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "market.db")
+    spy = load_benchmark_series("SPY", min_d, max_d, db_path)
+
+    if spy.empty:
+        st.markdown(f"""
+        <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
+            <div class="metric-label">📊 S&P 500 (Benchmark)</div>
+            <div class="metric-value" style="color: #94a3b8;">N/A</div>
+            <div class="metric-delta" style="color: #64748b;">
+                Missing SPY data for {min_d.strftime('%Y-%m-%d') if min_d else '—'} → {max_d.strftime('%Y-%m-%d') if max_d else '—'}
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    else:
+        start_px = float(spy.iloc[0]["px"])
+        end_px = float(spy.iloc[-1]["px"])
+        bench_value = base_start * (end_px / start_px) if start_px > 0 else base_start
+        bench_ret = ((end_px / start_px) - 1) * 100 if start_px > 0 else 0.0
+        bench_arrow = "↑" if bench_ret >= 0 else "↓"
+        bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
+        period_label = f"{min_d.strftime('%b %d, %Y')} → {max_d.strftime('%b %d, %Y')}" if min_d and max_d else "Ledger period"
+
+        st.markdown(f"""
+        <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
+            <div class="metric-label">📊 S&P 500 (SPY)</div>
+            <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
+            <div class="metric-delta" style="color: {bench_color};">
+                {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # ============ PERFORMANCE CHART ============
