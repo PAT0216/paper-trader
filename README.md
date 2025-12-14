@@ -7,6 +7,9 @@
 
 **Paper Trader AI** is a production-grade algorithmic trading system featuring a **Dual Portfolio Architecture** that runs two independent strategies simultaneously for performance comparison.
 
+### 🔴 [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
+> Real-time portfolio values, performance charts, and trade history updated daily.
+
 ## 🎯 Dual Portfolio System
 
 | Portfolio | Strategy | Schedule | Ledger |
