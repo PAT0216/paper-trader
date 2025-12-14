@@ -67,8 +67,9 @@ cd dashboard && streamlit run app.py
 
 ### 📦 Infrastructure
 - **SQLite data cache**: 4.3M rows, 503 S&P 500 tickers
-- **GitHub Actions**: Automated trading workflows
-- **Streamlit Dashboard**: Live portfolio comparison
+- **GitHub Actions**: Automated trading + universe sync
+- **Streamlit Dashboard**: Live portfolio comparison with daily snapshots
+- **Point-in-time Universe**: Monthly S&P 500 sync from Wikipedia
 
 ---
 
@@ -76,6 +77,8 @@ cd dashboard && streamlit run app.py
 
 | Workflow | Purpose | Schedule |
 |----------|---------|----------|
+| **Universe Refresh** | Update S&P 500 ticker list | 1st of month, 8 PM UTC |
+| **Cache Refresh** | Update price data + snapshot | Daily, 9 PM UTC |
 | **Momentum Strategy Trade** | Monthly momentum rebalance | 1st-3rd of month, 9:30 PM UTC |
 | **ML Strategy Trade** | Daily ML predictions | Mon-Fri, 9:30 PM UTC |
 

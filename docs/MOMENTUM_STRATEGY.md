@@ -8,18 +8,16 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 
 ---
 
-## Performance (Backtested 2016-2023)
+## Performance (Unbiased Point-in-Time Backtest 2016-2025)
 
 | Metric | Momentum | S&P 500 |
 |--------|----------|---------|
-| **CAGR** | 37.4% | 13.2% |
-| **Sharpe Ratio** | 1.97 | 0.87 |
-| **Total Return** | 1,169% | 169% |
+| **CAGR** | 17.3% | 15.0% |
+| **Total Return** | 391% | 303% |
+| **Best Year** | +40.0% (2017) | +31.1% (2019) |
+| **Worst Year** | +4.2% (2018) | -18.6% (2022) |
 
-### Bear Market (2022)
-- **Momentum**: +19.0%
-- **S&P 500**: -18.6%
-- **Outperformance**: +37.6%
+> ⚠️ **Note**: Results use **point-in-time S&P 500 universe** (survivorship bias removed). Strategy beat S&P 500 in 6/10 years.
 
 ---
 

@@ -49,12 +49,14 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 5. Apply 15% stop-loss daily
 ```
 
-### Performance
+### Performance (Unbiased Backtest 2016-2025)
 | Metric | Value |
 |--------|-------|
-| CAGR | 37.4% |
-| Sharpe | 1.97 |
-| 2022 Return | +19% |
+| CAGR | 17.3% |
+| Total Return | 391% |
+| Beat S&P | 6/10 years |
+
+> Results use **point-in-time S&P 500** (survivorship bias removed).
 
 ---
 
@@ -166,6 +168,22 @@ if strategy == "momentum":
 ---
 
 ## 🔄 GitHub Actions Workflows
+
+### Universe Refresh
+```yaml
+schedule: '0 20 1 * *'  # 1st of month, 8 PM UTC
+```
+- Fetches current S&P 500 from Wikipedia
+- Updates `data/sp500_tickers.txt`
+- Runs before trading workflows
+
+### Cache Refresh
+```yaml
+schedule: '0 21 * * 1-5'  # Mon-Fri, 9 PM UTC
+```
+- Updates price data cache
+- Computes portfolio snapshot (`data/portfolio_snapshot.json`)
+- Dashboard reads snapshot for live values
 
 ### Momentum Strategy Trade
 ```yaml
@@ -280,7 +298,7 @@ python main.py  # Uses momentum strategy, default portfolio
 
 ## ⚠️ Known Limitations
 
-1. **Survivorship bias**: Using current S&P 500 for historical backtest
+1. ~~**Survivorship bias**: Using current S&P 500 for historical backtest~~ ✅ **Fixed** - Point-in-time universe via `UniverseManager`
 2. **Paper trading only**: No real money integration
 3. **US market only**: No international support
 4. **Daily resolution**: No intraday trading
