@@ -1,0 +1,88 @@
+name: Daily Portfolio Monitor
+
+# Runs every trading day at 4:30 PM ET (21:30 UTC)
+# Does NOT execute trades - only monitors portfolio value
+
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'  # Mon-Fri at 4:30 PM ET
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Cache Market Data
+      id: cache-market-data
+      uses: actions/cache@v4
+      with:
+        path: |
+          data/market.db
+          data/universe_cache.csv
+        key: market-data-${{ runner.os }}-${{ github.run_id }}
+        restore-keys: |
+          market-data-${{ runner.os }}-
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        pip install pandas numpy yfinance scipy
+
+    - name: Run Daily Monitor
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        from datetime import datetime
+        print('=' * 60)
+        print(f'📊 Daily Portfolio Monitor - {datetime.now().strftime(\"%Y-%m-%d %H:%M\")}')
+        print('=' * 60)
+        
+        # Import monitoring module
+        try:
+            from src.monitoring.portfolio_tracker import run_daily_monitor
+            run_daily_monitor()
+        except Exception as e:
+            print(f'⚠️  Monitor failed: {e}')
+            print('Continuing with basic status only...')
+            
+            # Fallback: just show ledger status
+            import os
+            if os.path.exists('ledger.csv'):
+                import pandas as pd
+                ledger = pd.read_csv('ledger.csv')
+                print(f'\\nLedger has {len(ledger)} entries')
+                print(ledger.tail(5))
+            else:
+                print('No ledger found')
+        
+        print('\\n✅ Daily monitoring complete (NO TRADES EXECUTED)')
+        "
+
+    - name: Commit Daily Log
+      run: |
+        git config --global user.name 'PAT0216'
+        git config --global user.email '69978508+PAT0216@users.noreply.github.com'
+        
+        # Only commit logs if they exist
+        mkdir -p logs
+        
+        if [ -f logs/portfolio_daily.csv ]; then
+          git add logs/portfolio_daily.csv
+          git diff --staged --quiet || git commit -m "📊 Daily Portfolio Update $(date +'%Y-%m-%d')"
+          git push origin HEAD
+        fi
