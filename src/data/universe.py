@@ -55,3 +55,26 @@ class UniverseManager:
                     universe.add(ticker)
                     
         return list(universe)
+
+
+def fetch_sp500_tickers() -> list[str]:
+    """Fetch current S&P 500 tickers from Wikipedia."""
+    try:
+        tables = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+        df = tables[0]
+        tickers = df['Symbol'].tolist()
+        # Clean tickers: BRK.B -> BRK-B (Yahoo Finance format)
+        return [t.replace('.', '-') for t in tickers]
+    except Exception as e:
+        print(f"Error fetching S&P 500 from Wikipedia: {e}")
+        return []
+
+
+def get_mega_caps() -> list[str]:
+    """Fallback: hardcoded mega-cap stocks if Wikipedia fetch fails."""
+    return [
+        'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK-B', 
+        'LLY', 'V', 'UNH', 'JPM', 'XOM', 'JNJ', 'MA', 'PG', 'HD', 'CVX',
+        'MRK', 'ABBV', 'COST', 'PEP', 'KO', 'AVGO', 'WMT', 'MCD', 'CSCO',
+        'CRM', 'ACN', 'LIN', 'TMO', 'ABT', 'ADBE', 'AMD', 'ORCL', 'NKE'
+    ]

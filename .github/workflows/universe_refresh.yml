@@ -1,0 +1,49 @@
+name: Monthly Universe Refresh
+
+# Runs on 1st of each month at 20:00 UTC (before trading workflows)
+# Fetches current S&P 500 constituents and updates ticker files
+
+on:
+  schedule:
+    - cron: '0 20 1 * *'  # 1st of month at 20:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas lxml
+
+      - name: Update Universe
+        run: |
+          python scripts/update_universe.py
+
+      - name: Commit Changes
+        run: |
+          git config user.name "PAT0216"
+          git config user.email "28152569+PAT0216@users.noreply.github.com"
+          
+          git add data/sp500_tickers.txt data/sp500_current.csv
+          
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git commit -m "🔄 Universe refresh $(date +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin main
