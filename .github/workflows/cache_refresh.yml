@@ -1,0 +1,82 @@
+name: Daily Cache Refresh
+
+# Runs daily at 5 PM ET (9 PM UTC) to update market data cache
+# Must complete BEFORE trading workflows run (9:30 PM UTC)
+
+on:
+  schedule:
+    - cron: '0 21 * * 1-5'  # Mon-Fri at 9 PM UTC (before trading workflows)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore Market Data Cache
+        uses: actions/cache@v4
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
+          restore-keys: |
+            market-data-v3-
+
+      - name: Check Cache Status
+        run: |
+          if [ -f data/market.db ]; then
+            echo "✅ Cache restored: $(du -h data/market.db)"
+          else
+            echo "⚠️ No cache found, will create fresh"
+            mkdir -p data
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas yfinance
+
+      - name: Refresh Cache (Incremental)
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from src.data.loader import fetch_data
+          
+          # Load tickers
+          with open('data/sp500_tickers.txt', 'r') as f:
+              tickers = [line.strip() for line in f if line.strip()]
+          
+          print(f'📊 Refreshing cache for {len(tickers)} tickers...')
+          
+          # Incremental update - only fetches new bars
+          data = fetch_data(tickers, period='1mo', use_cache=True)
+          
+          print(f'✅ Cache updated with {len(data)} tickers')
+          "
+
+      - name: Save Market Data Cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
+
+      - name: Commit Cache Status
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          # Only commit if there are changes to track
+          date > .cache_last_updated
+          git add .cache_last_updated
+          git diff --cached --quiet || git commit -m "📦 Cache refreshed $(date +%Y-%m-%d)"
+          git push || echo "No changes to push"
