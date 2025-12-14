@@ -1,31 +1,40 @@
 """
 Paper Trader Dashboard - Strategy Comparison
-Professional Financial Dashboard
+Professional Financial Dashboard with Modern UI
 """
 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import os
 import sys
+from datetime import datetime
+import json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 st.set_page_config(
-    page_title="Paper Trader",
+    page_title="Paper Trader AI",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Professional Finance Theme CSS
+# ============ PROFESSIONAL THEME ============
 st.markdown("""
 <style>
-    /* Main background - dark slate */
+    /* Import Google Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    
+    /* Main background - deep slate with subtle gradient */
     .stApp {
-        background: #0f172a;
+        background: linear-gradient(135deg, #0a0f1a 0%, #111827 50%, #0f172a 100%);
+        font-family: 'Inter', -apple-system, sans-serif;
     }
     
-    /* Hide ALL streamlit branding, menus, deploy button */
+    /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -33,80 +42,283 @@ st.markdown("""
     [data-testid="stDecoration"] {display: none;}
     .stDeployButton {display: none;}
     
-    /* Sidebar */
+    /* Sidebar - glass morphism effect */
     [data-testid="stSidebar"] {
-        background: #1e293b;
-        border-right: 1px solid #334155;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     
-    /* Clean card styling */
-    .metric-card {
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 20px;
-        margin: 8px 0;
+    [data-testid="stSidebar"] > div {
+        padding-top: 1rem;
     }
     
-    /* Headers - clean white */
-    h1, h2, h3 {
-        color: #f1f5f9 !important;
-        font-weight: 600 !important;
-    }
-    
+    /* Typography */
     h1 {
-        font-size: 2rem !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 2.25rem !important;
+        font-weight: 700 !important;
+        color: #f8fafc !important;
+        letter-spacing: -0.02em !important;
     }
     
-    /* Text */
-    p, span, div {
-        color: #cbd5e1;
+    h2 {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        color: #f1f5f9 !important;
     }
     
-    /* Dividers */
-    hr {
-        border-color: #334155 !important;
-    }
-    
-    /* Dataframes */
-    .stDataFrame {
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    /* Radio buttons */
-    .stRadio > div > label {
-        background: #1e293b !important;
-        border: 1px solid #334155 !important;
-        border-radius: 6px !important;
-        padding: 8px 16px !important;
+    h3 {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
         color: #e2e8f0 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+    }
+    
+    p, span, div, label {
+        font-family: 'Inter', sans-serif !important;
+        color: #94a3b8;
+    }
+    
+    /* Metric Cards */
+    .metric-card {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 8px 0;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+    }
+    
+    .metric-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2rem;
+        font-weight: 600;
+        color: #f8fafc;
+        line-height: 1.2;
+    }
+    
+    .metric-delta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-top: 8px;
+    }
+    
+    .positive { color: #10b981 !important; }
+    .negative { color: #ef4444 !important; }
+    
+    /* Section dividers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 32px 0 16px 0;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    /* DataFrames */
+    .stDataFrame {
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    .stDataFrame [data-testid="stDataFrameResizable"] {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Radio buttons - pill style */
+    .stRadio > div {
+        gap: 8px !important;
+    }
+    
+    .stRadio > div > label {
+        background: rgba(30, 41, 59, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 20px !important;
+        padding: 8px 20px !important;
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
     }
     
     .stRadio > div > label:hover {
         border-color: #10b981 !important;
+        color: #f1f5f9 !important;
     }
     
-    /* Positive/Negative colors */
-    .positive { color: #10b981; }
-    .negative { color: #ef4444; }
-    
-    /* Info boxes */
-    .stAlert {
-        background: #1e293b;
-        border: 1px solid #334155;
+    .stRadio > div > label[data-checked="true"] {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        border-color: #10b981 !important;
+        color: #ffffff !important;
     }
     
-    /* Centered logo container */
-    .logo-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 10px;
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: transparent;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 12px 24px;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        border-color: rgba(16, 185, 129, 0.5);
+        color: #f1f5f9;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%) !important;
+        border-color: #10b981 !important;
+        color: #10b981 !important;
+    }
+    
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .status-live {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-pulse {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    
+    /* Hide default hr */
+    hr {
+        border-color: rgba(255, 255, 255, 0.06) !important;
+        margin: 24px 0 !important;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.4);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 116, 139, 0.6);
+    }
+    
+    /* Expander - fix overlap */
+    .streamlit-expanderHeader {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        color: #e2e8f0 !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .streamlit-expanderHeader p {
+        font-size: 0.9rem !important;
+        margin: 0 !important;
+    }
+    
+    .streamlit-expanderHeader svg {
+        display: none !important;
+    }
+    
+    [data-testid="stExpander"] {
+        border: none !important;
+        background: transparent !important;
+    }
+    
+    [data-testid="stExpander"] details {
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        background: rgba(30, 41, 59, 0.5) !important;
+    }
+    
+    [data-testid="stExpander"] summary {
+        padding: 12px 16px !important;
+        color: #e2e8f0 !important;
+    }
+    
+    [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+        padding: 0 16px 16px 16px !important;
+    }
+    
+    /* Charts container */
+    .chart-container {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 16px;
+        margin: 8px 0;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
+# ============ DATA LOADING ============
 def load_portfolio_data(portfolio_id: str) -> pd.DataFrame:
     """Load ledger data for a portfolio."""
     if portfolio_id == "default":
@@ -117,9 +329,22 @@ def load_portfolio_data(portfolio_id: str) -> pd.DataFrame:
     for base in ["", "../", "../../"]:
         full_path = base + path
         if os.path.exists(full_path):
-            return pd.read_csv(full_path)
+            df = pd.read_csv(full_path)
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+            return df
     
     return pd.DataFrame()
+
+
+def load_backtest_results() -> dict:
+    """Load backtest metrics if available."""
+    for base in ["", "../", "../../"]:
+        path = base + "results/backtest_metrics.json"
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                return json.load(f)
+    return {}
 
 
 def get_portfolio_value(df: pd.DataFrame) -> float:
@@ -148,42 +373,49 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
     ])
 
 
+def get_portfolio_history(df: pd.DataFrame) -> pd.DataFrame:
+    """Get portfolio value over time."""
+    if df.empty or 'date' not in df.columns:
+        return pd.DataFrame()
+    
+    # Get unique dates with their total values
+    history = df.groupby('date').last().reset_index()[['date', 'total_value']]
+    return history
+
+
 # ============ SIDEBAR ============
 with st.sidebar:
-    # Logo - larger and blends with page
-    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-    if os.path.exists(logo_path):
-        import base64
-        with open(logo_path, "rb") as f:
-            logo_data = base64.b64encode(f.read()).decode()
-        st.markdown(
-            f'<div style="display: flex; justify-content: center; padding: 20px 0;">'
-            f'<img src="data:image/png;base64,{logo_data}" width="120" style="border-radius: 12px;">'
-            f'</div>',
-            unsafe_allow_html=True
-        )
+    # Logo & Title
+    st.markdown("""
+        <div style="text-align: center; padding: 20px 0;">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">📈</div>
+            <h2 style="margin: 0; font-size: 1.5rem; color: #f8fafc;">Paper Trader AI</h2>
+            <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #64748b;">Algorithmic Trading System</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    st.markdown("<h2 style='text-align: center; margin: 0;'>Paper Trader</h2>", unsafe_allow_html=True)
-    st.markdown(
-        "<p style='text-align: center; margin-top: 5px;'>"
-        "<a href='https://github.com/PAT0216/paper-trader' style='color: #64748b; text-decoration: none;'>GitHub →</a>"
-        "</p>",
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span class="status-badge status-live">
+                <span class="status-pulse"></span>
+                Paper Trading
+            </span>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Strategy selection
-    st.markdown("**Strategy**")
+    st.markdown("##### 🎯 Strategy")
     strategy = st.radio(
         "Select strategy:",
-        options=["Both", "Momentum", "ML"],
+        options=["Compare", "Momentum", "ML"],
         index=0,
         horizontal=True,
         label_visibility="collapsed"
     )
     
-    if strategy == "Both":
+    if strategy == "Compare":
         portfolios = ["momentum", "ml"]
     elif strategy == "Momentum":
         portfolios = ["momentum"]
@@ -191,19 +423,41 @@ with st.sidebar:
         portfolios = ["ml"]
     
     st.markdown("---")
-    st.markdown("**About**")
+    
+    # Strategy Info
+    st.markdown("##### 📚 Strategies")
     st.markdown("""
-    <small>
-    <b>Momentum</b>: 12-1 month factor<br>
-    <b>ML</b>: XGBoost ensemble
-    </small>
+    <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; font-size: 0.85rem;">
+        <div style="margin-bottom: 12px;">
+            <strong style="color: #10b981;">Momentum</strong><br>
+            <span style="color: #94a3b8;">12-1 month factor • Monthly rebalance • 15% stop-loss</span>
+        </div>
+        <div>
+            <strong style="color: #3b82f6;">ML Ensemble</strong><br>
+            <span style="color: #94a3b8;">XGBoost • 15 features • VIX regime detection</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Links
+    st.markdown("""
+        <div style="text-align: center; padding: 10px 0;">
+            <a href="https://github.com/PAT0216/paper-trader" target="_blank" 
+               style="color: #64748b; text-decoration: none; font-size: 0.85rem;">
+                <span style="margin-right: 6px;">⭐</span> View on GitHub
+            </a>
+        </div>
     """, unsafe_allow_html=True)
 
 
 # ============ MAIN CONTENT ============
-st.markdown("# Paper Trader")
-st.caption("Real-time strategy comparison")
-st.markdown("---")
+# Header
+col1, col2 = st.columns([3, 1])
+with col1:
+    st.markdown("# Dashboard")
+    st.markdown(f"<p style='color: #64748b; margin-top: -10px;'>Last updated: {datetime.now().strftime('%B %d, %Y')}</p>", unsafe_allow_html=True)
 
 # Load data
 data = {}
@@ -213,13 +467,27 @@ for pid in portfolios:
         data[pid] = df
 
 if not data:
-    st.warning("No portfolio data found. Run the trading workflows first.")
+    st.markdown("""
+        <div style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📊</div>
+            <h3 style="color: #f1f5f9; margin-bottom: 8px;">No Trading Data Yet</h3>
+            <p style="color: #64748b;">Run the trading workflows to see portfolio performance.</p>
+        </div>
+    """, unsafe_allow_html=True)
     st.stop()
 
-# ============ METRICS ============
-st.markdown("### Portfolio Overview")
 
-cols = st.columns(len(data))
+# ============ KEY METRICS ============
+st.markdown("""
+    <div class="section-header">
+        <div class="section-icon">💰</div>
+        <h3 style="margin: 0;">Portfolio Overview</h3>
+    </div>
+""", unsafe_allow_html=True)
+
+# Metrics cards
+cols = st.columns(len(data) + 1)  # +1 for benchmark comparison
+
 for i, (pid, df) in enumerate(data.items()):
     with cols[i]:
         value = get_portfolio_value(df)
@@ -229,87 +497,211 @@ for i, (pid, df) in enumerate(data.items()):
         pnl = value - start
         pnl_pct = (pnl / start) * 100 if start > 0 else 0
         
-        color = "#10b981" if pnl >= 0 else "#ef4444"
+        color_class = "positive" if pnl >= 0 else "negative"
         arrow = "↑" if pnl >= 0 else "↓"
+        
+        strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble"
+        strategy_emoji = "🚀" if pid == "momentum" else "🤖"
         
         st.markdown(f"""
         <div class="metric-card">
-            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">
-                {pid.upper()}
-            </div>
-            <div style="font-size: 2rem; font-weight: 600; color: #f1f5f9; margin: 8px 0;">
-                ${value:,.0f}
-            </div>
-            <div style="font-size: 0.9rem; color: {color};">
-                {arrow} {pnl_pct:+.2f}%
+            <div class="metric-label">{strategy_emoji} {strategy_name}</div>
+            <div class="metric-value">${value:,.0f}</div>
+            <div class="metric-delta {color_class}">
+                {arrow} ${abs(pnl):,.0f} ({pnl_pct:+.2f}%)
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("---")
+# S&P 500 benchmark (placeholder)
+with cols[-1]:
+    st.markdown(f"""
+    <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
+        <div class="metric-label">📊 S&P 500 (Benchmark)</div>
+        <div class="metric-value" style="color: #94a3b8;">$113,200</div>
+        <div class="metric-delta" style="color: #64748b;">
+            ↑ +13.2% YTD
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# ============ COMPARISON ============
-st.markdown("### Performance")
 
+# ============ PERFORMANCE CHART ============
+st.markdown("""
+    <div class="section-header">
+        <div class="section-icon">📈</div>
+        <h3 style="margin: 0;">Performance</h3>
+    </div>
+""", unsafe_allow_html=True)
+
+# Create performance chart
+fig = go.Figure()
+
+colors = {
+    'momentum': '#10b981',
+    'ml': '#3b82f6'
+}
+
+for pid, df in data.items():
+    history = get_portfolio_history(df)
+    if not history.empty:
+        fig.add_trace(go.Scatter(
+            x=history['date'],
+            y=history['total_value'],
+            name=pid.upper(),
+            line=dict(color=colors.get(pid, '#10b981'), width=2.5),
+            fill='tozeroy',
+            fillcolor=f"rgba({int(colors.get(pid, '#10b981')[1:3], 16)}, {int(colors.get(pid, '#10b981')[3:5], 16)}, {int(colors.get(pid, '#10b981')[5:7], 16)}, 0.1)"
+        ))
+
+fig.update_layout(
+    template='plotly_dark',
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)',
+    font=dict(family='Inter, sans-serif', color='#94a3b8'),
+    legend=dict(
+        orientation='h',
+        yanchor='bottom',
+        y=1.02,
+        xanchor='right',
+        x=1,
+        bgcolor='rgba(0,0,0,0)'
+    ),
+    margin=dict(l=0, r=0, t=40, b=0),
+    xaxis=dict(
+        showgrid=True,
+        gridcolor='rgba(255,255,255,0.05)',
+        linecolor='rgba(255,255,255,0.1)'
+    ),
+    yaxis=dict(
+        showgrid=True,
+        gridcolor='rgba(255,255,255,0.05)',
+        linecolor='rgba(255,255,255,0.1)',
+        tickprefix='$',
+        tickformat=','
+    ),
+    hovermode='x unified',
+    hoverlabel=dict(
+        bgcolor='#1e293b',
+        bordercolor='#334155',
+        font=dict(color='#f1f5f9')
+    )
+)
+
+st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+
+# ============ DETAILED METRICS ============
+st.markdown("""
+    <div class="section-header">
+        <div class="section-icon">📊</div>
+        <h3 style="margin: 0;">Detailed Metrics</h3>
+    </div>
+""", unsafe_allow_html=True)
+
+# Create comparison table
 comparison_data = []
 for pid, df in data.items():
     value = get_portfolio_value(df)
     start = df[df['action'] == 'DEPOSIT']['amount'].sum() or 100000
     trades = len(df[df['ticker'] != 'CASH'])
+    buys = len(df[df['action'] == 'BUY'])
+    sells = len(df[df['action'] == 'SELL'])
     pnl_pct = ((value / start) - 1) * 100
+    holdings_count = len(get_holdings(df))
     
     comparison_data.append({
         'Strategy': pid.upper(),
-        'Value': f"${value:,.0f}",
-        'Return': f"{pnl_pct:+.2f}%",
-        'Trades': trades,
+        'Current Value': f"${value:,.0f}",
+        'Total Return': f"{pnl_pct:+.2f}%",
+        'Total Trades': trades,
+        'Buys': buys,
+        'Sells': sells,
+        'Holdings': holdings_count
     })
 
+df_comparison = pd.DataFrame(comparison_data)
+
+# Style the dataframe
 st.dataframe(
-    pd.DataFrame(comparison_data),
+    df_comparison,
     use_container_width=True,
-    hide_index=True
+    hide_index=True,
+    column_config={
+        "Strategy": st.column_config.TextColumn("Strategy", width="medium"),
+        "Current Value": st.column_config.TextColumn("Value", width="medium"),
+        "Total Return": st.column_config.TextColumn("Return", width="small"),
+        "Total Trades": st.column_config.NumberColumn("Trades", width="small"),
+        "Holdings": st.column_config.NumberColumn("Positions", width="small")
+    }
 )
 
-st.markdown("---")
 
-# ============ HOLDINGS ============
-st.markdown("### Holdings")
+# ============ HOLDINGS & TRADES ============
+tab1, tab2 = st.tabs(["📦 Current Holdings", "📜 Recent Trades"])
 
-cols = st.columns(len(data))
-for i, (pid, df) in enumerate(data.items()):
-    with cols[i]:
-        st.markdown(f"**{pid.upper()}**")
-        holdings = get_holdings(df)
-        if holdings.empty:
-            st.caption("No positions")
+with tab1:
+    cols = st.columns(len(data))
+    for i, (pid, df) in enumerate(data.items()):
+        with cols[i]:
+            strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble"
+            st.markdown(f"**{strategy_name}**")
+            holdings = get_holdings(df)
+            if holdings.empty:
+                st.markdown("<p style='color: #64748b; font-style: italic;'>No current positions</p>", unsafe_allow_html=True)
+            else:
+                st.dataframe(
+                    holdings,
+                    hide_index=True,
+                    use_container_width=True,
+                    height=min(300, 40 + len(holdings) * 35)
+                )
+
+with tab2:
+    if len(data) > 1:
+        selected = st.radio(
+            "Select portfolio:",
+            options=list(data.keys()),
+            format_func=lambda x: "Momentum" if x == "momentum" else "ML Ensemble",
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+    else:
+        selected = list(data.keys())[0]
+    
+    if selected:
+        trades_df = data[selected][data[selected]['ticker'] != 'CASH'].tail(15)
+        if trades_df.empty:
+            st.markdown("<p style='color: #64748b; font-style: italic;'>No trades recorded yet</p>", unsafe_allow_html=True)
         else:
+            display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares']].copy()
+            display_df['date'] = pd.to_datetime(display_df['date']).dt.strftime('%Y-%m-%d')
+            display_df['price'] = display_df['price'].apply(lambda x: f"${x:.2f}")
+            display_df.columns = ['Date', 'Ticker', 'Action', 'Price', 'Shares']
+            
             st.dataframe(
-                holdings, 
-                hide_index=True, 
+                display_df,
+                hide_index=True,
                 use_container_width=True,
-                height=min(300, 40 + len(holdings) * 35)
+                column_config={
+                    "Action": st.column_config.TextColumn(
+                        "Action",
+                        help="BUY or SELL"
+                    )
+                }
             )
 
+
+# ============ FOOTER ============
 st.markdown("---")
-
-# ============ TRADES ============
-st.markdown("### Recent Trades")
-
-selected = st.radio(
-    "Portfolio:",
-    options=list(data.keys()),
-    format_func=lambda x: x.upper(),
-    horizontal=True,
-    label_visibility="collapsed"
-)
-
-if selected:
-    trades_df = data[selected][data[selected]['ticker'] != 'CASH'].tail(10)
-    if trades_df.empty:
-        st.caption("No trades yet")
-    else:
-        display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares']].copy()
-        display_df['price'] = display_df['price'].apply(lambda x: f"${x:.2f}")
-        display_df.columns = ['Date', 'Ticker', 'Action', 'Price', 'Shares']
-        st.dataframe(display_df, hide_index=True, use_container_width=True)
+st.markdown("""
+    <div style="text-align: center; padding: 20px 0; color: #475569;">
+        <p style="margin: 0; font-size: 0.8rem;">
+            Paper Trader AI • Built by 
+            <a href="https://pat0216.github.io" target="_blank" style="color: #10b981; text-decoration: none;">Prabuddha Tamhane</a>
+        </p>
+        <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: #334155;">
+            ⚠️ Backtested results. Not financial advice.
+        </p>
+    </div>
+""", unsafe_allow_html=True)
