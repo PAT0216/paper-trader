@@ -1,0 +1,57 @@
+name: ML Strategy Trade
+
+on:
+  schedule:
+    # Run daily at 9:30 PM UTC (after market close)
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore Market Data Cache
+        uses: actions/cache@v4
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
+          restore-keys: |
+            market-data-v3-
+
+      - name: Check Cache Status
+        run: |
+          if [ -f data/market.db ]; then
+            echo "✅ Cache restored: $(du -h data/market.db)"
+          else
+            echo "⚠️ No cache found, will fetch fresh data"
+          fi
+
+      - name: Build Docker Image
+        run: docker build -t paper-trader .
+
+      - name: Run ML Strategy
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            paper-trader \
+            conda run --no-capture-output -n paper-trader \
+            python main.py --mode trade --strategy ml --portfolio ml
+
+      - name: Push Ledger Changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add ledger_ml.csv logs/ models/
+          git diff --cached --quiet || git commit -m "🤖 ML: Daily trade $(date +%Y-%m-%d)"
+          git push
+
+      - name: Post Cache Market Data
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
