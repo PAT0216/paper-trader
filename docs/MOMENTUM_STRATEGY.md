@@ -2,23 +2,26 @@
 
 ## Overview
 
-This is a **long-only momentum strategy** based on academic research by Jegadeesh & Titman (1993) and Fama-French factor investing.
+The **primary production strategy** using 12-month momentum factor with 15% daily stop-loss.
 
-**Configuration:** 12-month momentum lookback with 15% daily stop-loss
+Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor investing.
+
+---
 
 ## Performance (Backtested 2016-2023)
 
-| Metric | Value |
-|--------|-------|
-| **CAGR** | 37.4% |
-| **Sharpe Ratio** | 1.97 |
-| **Total Return** | 1,169% |
-| vs SPY | 169% |
+| Metric | Momentum | S&P 500 |
+|--------|----------|---------|
+| **CAGR** | 37.4% | 13.2% |
+| **Sharpe Ratio** | 1.97 | 0.87 |
+| **Total Return** | 1,169% | 169% |
 
-### Bear Market Performance (2022)
-- Strategy: **+19.0%**
-- SPY: **-18.6%**
-- Outperformance: **+37.6%**
+### Bear Market (2022)
+- **Momentum**: +19.0%
+- **S&P 500**: -18.6%
+- **Outperformance**: +37.6%
+
+---
 
 ## How It Works
 
@@ -36,8 +39,9 @@ This is a **long-only momentum strategy** based on academic research by Jegadees
 For each position:
   - Track entry price
   - If current price drops 15% below entry → SELL immediately
-  - This prevents catastrophic losses
 ```
+
+---
 
 ## Configuration
 
@@ -55,22 +59,32 @@ risk:
   stop_loss_pct: 0.15 # 15% daily stop-loss
 ```
 
+---
+
 ## Usage
 
+### Command Line
 ```bash
-# Run with momentum strategy
-python main.py --strategy momentum
-
-# Or use make
-make trade-momentum
+# Run momentum strategy with isolated portfolio
+python main.py --strategy momentum --portfolio momentum
 ```
 
-## Schedule
+### GitHub Actions
+1. Go to **Actions** tab
+2. Select **"Momentum Strategy Trade"**
+3. Click **"Run workflow"**
 
-| Job | When | Action |
-|-----|------|--------|
-| Daily Monitor | Mon-Fri 4:30 PM ET | Check stop-loss, update PnL |
-| Monthly Rebalance | 1st trading day of month | Execute trades |
+---
+
+## Workflow Schedule
+
+| Workflow | Schedule | Action |
+|----------|----------|--------|
+| **Momentum Strategy Trade** | 1st-3rd of month, 9:30 PM UTC | Monthly rebalance |
+
+The workflow runs on days 1-3 to catch the first trading day regardless of weekends/holidays.
+
+---
 
 ## Files
 
@@ -78,4 +92,21 @@ make trade-momentum
 |------|---------|
 | `src/strategies/momentum_strategy.py` | Strategy implementation |
 | `config/momentum_config.yaml` | Configuration |
-| `results/full_universe_comparison.json` | Backtest results |
+| `ledger_momentum.csv` | Trade history |
+| `.github/workflows/momentum_trade.yml` | Automation |
+
+---
+
+## Dual Portfolio Integration
+
+This strategy runs independently alongside the ML strategy:
+
+| Portfolio | Ledger | Strategy |
+|-----------|--------|----------|
+| Momentum | `ledger_momentum.csv` | This strategy |
+| ML | `ledger_ml.csv` | XGBoost predictions |
+
+Compare performance in the **Streamlit Dashboard**:
+```bash
+cd dashboard && streamlit run app.py
+```
