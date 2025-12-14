@@ -571,37 +571,18 @@ for i, (pid, df) in enumerate(data.items()):
         </div>
         """, unsafe_allow_html=True)
 
-# S&P 500 benchmark (dynamic, uses SPY over the same ledger period)
+# S&P 500 benchmark (uses snapshot first, fallback to database)
 with cols[-1]:
-    min_d, max_d = get_ledger_date_range(data)
-    # Align initial capital with the first portfolio (same as PnL cards)
-    first_df = next(iter(data.values()))
-    base_start = first_df[first_df["action"] == "DEPOSIT"]["amount"].sum() if "action" in first_df.columns else 0
-    if not base_start:
-        base_start = 100000
-
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "market.db")
-    spy = load_benchmark_series("SPY", min_d, max_d, db_path)
-
-    if spy.empty:
-        st.markdown(f"""
-        <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-            <div class="metric-label">📊 S&P 500 (Benchmark)</div>
-            <div class="metric-value" style="color: #94a3b8;">N/A</div>
-            <div class="metric-delta" style="color: #64748b;">
-                Missing SPY data for {min_d.strftime('%Y-%m-%d') if min_d else '—'} → {max_d.strftime('%Y-%m-%d') if max_d else '—'}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        start_px = float(spy.iloc[0]["px"])
-        end_px = float(spy.iloc[-1]["px"])
-        bench_value = base_start * (end_px / start_px) if start_px > 0 else base_start
-        bench_ret = ((end_px / start_px) - 1) * 100 if start_px > 0 else 0.0
+    # Try snapshot first (works on deployed site)
+    benchmark = snapshot.get('benchmark', {})
+    
+    if benchmark:
+        bench_value = benchmark['value']
+        bench_ret = benchmark['return_pct']
+        period_label = f"{benchmark.get('start_date', '')} → {benchmark.get('end_date', '')}"
         bench_arrow = "↑" if bench_ret >= 0 else "↓"
         bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
-        period_label = f"{min_d.strftime('%b %d, %Y')} → {max_d.strftime('%b %d, %Y')}" if min_d and max_d else "Ledger period"
-
+        
         st.markdown(f"""
         <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
             <div class="metric-label">📊 S&P 500 (SPY)</div>
@@ -611,6 +592,45 @@ with cols[-1]:
             </div>
         </div>
         """, unsafe_allow_html=True)
+    else:
+        # Fallback to database (works on localhost)
+        min_d, max_d = get_ledger_date_range(data)
+        first_df = next(iter(data.values()))
+        base_start = first_df[first_df["action"] == "DEPOSIT"]["amount"].sum() if "action" in first_df.columns else 0
+        if not base_start:
+            base_start = 10000
+
+        db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "market.db")
+        spy = load_benchmark_series("SPY", min_d, max_d, db_path)
+
+        if spy.empty:
+            st.markdown(f"""
+            <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
+                <div class="metric-label">📊 S&P 500 (Benchmark)</div>
+                <div class="metric-value" style="color: #94a3b8;">N/A</div>
+                <div class="metric-delta" style="color: #64748b;">
+                    Missing SPY data for {min_d.strftime('%Y-%m-%d') if min_d else '—'} → {max_d.strftime('%Y-%m-%d') if max_d else '—'}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            start_px = float(spy.iloc[0]["px"])
+            end_px = float(spy.iloc[-1]["px"])
+            bench_value = base_start * (end_px / start_px) if start_px > 0 else base_start
+            bench_ret = ((end_px / start_px) - 1) * 100 if start_px > 0 else 0.0
+            bench_arrow = "↑" if bench_ret >= 0 else "↓"
+            bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
+            period_label = f"{min_d.strftime('%b %d, %Y')} → {max_d.strftime('%b %d, %Y')}" if min_d and max_d else "Ledger period"
+
+            st.markdown(f"""
+            <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
+                <div class="metric-label">📊 S&P 500 (SPY)</div>
+                <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
+                <div class="metric-delta" style="color: {bench_color};">
+                    {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 # ============ PERFORMANCE CHART ============

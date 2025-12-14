@@ -158,6 +158,52 @@ def main():
         print(f"  Value: ${value:,.2f}")
         print(f"  Return: {return_pct:+.2f}%")
     
+    # Add SPY benchmark
+    print("\n📈 Computing SPY benchmark...")
+    try:
+        # Get first ledger date
+        first_date = None
+        for path in ledgers.values():
+            if os.path.exists(path):
+                df = pd.read_csv(path)
+                if not df.empty and 'date' in df.columns:
+                    first_date = df['date'].min()
+                    break
+        
+        if first_date and os.path.exists(DB_PATH):
+            con = sqlite3.connect(DB_PATH)
+            spy_df = pd.read_sql_query("""
+                SELECT date, COALESCE(adj_close, close) AS price
+                FROM price_data
+                WHERE ticker = 'SPY'
+                  AND date >= ?
+                ORDER BY date ASC
+            """, con, params=(first_date,))
+            con.close()
+            
+            if not spy_df.empty:
+                spy_start = spy_df['price'].iloc[0]
+                spy_end = spy_df['price'].iloc[-1]
+                spy_return = ((spy_end / spy_start) - 1) * 100
+                spy_value = INITIAL_CAPITAL * (1 + spy_return / 100)
+                
+                snapshot['benchmark'] = {
+                    'ticker': 'SPY',
+                    'start_price': round(spy_start, 2),
+                    'end_price': round(spy_end, 2),
+                    'return_pct': round(spy_return, 2),
+                    'value': round(spy_value, 2),
+                    'start_date': first_date,
+                    'end_date': spy_df['date'].iloc[-1]
+                }
+                print(f"  SPY: {spy_return:+.2f}% (${spy_value:,.2f})")
+            else:
+                print("  No SPY data found")
+        else:
+            print("  Skipped - no date range")
+    except Exception as e:
+        print(f"  Error: {e}")
+    
     # Save snapshot
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, 'w') as f:
