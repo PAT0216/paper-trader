@@ -21,19 +21,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS for clean styling
+# CSS for clean styling - theme-aware
 st.markdown("""
 <style>
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
-    }
+    /* Remove fixed background colors - let Streamlit handle theme */
     .stMetric {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 8px;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(128, 128, 128, 0.2);
+    }
+    /* Ensure text is visible in both modes */
+    .stMetric label {
+        font-weight: 600 !important;
+    }
+    /* Header styling */
+    h1, h2, h3 {
+        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
