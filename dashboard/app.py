@@ -25,9 +25,13 @@ st.markdown("""
         background: #0f172a;
     }
     
-    /* Hide streamlit branding */
+    /* Hide ALL streamlit branding, menus, deploy button */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    header {visibility: hidden;}
+    [data-testid="stToolbar"] {display: none;}
+    [data-testid="stDecoration"] {display: none;}
+    .stDeployButton {display: none;}
     
     /* Sidebar */
     [data-testid="stSidebar"] {
@@ -92,6 +96,13 @@ st.markdown("""
         background: #1e293b;
         border: 1px solid #334155;
     }
+    
+    /* Centered logo container */
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -139,17 +150,23 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    # Logo centered
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-        if os.path.exists(logo_path):
-            st.image(logo_path, width=60)
+    # Logo centered using HTML
+    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    if os.path.exists(logo_path):
+        import base64
+        with open(logo_path, "rb") as f:
+            logo_data = base64.b64encode(f.read()).decode()
+        st.markdown(
+            f'<div style="display: flex; justify-content: center; margin-bottom: 10px;">'
+            f'<img src="data:image/png;base64,{logo_data}" width="60">'
+            f'</div>',
+            unsafe_allow_html=True
+        )
     
-    st.markdown("<h2 style='text-align: center; margin-top: 0;'>Paper Trader</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; margin: 0;'>Paper Trader</h2>", unsafe_allow_html=True)
     st.markdown(
-        "<p style='text-align: center;'>"
-        "<a href='https://github.com/PAT0216/paper-trader' style='color: #64748b;'>GitHub →</a>"
+        "<p style='text-align: center; margin-top: 5px;'>"
+        "<a href='https://github.com/PAT0216/paper-trader' style='color: #64748b; text-decoration: none;'>GitHub →</a>"
         "</p>",
         unsafe_allow_html=True
     )
