@@ -185,24 +185,23 @@ class DataCache:
             df['adj_close'] = df['close']
         
         with sqlite3.connect(self.db_path) as conn:
-            # Insert or replace
-            df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume', 'adj_close']].to_sql(
-                'price_data',
-                conn,
-                if_exists='append',
-                index=False,
-                method='multi'
-            )
-            
-            # Handle duplicates by keeping latest
-            conn.execute("""
-                DELETE FROM price_data 
-                WHERE rowid NOT IN (
-                    SELECT MIN(rowid) 
-                    FROM price_data 
-                    GROUP BY ticker, date
-                )
-            """)
+            # Use INSERT OR REPLACE to handle duplicates
+            cursor = conn.cursor()
+            for _, row in df.iterrows():
+                cursor.execute("""
+                    INSERT OR REPLACE INTO price_data 
+                    (ticker, date, open, high, low, close, volume, adj_close)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    row.get('ticker', ticker),
+                    row.get('date'),
+                    row.get('open'),
+                    row.get('high'),
+                    row.get('low'),
+                    row.get('close'),
+                    row.get('volume'),
+                    row.get('adj_close', row.get('close'))
+                ))
             
             # Update metadata
             self._update_metadata(ticker, conn)
