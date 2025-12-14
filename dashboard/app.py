@@ -285,11 +285,12 @@ st.markdown("---")
 # ============ RECENT TRADES ============
 st.markdown("### 📜 Recent Trades")
 
-# Use selectbox instead of multiselect (no typing allowed)
-selected = st.selectbox(
+# Use radio instead of selectbox (no typing/cursor)
+selected = st.radio(
     "Select portfolio:",
     options=list(data.keys()),
-    format_func=lambda x: x.upper()
+    format_func=lambda x: x.upper(),
+    horizontal=True
 )
 
 if selected:
