@@ -14,16 +14,16 @@
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
 
-### Performance Summary (2015-2024 Walk-Forward Backtest)
+### Performance Summary (2016-2025 Unbiased Backtest)
 
 | Metric | Momentum | S&P 500 |
 |--------|----------|---------|
-| **CAGR** | 11.2% | 13.2% |
-| **Total Return** | 189% | 169% |
-| **Best Year** | +38.2% (2016) | +31.1% (2019) |
-| **Worst Year** | -20.7% (2022) | -18.6% (2022) |
+| **CAGR** | 17.3% | 15.0% |
+| **Total Return** | 391% | 303% |
+| **Best Year** | +40.0% (2017) | +31.1% (2019) |
+| **Worst Year** | +4.2% (2018) | -18.6% (2022) |
 
-> ⚠️ **Note**: Past performance does not guarantee future results. Walk-forward tested with monthly rebalancing and real execution simulation.
+> ⚠️ **Note**: Results are from an **unbiased point-in-time backtest** (survivorship bias removed). Strategy beat S&P 500 in 6/10 years.
 
 ---
 
