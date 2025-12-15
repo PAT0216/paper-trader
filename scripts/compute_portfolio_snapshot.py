@@ -170,6 +170,9 @@ def main():
                     first_date = df['date'].min()
                     break
         
+        spy_df = None
+        
+        # Try database first
         if first_date and os.path.exists(DB_PATH):
             con = sqlite3.connect(DB_PATH)
             spy_df = pd.read_sql_query("""
@@ -180,27 +183,44 @@ def main():
                 ORDER BY date ASC
             """, con, params=(first_date,))
             con.close()
+            if spy_df.empty:
+                spy_df = None
+                print("  Database has no SPY data, trying yfinance...")
+        
+        # Fallback to yfinance
+        if spy_df is None and first_date:
+            try:
+                import yfinance as yf
+                ticker = yf.Ticker('SPY')
+                hist = ticker.history(start=first_date, end=None)
+                if not hist.empty:
+                    hist = hist.reset_index()
+                    spy_df = pd.DataFrame({
+                        'date': hist['Date'].astype(str).str[:10],
+                        'price': hist['Close']
+                    })
+                    print(f"  Fetched {len(spy_df)} days from yfinance")
+            except Exception as yf_err:
+                print(f"  yfinance fallback failed: {yf_err}")
+        
+        if spy_df is not None and not spy_df.empty:
+            spy_start = spy_df['price'].iloc[0]
+            spy_end = spy_df['price'].iloc[-1]
+            spy_return = ((spy_end / spy_start) - 1) * 100
+            spy_value = INITIAL_CAPITAL * (1 + spy_return / 100)
             
-            if not spy_df.empty:
-                spy_start = spy_df['price'].iloc[0]
-                spy_end = spy_df['price'].iloc[-1]
-                spy_return = ((spy_end / spy_start) - 1) * 100
-                spy_value = INITIAL_CAPITAL * (1 + spy_return / 100)
-                
-                snapshot['benchmark'] = {
-                    'ticker': 'SPY',
-                    'start_price': round(spy_start, 2),
-                    'end_price': round(spy_end, 2),
-                    'return_pct': round(spy_return, 2),
-                    'value': round(spy_value, 2),
-                    'start_date': first_date,
-                    'end_date': spy_df['date'].iloc[-1]
-                }
-                print(f"  SPY: {spy_return:+.2f}% (${spy_value:,.2f})")
-            else:
-                print("  No SPY data found")
+            snapshot['benchmark'] = {
+                'ticker': 'SPY',
+                'start_price': round(float(spy_start), 2),
+                'end_price': round(float(spy_end), 2),
+                'return_pct': round(spy_return, 2),
+                'value': round(spy_value, 2),
+                'start_date': first_date,
+                'end_date': str(spy_df['date'].iloc[-1])
+            }
+            print(f"  SPY: {spy_return:+.2f}% (${spy_value:,.2f})")
         else:
-            print("  Skipped - no date range")
+            print("  No SPY data found")
     except Exception as e:
         print(f"  Error: {e}")
     
