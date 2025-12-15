@@ -103,8 +103,14 @@ def run_momentum_backfill():
         'momentum_score': ''
     })
     
-    tickers = cache.get_cached_tickers()[:150]
-    print(f"Using {len(tickers)} tickers")
+    # Use verified S&P 500 universe
+    if os.path.exists('data/sp500_current.csv'):
+        sp500_df = pd.read_csv('data/sp500_current.csv')
+        tickers = sp500_df['Symbol'].tolist()
+        print(f"Using verified S&P 500: {len(tickers)} tickers")
+    else:
+        tickers = cache.get_cached_tickers()[:150]
+        print(f"Fallback to cache: {len(tickers)} tickers")
     
     for rebalance_date in rebalance_dates:
         print(f"\n📅 Rebalancing on {rebalance_date}...")
@@ -130,7 +136,7 @@ def run_momentum_backfill():
                 ticker_data = price_data[price_data['ticker'] == ticker].sort_values('date')
                 if len(ticker_data) >= 50:
                     score = calculate_momentum(ticker_data)
-                    if not np.isnan(score) and -0.5 < score < 2.0:  # Filter extremes
+                    if not np.isnan(score):  # Removed artificial cap
                         momentum_scores[ticker] = score
                         latest_prices[ticker] = ticker_data[price_col].iloc[-1]
             
@@ -213,6 +219,7 @@ def run_momentum_backfill():
             traceback.print_exc()
             continue
     
+    # Save the ledger (trades only - dashboard computes daily values dynamically)
     df = pd.DataFrame(ledger)
     df.to_csv('ledger_momentum.csv', index=False)
     print(f"\n✅ Saved ledger_momentum.csv with {len(df)} entries")

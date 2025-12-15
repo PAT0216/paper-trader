@@ -1,0 +1,21 @@
+{
+  "strategy": "low_volatility",
+  "period": "2016-01-01 to 2024-11-01",
+  "n_stocks": 50,
+  "lowvol_metrics": {
+    "total_return": 115.14,
+    "cagr": 9.07,
+    "volatility": 12.72,
+    "sharpe": 0.71,
+    "max_drawdown": -31.61,
+    "final_value": 21513.98
+  },
+  "spy_metrics": {
+    "total_return": 230.17,
+    "cagr": 14.49,
+    "volatility": 17.91,
+    "sharpe": 0.81,
+    "max_drawdown": -33.72,
+    "final_value": 33017.06
+  }
+}
