@@ -76,6 +76,47 @@ cd dashboard && streamlit run app.py
 
 ---
 
+## 🏗️ Strategy Architecture
+
+### Momentum Strategy (Monthly)
+
+```mermaid
+flowchart LR
+    A[S&P 500 Tickers] --> B[Fetch 12-Month Prices]
+    B --> C[Calculate Returns<br/>Skip Last Month]
+    C --> D[Rank by Momentum]
+    D --> E[Select Top 10]
+    E --> F[Equal Weight<br/>~10% Each]
+    F --> G[Execute Trades]
+    G --> H[Daily Stop-Loss<br/>Check 15%]
+```
+
+### ML Ensemble Strategy (Daily)
+
+```mermaid
+flowchart LR
+    A[OHLCV Data] --> B[Generate 15<br/>Technical Features]
+    B --> C1[1-Day Model<br/>50% Weight]
+    B --> C2[5-Day Model<br/>30% Weight]
+    B --> C3[20-Day Model<br/>20% Weight]
+    C1 --> D[Weighted<br/>Blend]
+    C2 --> D
+    C3 --> D
+    D --> E[VIX Regime<br/>Check]
+    E --> F{Crisis?}
+    F -->|Yes| G[Reduce<br/>Position]
+    F -->|No| H[Full<br/>Position]
+    G --> I[Execute Trade]
+    H --> I
+```
+
+**Ensemble Logic:**
+- **3 XGBoost models** trained on different prediction horizons
+- **Weighted average**: 50% short-term + 30% weekly + 20% monthly
+- **Regime detection**: VIX > 30 = Crisis → conservative positioning
+
+---
+
 ## 📊 GitHub Actions Workflows
 
 | Workflow | Purpose | Schedule |
