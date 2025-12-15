@@ -1,29 +1,29 @@
 {
-  "timestamp": "2025-12-15T23:36:55.626892Z",
-  "price_date": "2025-12-12",
+  "timestamp": "2025-12-15T23:42:32.082957Z",
+  "price_date": "2025-12-15",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10454.47,
-      "return_pct": 4.54,
+      "value": 10141.97,
+      "return_pct": 1.42,
       "cash": 2329.49,
       "holdings": {
-        "NEM": 8,
-        "WBD": 34,
         "PLTR": 4,
         "STX": 3,
         "WDC": 5,
         "AVGO": 2,
-        "MU": 3,
-        "LRCX": 5,
         "HOOD": 6,
+        "WBD": 34,
+        "LRCX": 5,
+        "MU": 3,
+        "NEM": 8,
         "APH": 5
       },
       "positions": 10
     },
     "ml": {
-      "value": 10034.84,
-      "return_pct": 0.35,
+      "value": 9936.04,
+      "return_pct": -0.64,
       "cash": 239.64,
       "holdings": {
         "ALB": 8,
@@ -31,11 +31,11 @@
         "ALGN": 6,
         "AMAT": 3,
         "BF-B": 33,
-        "CFG": 17,
-        "APO": 6,
         "ARES": 5,
         "AVGO": 3,
+        "CFG": 17,
         "APP": 1,
+        "APO": 6,
         "AMD": 2,
         "NFLX": 2
       },
@@ -45,10 +45,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 668.45,
-    "end_price": 689.17,
-    "return_pct": 3.1,
-    "value": 10309.97,
+    "end_price": 680.73,
+    "return_pct": 1.84,
+    "value": 10183.71,
     "start_date": "2025-10-01",
-    "end_date": "2025-12-11"
+    "end_date": "2025-12-15"
   }
 }
