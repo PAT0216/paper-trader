@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-12-15T23:00:16.715284",
+  "fundamental_metrics": {
+    "name": "FUNDAMENTAL FACTOR",
+    "total_return_pct": -1.35,
+    "cagr_pct": -0.8,
+    "volatility_pct": 26.37,
+    "sharpe": -0.03,
+    "sortino": -0.022,
+    "max_drawdown_pct": -29.0,
+    "win_rate_pct": 58.97,
+    "final_value": 9865.37,
+    "years": 1.7
+  },
+  "spy_metrics": {
+    "name": "SPY BUY-AND-HOLD",
+    "total_return_pct": 34.43,
+    "cagr_pct": 19.08,
+    "volatility_pct": 17.17,
+    "sharpe": 1.111,
+    "sortino": 1.395,
+    "max_drawdown_pct": -18.76,
+    "win_rate_pct": 59.11,
+    "final_value": 13443.11,
+    "years": 1.69
+  },
+  "config": {
+    "top_n": 20,
+    "rebalance": "monthly",
+    "factors": [
+      "roe",
+      "profitMargin",
+      "grossMargin",
+      "low_leverage"
+    ]
+  }
+}
