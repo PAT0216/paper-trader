@@ -6,6 +6,7 @@ Key improvements over previous version:
 2. XGBRegressor predicts return magnitude (not just direction)
 3. Target creation is separate from feature generation
 4. Reports metrics across all CV folds for robustness
+5. Dynamic noise-based feature selection (Phase 3.7)
 """
 
 from sklearn.model_selection import TimeSeriesSplit
@@ -24,6 +25,62 @@ MODEL_PATH = "models"
 MODEL_FILE = os.path.join(MODEL_PATH, "xgb_model.joblib")
 RESULTS_LIVE_DIR = "results/live"  # Training/live metrics go here
 RESULTS_BACKTEST_DIR = "results/backtest"  # Backtest results go here
+
+# Number of random noise features to use as baseline
+N_NOISE_FEATURES = 5
+
+
+def select_features_better_than_noise(X, y, feature_names, n_noise=N_NOISE_FEATURES):
+    """
+    Train a quick model with real features + random noise to identify
+    which features have importance greater than random baseline.
+    
+    This is a robust feature selection method that automatically adapts
+    to changing market conditions.
+    
+    Args:
+        X: Feature matrix (n_samples, n_features)
+        y: Target vector
+        feature_names: List of feature names corresponding to X columns
+        n_noise: Number of random noise features to add
+        
+    Returns:
+        List of feature names that beat random noise baseline
+    """
+    # Add random noise features
+    np.random.seed(None)  # Use random seed each time for true randomness
+    noise = np.random.randn(len(X), n_noise)
+    X_with_noise = np.hstack([X, noise])
+    
+    noise_names = [f'NOISE_{i}' for i in range(n_noise)]
+    all_names = list(feature_names) + noise_names
+    
+    # Train quick model
+    model = xgb.XGBRegressor(
+        n_estimators=50, 
+        learning_rate=0.1, 
+        max_depth=4, 
+        random_state=42, 
+        verbosity=0
+    )
+    model.fit(X_with_noise, y)
+    
+    # Calculate noise baseline
+    importances = model.feature_importances_
+    noise_baseline = np.mean(importances[-n_noise:])
+    
+    # Select features better than noise
+    selected = []
+    for i, feat in enumerate(feature_names):
+        if importances[i] > noise_baseline:
+            selected.append(feat)
+    
+    # Fallback: if no features beat noise, keep top 8 by importance
+    if not selected:
+        sorted_idx = np.argsort(importances[:len(feature_names)])[::-1]
+        selected = [feature_names[i] for i in sorted_idx[:8]]
+    
+    return selected
 
 
 def train_model(data_dict, n_splits=5, save_model=True):
@@ -191,29 +248,21 @@ def train_model(data_dict, n_splits=5, save_model=True):
     )
     final_model.fit(X, y)
     
-    # ==================== DYNAMIC FEATURE SELECTION ====================
-    # Phase 3.5: Automatically filter features with importance < threshold
-    IMPORTANCE_THRESHOLD = 0.03  # 3% minimum importance
+    # ==================== NOISE-BASED FEATURE SELECTION (Phase 3.7) ====================
+    # Compare features against random noise to keep only those with real predictive power
     
-    feature_importance = pd.DataFrame({
-        'feature': FEATURE_COLUMNS,
-        'importance': final_model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    print(f"\n🔍 Noise-Based Feature Selection:")
+    useful_features = select_features_better_than_noise(X, y, FEATURE_COLUMNS)
+    dropped_features = [f for f in FEATURE_COLUMNS if f not in useful_features]
     
-    # Identify useful features (above threshold) - KEEP IN ORIGINAL ORDER!
-    # This is critical: model was trained with FEATURE_COLUMNS order
-    useful_features_set = set(feature_importance[feature_importance['importance'] >= IMPORTANCE_THRESHOLD]['feature'].tolist())
-    # Preserve FEATURE_COLUMNS order (not importance order)
-    useful_features = [f for f in FEATURE_COLUMNS if f in useful_features_set]
-    dropped_features = [f for f in FEATURE_COLUMNS if f not in useful_features_set]
+    print(f"   Keeping: {len(useful_features)} features (beat random noise)")
+    print(f"   Selected: {useful_features}")
     
-    print(f"\n🔍 Feature Selection (threshold: {IMPORTANCE_THRESHOLD*100:.1f}%):")
-    print(f"   Keeping: {len(useful_features)} features")
     if dropped_features:
-        print(f"   ⚠️  Dropping: {dropped_features}")
+        print(f"   ⚠️  Dropping (worse than noise): {dropped_features}")
         
         # Retrain with only useful features (maintaining original order)
-        feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features_set]
+        feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
         X_selected = X[:, feature_indices]
         
         print(f"\n🔄 Retraining with {len(useful_features)} selected features...")
@@ -232,12 +281,16 @@ def train_model(data_dict, n_splits=5, save_model=True):
             'importance': final_model.feature_importances_
         }).sort_values('importance', ascending=False)
     else:
-        print("   ✅ All features above threshold - keeping all")
+        print("   ✅ All features beat noise - keeping all")
+        feature_importance = pd.DataFrame({
+            'feature': FEATURE_COLUMNS,
+            'importance': final_model.feature_importances_
+        }).sort_values('importance', ascending=False)
     
     # Store selected features for inference - IN TRAINING ORDER (critical!)
     selected_features = useful_features
     print(f"   Feature order: {selected_features[:3]}... (preserved training order)")
-    # ==================== END DYNAMIC FEATURE SELECTION ====================
+    # ==================== END NOISE-BASED FEATURE SELECTION ====================
 
     
     # Save metrics to LIVE results directory (separate from backtest)
@@ -245,7 +298,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
     
     with open(os.path.join(RESULTS_LIVE_DIR, "metrics.txt"), "w") as f:
         f.write("=" * 50 + "\n")
-        f.write("ML MODEL METRICS (Phase 3.5 - Dynamic Feature Selection)\n")
+        f.write("ML MODEL METRICS (Phase 3.7 - Noise-Based Feature Selection)\n")
         f.write("=" * 50 + "\n\n")
         f.write("Cross-Validation Results:\n")
         for m in fold_metrics:
@@ -261,8 +314,8 @@ def train_model(data_dict, n_splits=5, save_model=True):
         f.write(f"  Top-10% Accuracy: {avg_top_k:.2%}\n")
         f.write(f"\n  Training Samples: {len(X):,}\n")
         f.write(f"  CV Folds: {n_splits}\n")
-        f.write(f"\nFeature Selection:\n")
-        f.write(f"  Threshold: {IMPORTANCE_THRESHOLD*100:.1f}%\n")
+        f.write(f"\nNoise-Based Feature Selection:\n")
+        f.write(f"  Method: Features beating random noise baseline\n")
         f.write(f"  Selected: {len(selected_features)} of {len(FEATURE_COLUMNS)}\n")
         if dropped_features:
             f.write(f"  Dropped: {dropped_features}\n")
@@ -270,19 +323,17 @@ def train_model(data_dict, n_splits=5, save_model=True):
     # Feature importance plot (for selected features)
     plt.figure(figsize=(10, 6))
     feat_sorted = feature_importance.sort_values('importance', ascending=True)
-    colors = ['green' if imp >= IMPORTANCE_THRESHOLD else 'red' for imp in feat_sorted['importance']]
+    colors = ['green' if feat in selected_features else 'red' for feat in feat_sorted['feature']]
     plt.barh(feat_sorted['feature'], feat_sorted['importance'], color=colors)
-    plt.axvline(x=IMPORTANCE_THRESHOLD, color='red', linestyle='--', label=f'Threshold ({IMPORTANCE_THRESHOLD*100:.0f}%)')
     plt.xlabel('Importance')
-    plt.title(f'Feature Importance (Selected: {len(selected_features)} features)')
-    plt.legend()
+    plt.title(f'Feature Importance - Noise Selection (Kept: {len(selected_features)})')
     plt.tight_layout()
     plt.savefig(os.path.join(RESULTS_LIVE_DIR, "feature_importance.png"))
     plt.close()
     
     # Save selected features list for inference
     with open(os.path.join(RESULTS_LIVE_DIR, "selected_features.txt"), "w") as f:
-        f.write("# Selected Features (importance >= 3%)\n")
+        f.write("# Selected Features (beat random noise baseline)\n")
         for feat in selected_features:
             imp = feature_importance[feature_importance['feature'] == feat]['importance'].values[0]
             f.write(f"{feat}: {imp:.4f}\n")
@@ -487,20 +538,12 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
         )
         final_model.fit(X, y)
         
-        # Dynamic feature selection (same as single model)
-        IMPORTANCE_THRESHOLD = 0.03
-        feature_importance = pd.DataFrame({
-            'feature': FEATURE_COLUMNS,
-            'importance': final_model.feature_importances_
-        }).sort_values('importance', ascending=False)
-        
-        useful_features = feature_importance[
-            feature_importance['importance'] >= IMPORTANCE_THRESHOLD
-        ]['feature'].tolist()
+        # Noise-based feature selection (same as single model - Phase 3.7)
+        useful_features = select_features_better_than_noise(X, y, FEATURE_COLUMNS)
         
         dropped = len(FEATURE_COLUMNS) - len(useful_features)
         if dropped > 0:
-            print(f"   Dropped {dropped} low-importance features")
+            print(f"   Dropped {dropped} features (worse than noise)")
             feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
             X_selected = X[:, feature_indices]
             final_model = xgb.XGBRegressor(

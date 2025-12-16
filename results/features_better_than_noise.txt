@@ -1,0 +1,11 @@
+# Features that beat random noise baseline
+# Noise importance: 0.0444
+
+BB_PctB: 0.0846
+Volume_Ratio: 0.0757
+Vol_Ratio: 0.0749
+ATR_Pct: 0.0622
+Return_1d: 0.0617
+RSI: 0.0591
+Return_5d: 0.0516
+MACD_hist: 0.0445
