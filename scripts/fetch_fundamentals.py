@@ -1,23 +1,40 @@
 """
-Fetch Fundamental Data for S&P 500 Stocks
+Fetch Historical Fundamental Data from Financial Modeling Prep (FMP)
 
-Fetches quarterly fundamentals from yfinance for all S&P 500 stocks.
-Designed to run on GitHub Actions to avoid local rate limiting.
+Fetches quarterly fundamentals going back to 2010 for S&P 500 stocks.
+Designed to run on GitHub Actions to maximize API calls.
 
-Output: data/fundamentals.csv
+FMP Free Tier: 250 calls/day
+Each ticker needs ~2-3 calls, so process ~80-100 tickers per run.
+
+Output: data/fundamentals_historical.csv
 """
 
 import pandas as pd
-import yfinance as yf
+import requests
 import os
 import time
 import json
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import traceback
+from typing import Optional, List
 
 
-def load_tickers():
+# FMP API base URL
+FMP_BASE_URL = "https://financialmodelingprep.com/api/v3"
+
+
+def get_api_key() -> str:
+    """Get API key from environment or raise error."""
+    key = os.environ.get('FMP_API_KEY')
+    if not key:
+        raise ValueError(
+            "FMP_API_KEY not found in environment. "
+            "Set it with: export FMP_API_KEY=your_key"
+        )
+    return key
+
+
+def load_tickers() -> List[str]:
     """Load S&P 500 tickers from file."""
     txt_path = 'data/sp500_tickers.txt'
     if os.path.exists(txt_path):
@@ -26,177 +43,169 @@ def load_tickers():
         print(f"📋 Loaded {len(tickers)} tickers from {txt_path}")
         return tickers
     
-    # Fallback: fetch from Wikipedia
-    print("📋 Fetching tickers from Wikipedia...")
+    # Fallback
+    print("⚠️ No ticker file found, using sample")
+    return ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
+
+
+def fetch_key_metrics(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
+    """
+    Fetch quarterly key metrics (P/E, P/B, ROE, etc.) from FMP.
+    
+    Returns DataFrame with quarterly data going back ~15 years.
+    """
+    url = f"{FMP_BASE_URL}/key-metrics/{ticker}"
+    params = {
+        'period': 'quarter',
+        'limit': limit,  # 60 quarters = 15 years
+        'apikey': api_key
+    }
+    
     try:
-        tables = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-        tickers = tables[0]['Symbol'].tolist()
-        tickers = [t.replace('.', '-') for t in tickers]  # BRK.B -> BRK-B
-        print(f"   Got {len(tickers)} tickers")
-        return tickers
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        
+        if not data:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(data)
+        df['ticker'] = ticker
+        return df
+        
     except Exception as e:
-        print(f"❌ Failed to get tickers: {e}")
-        return []
+        print(f"   ⚠️ key-metrics failed: {e}")
+        return pd.DataFrame()
 
 
-def fetch_fundamentals_for_ticker(ticker: str, max_retries: int = 3) -> dict:
+def fetch_ratios(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
     """
-    Fetch fundamental data for a single ticker.
-    
-    Returns dict with fundamental metrics or None if failed.
+    Fetch quarterly financial ratios from FMP.
     """
-    for attempt in range(max_retries):
-        try:
-            stock = yf.Ticker(ticker)
-            info = stock.info
-            
-            if not info or 'symbol' not in info:
-                return {'ticker': ticker, 'error': 'No data available'}
-            
-            # Extract key fundamentals
-            fundamentals = {
-                'ticker': ticker,
-                'fetch_date': datetime.now().strftime('%Y-%m-%d'),
-                
-                # Valuation
-                'trailingPE': info.get('trailingPE'),
-                'forwardPE': info.get('forwardPE'),
-                'priceToBook': info.get('priceToBook'),
-                'priceToSales': info.get('priceToSalesTrailing12Months'),
-                'enterpriseToEbitda': info.get('enterpriseToEbitda'),
-                'enterpriseToRevenue': info.get('enterpriseToRevenue'),
-                
-                # Profitability
-                'profitMargins': info.get('profitMargins'),
-                'operatingMargins': info.get('operatingMargins'),
-                'returnOnAssets': info.get('returnOnAssets'),
-                'returnOnEquity': info.get('returnOnEquity'),
-                'grossMargins': info.get('grossMargins'),
-                
-                # Growth
-                'earningsGrowth': info.get('earningsGrowth'),
-                'revenueGrowth': info.get('revenueGrowth'),
-                'earningsQuarterlyGrowth': info.get('earningsQuarterlyGrowth'),
-                
-                # Financial Health
-                'debtToEquity': info.get('debtToEquity'),
-                'currentRatio': info.get('currentRatio'),
-                'quickRatio': info.get('quickRatio'),
-                
-                # Dividends
-                'dividendYield': info.get('dividendYield'),
-                'payoutRatio': info.get('payoutRatio'),
-                
-                # Size
-                'marketCap': info.get('marketCap'),
-                'enterpriseValue': info.get('enterpriseValue'),
-                
-                # Trading
-                'beta': info.get('beta'),
-                'averageVolume': info.get('averageVolume'),
-                '52WeekChange': info.get('52WeekChange'),
-                
-                # Per Share
-                'trailingEps': info.get('trailingEps'),
-                'forwardEps': info.get('forwardEps'),
-                'bookValue': info.get('bookValue'),
-                
-                # Sector/Industry
-                'sector': info.get('sector'),
-                'industry': info.get('industry'),
-                
-                # Status
-                'error': None
-            }
-            
-            return fundamentals
-            
-        except Exception as e:
-            if attempt < max_retries - 1:
-                time.sleep(1 * (attempt + 1))  # Exponential backoff
-            else:
-                return {
-                    'ticker': ticker,
-                    'error': str(e)[:100],
-                    'fetch_date': datetime.now().strftime('%Y-%m-%d')
-                }
+    url = f"{FMP_BASE_URL}/ratios/{ticker}"
+    params = {
+        'period': 'quarter',
+        'limit': limit,
+        'apikey': api_key
+    }
     
-    return {'ticker': ticker, 'error': 'Max retries exceeded'}
+    try:
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        
+        if not data:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(data)
+        df['ticker'] = ticker
+        return df
+        
+    except Exception as e:
+        print(f"   ⚠️ ratios failed: {e}")
+        return pd.DataFrame()
 
 
-def fetch_all_fundamentals(tickers: list, max_workers: int = 5, 
-                            batch_size: int = 50) -> pd.DataFrame:
+def fetch_fundamentals_for_ticker(ticker: str, api_key: str) -> pd.DataFrame:
     """
-    Fetch fundamentals for all tickers with rate limiting.
+    Fetch and combine all fundamental data for a ticker.
     
-    Uses threading with careful rate limiting to avoid blocks.
+    Returns DataFrame with date, ticker, and all metrics.
+    """
+    # Fetch both endpoints
+    metrics_df = fetch_key_metrics(ticker, api_key)
+    ratios_df = fetch_ratios(ticker, api_key)
+    
+    if metrics_df.empty and ratios_df.empty:
+        return pd.DataFrame()
+    
+    # Merge on date if both exist
+    if not metrics_df.empty and not ratios_df.empty:
+        # Remove duplicate columns before merge
+        common_cols = set(metrics_df.columns) & set(ratios_df.columns) - {'date', 'ticker'}
+        ratios_df = ratios_df.drop(columns=list(common_cols), errors='ignore')
+        
+        df = pd.merge(metrics_df, ratios_df, on=['date', 'ticker'], how='outer')
+    elif not metrics_df.empty:
+        df = metrics_df
+    else:
+        df = ratios_df
+    
+    return df
+
+
+def fetch_all_fundamentals(
+    tickers: List[str], 
+    api_key: str, 
+    max_tickers: Optional[int] = None,
+    start_idx: int = 0
+) -> pd.DataFrame:
+    """
+    Fetch fundamentals for multiple tickers with rate limiting.
+    
+    Args:
+        tickers: List of ticker symbols
+        api_key: FMP API key
+        max_tickers: Max tickers to process (for partial runs)
+        start_idx: Starting index (for resume)
     """
     all_data = []
-    total = len(tickers)
     
-    print(f"\n🚀 Fetching fundamentals for {total} tickers...")
-    print(f"   Workers: {max_workers}, Batch size: {batch_size}")
+    # Slice tickers for partial run
+    tickers_to_process = tickers[start_idx:]
+    if max_tickers:
+        tickers_to_process = tickers_to_process[:max_tickers]
+    
+    total = len(tickers_to_process)
+    print(f"\n🚀 Fetching fundamentals for {total} tickers")
+    print(f"   Starting at index {start_idx}")
     print("=" * 60)
     
-    # Process in batches to add pauses
-    for batch_start in range(0, total, batch_size):
-        batch_end = min(batch_start + batch_size, total)
-        batch_tickers = tickers[batch_start:batch_end]
+    for i, ticker in enumerate(tickers_to_process):
+        print(f"\n[{i+1}/{total}] {ticker}...")
         
-        print(f"\n📦 Batch {batch_start//batch_size + 1}: "
-              f"Tickers {batch_start+1}-{batch_end} of {total}")
-        
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(fetch_fundamentals_for_ticker, ticker): ticker 
-                for ticker in batch_tickers
-            }
+        try:
+            df = fetch_fundamentals_for_ticker(ticker, api_key)
             
-            for future in as_completed(futures):
-                ticker = futures[future]
-                try:
-                    result = future.result()
-                    all_data.append(result)
-                    
-                    if result.get('error'):
-                        print(f"   ⚠️ {ticker}: {result['error'][:50]}")
-                    else:
-                        pe = result.get('trailingPE', 'N/A')
-                        print(f"   ✅ {ticker}: P/E={pe}")
-                        
-                except Exception as e:
-                    print(f"   ❌ {ticker}: Unexpected error: {e}")
-                    all_data.append({
-                        'ticker': ticker,
-                        'error': str(e)[:100],
-                        'fetch_date': datetime.now().strftime('%Y-%m-%d')
-                    })
+            if not df.empty:
+                all_data.append(df)
+                quarters = len(df)
+                earliest = df['date'].min() if 'date' in df.columns else 'N/A'
+                print(f"   ✅ Got {quarters} quarters (back to {earliest})")
+            else:
+                print(f"   ⚠️ No data returned")
+                
+        except Exception as e:
+            print(f"   ❌ Error: {e}")
         
-        # Pause between batches to avoid rate limiting
-        if batch_end < total:
-            print(f"   ⏳ Pausing 5s between batches...")
-            time.sleep(5)
+        # Rate limit: ~1 request per second to stay under limits
+        time.sleep(1)
     
-    return pd.DataFrame(all_data)
+    if all_data:
+        return pd.concat(all_data, ignore_index=True)
+    return pd.DataFrame()
 
 
 def main():
     print("=" * 60)
-    print("FUNDAMENTAL DATA FETCH")
+    print("HISTORICAL FUNDAMENTAL DATA FETCH (FMP)")
     print(f"Started: {datetime.now().isoformat()}")
     print("=" * 60)
     
+    # Get config from environment
+    api_key = get_api_key()
+    max_tickers = int(os.environ.get('MAX_TICKERS', 100))  # Default 100 per run
+    start_idx = int(os.environ.get('START_INDEX', 0))
+    
     # Load tickers
     tickers = load_tickers()
-    if not tickers:
-        print("❌ No tickers to process")
-        return
     
     # Fetch fundamentals
     df = fetch_all_fundamentals(
-        tickers, 
-        max_workers=5,   # Conservative to avoid rate limits
-        batch_size=50    # Process in batches
+        tickers,
+        api_key,
+        max_tickers=max_tickers,
+        start_idx=start_idx
     )
     
     # Summary
@@ -204,31 +213,54 @@ def main():
     print("SUMMARY")
     print("=" * 60)
     
-    success_count = df[df['error'].isna()].shape[0]
-    error_count = df[df['error'].notna()].shape[0]
+    if df.empty:
+        print("❌ No data fetched")
+        return
     
-    print(f"✅ Successful: {success_count}")
-    print(f"⚠️ Errors: {error_count}")
+    unique_tickers = df['ticker'].nunique() if 'ticker' in df.columns else 0
+    total_rows = len(df)
     
-    # Save to CSV
+    print(f"✅ Tickers processed: {unique_tickers}")
+    print(f"✅ Total rows: {total_rows}")
+    
+    if 'date' in df.columns:
+        print(f"📅 Date range: {df['date'].min()} to {df['date'].max()}")
+    
+    # Print columns
+    print(f"\n📊 Columns ({len(df.columns)}):")
+    for col in sorted(df.columns):
+        print(f"   - {col}")
+    
+    # Save
     os.makedirs('data', exist_ok=True)
-    output_path = 'data/fundamentals.csv'
+    
+    output_path = f"data/fundamentals_historical_{start_idx}_{start_idx + max_tickers}.csv"
     df.to_csv(output_path, index=False)
     print(f"\n💾 Saved to {output_path}")
     
-    # Also save a smaller "clean" version
-    clean_df = df[df['error'].isna()].drop(columns=['error'])
-    clean_path = 'data/fundamentals_clean.csv'
-    clean_df.to_csv(clean_path, index=False)
-    print(f"💾 Clean data saved to {clean_path}")
+    # Also save a combined file if it exists
+    combined_path = 'data/fundamentals_historical.csv'
+    if os.path.exists(combined_path):
+        existing = pd.read_csv(combined_path)
+        combined = pd.concat([existing, df], ignore_index=True)
+        combined = combined.drop_duplicates(subset=['ticker', 'date'])
+        combined.to_csv(combined_path, index=False)
+        print(f"💾 Updated {combined_path} (total: {len(combined)} rows)")
+    else:
+        df.to_csv(combined_path, index=False)
+        print(f"💾 Created {combined_path}")
     
     # Save metadata
     metadata = {
         'fetch_date': datetime.now().isoformat(),
-        'total_tickers': len(tickers),
-        'successful': success_count,
-        'failed': error_count,
-        'columns': list(df.columns)
+        'tickers_processed': unique_tickers,
+        'total_rows': total_rows,
+        'start_index': start_idx,
+        'max_tickers': max_tickers,
+        'date_range': {
+            'min': str(df['date'].min()) if 'date' in df.columns else None,
+            'max': str(df['date'].max()) if 'date' in df.columns else None
+        }
     }
     with open('data/fundamentals_metadata.json', 'w') as f:
         json.dump(metadata, f, indent=2)

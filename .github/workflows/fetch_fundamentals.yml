@@ -1,21 +1,21 @@
-name: Fetch Fundamental Data
+name: Fetch Historical Fundamentals (FMP)
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch:
     inputs:
-      max_workers:
-        description: 'Number of parallel workers (1-10)'
+      start_index:
+        description: 'Starting ticker index (0-499)'
         required: false
-        default: '5'
-      batch_size:
-        description: 'Batch size for rate limiting'
+        default: '0'
+      max_tickers:
+        description: 'Max tickers to process per run (recommend 80-100)'
         required: false
-        default: '50'
+        default: '100'
 
 jobs:
   fetch-fundamentals:
     runs-on: ubuntu-latest
-    timeout-minutes: 60  # Allow up to 1 hour for full S&P 500
+    timeout-minutes: 30
     
     steps:
       - name: Checkout repository
@@ -28,14 +28,15 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install yfinance pandas lxml
+          pip install pandas requests
       
-      - name: Fetch fundamental data
+      - name: Fetch historical fundamentals
         run: |
           python scripts/fetch_fundamentals.py
         env:
-          YFINANCE_MAX_WORKERS: ${{ github.event.inputs.max_workers || '5' }}
-          YFINANCE_BATCH_SIZE: ${{ github.event.inputs.batch_size || '50' }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          MAX_TICKERS: ${{ github.event.inputs.max_tickers || '100' }}
+          START_INDEX: ${{ github.event.inputs.start_index || '0' }}
       
       - name: Display summary
         run: |
@@ -45,34 +46,16 @@ jobs:
           fi
           echo ""
           echo "=== FILE SIZES ==="
-          ls -lh data/fundamentals*.csv data/fundamentals*.json 2>/dev/null || echo "No output files found"
+          ls -lh data/fundamentals*.csv 2>/dev/null || echo "No CSV files"
           echo ""
-          echo "=== SAMPLE DATA ==="
-          head -5 data/fundamentals_clean.csv 2>/dev/null || echo "No clean data"
+          echo "=== SAMPLE DATA (first 3 rows) ==="
+          head -4 data/fundamentals_historical.csv 2>/dev/null || echo "No data file"
       
       - name: Upload fundamentals as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fundamentals-data
+          name: fundamentals-historical-${{ github.event.inputs.start_index || '0' }}
           path: |
-            data/fundamentals.csv
-            data/fundamentals_clean.csv
+            data/fundamentals_historical*.csv
             data/fundamentals_metadata.json
           retention-days: 30
-      
-      - name: Check for errors
-        run: |
-          if [ -f data/fundamentals_metadata.json ]; then
-            FAILED=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['failed'])")
-            TOTAL=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['total_tickers'])")
-            SUCCESS=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['successful'])")
-            
-            echo "✅ Successful: $SUCCESS / $TOTAL"
-            echo "⚠️ Failed: $FAILED / $TOTAL"
-            
-            # Fail if more than 50% failed
-            if [ $FAILED -gt $((TOTAL / 2)) ]; then
-              echo "❌ Too many failures (>50%), marking as failed"
-              exit 1
-            fi
-          fi
