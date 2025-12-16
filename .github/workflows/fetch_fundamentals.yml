@@ -1,0 +1,78 @@
+name: Fetch Fundamental Data
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      max_workers:
+        description: 'Number of parallel workers (1-10)'
+        required: false
+        default: '5'
+      batch_size:
+        description: 'Batch size for rate limiting'
+        required: false
+        default: '50'
+
+jobs:
+  fetch-fundamentals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60  # Allow up to 1 hour for full S&P 500
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas lxml
+      
+      - name: Fetch fundamental data
+        run: |
+          python scripts/fetch_fundamentals.py
+        env:
+          YFINANCE_MAX_WORKERS: ${{ github.event.inputs.max_workers || '5' }}
+          YFINANCE_BATCH_SIZE: ${{ github.event.inputs.batch_size || '50' }}
+      
+      - name: Display summary
+        run: |
+          echo "=== FUNDAMENTALS FETCH SUMMARY ==="
+          if [ -f data/fundamentals_metadata.json ]; then
+            cat data/fundamentals_metadata.json
+          fi
+          echo ""
+          echo "=== FILE SIZES ==="
+          ls -lh data/fundamentals*.csv data/fundamentals*.json 2>/dev/null || echo "No output files found"
+          echo ""
+          echo "=== SAMPLE DATA ==="
+          head -5 data/fundamentals_clean.csv 2>/dev/null || echo "No clean data"
+      
+      - name: Upload fundamentals as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fundamentals-data
+          path: |
+            data/fundamentals.csv
+            data/fundamentals_clean.csv
+            data/fundamentals_metadata.json
+          retention-days: 30
+      
+      - name: Check for errors
+        run: |
+          if [ -f data/fundamentals_metadata.json ]; then
+            FAILED=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['failed'])")
+            TOTAL=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['total_tickers'])")
+            SUCCESS=$(python -c "import json; print(json.load(open('data/fundamentals_metadata.json'))['successful'])")
+            
+            echo "✅ Successful: $SUCCESS / $TOTAL"
+            echo "⚠️ Failed: $FAILED / $TOTAL"
+            
+            # Fail if more than 50% failed
+            if [ $FAILED -gt $((TOTAL / 2)) ]; then
+              echo "❌ Too many failures (>50%), marking as failed"
+              exit 1
+            fi
+          fi
