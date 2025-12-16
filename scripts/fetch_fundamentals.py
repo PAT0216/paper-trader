@@ -48,41 +48,11 @@ def load_tickers() -> List[str]:
     return ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
 
 
-def fetch_key_metrics(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
+def fetch_income_statement(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
     """
-    Fetch quarterly key metrics (P/E, P/B, ROE, etc.) from FMP.
-    
-    Returns DataFrame with quarterly data going back ~15 years.
+    Fetch quarterly income statements from FMP (FREE endpoint).
     """
-    url = f"{FMP_BASE_URL}/key-metrics/{ticker}"
-    params = {
-        'period': 'quarter',
-        'limit': limit,  # 60 quarters = 15 years
-        'apikey': api_key
-    }
-    
-    try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        
-        if not data:
-            return pd.DataFrame()
-        
-        df = pd.DataFrame(data)
-        df['ticker'] = ticker
-        return df
-        
-    except Exception as e:
-        print(f"   ⚠️ key-metrics failed: {e}")
-        return pd.DataFrame()
-
-
-def fetch_ratios(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
-    """
-    Fetch quarterly financial ratios from FMP.
-    """
-    url = f"{FMP_BASE_URL}/ratios/{ticker}"
+    url = f"{FMP_BASE_URL}/income-statement/{ticker}"
     params = {
         'period': 'quarter',
         'limit': limit,
@@ -102,34 +72,80 @@ def fetch_ratios(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
         return df
         
     except Exception as e:
-        print(f"   ⚠️ ratios failed: {e}")
+        print(f"   ⚠️ income-statement: {e}")
+        return pd.DataFrame()
+
+
+def fetch_balance_sheet(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
+    """
+    Fetch quarterly balance sheets from FMP (FREE endpoint).
+    """
+    url = f"{FMP_BASE_URL}/balance-sheet-statement/{ticker}"
+    params = {
+        'period': 'quarter',
+        'limit': limit,
+        'apikey': api_key
+    }
+    
+    try:
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        
+        if not data:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(data)
+        df['ticker'] = ticker
+        return df
+        
+    except Exception as e:
+        print(f"   ⚠️ balance-sheet: {e}")
         return pd.DataFrame()
 
 
 def fetch_fundamentals_for_ticker(ticker: str, api_key: str) -> pd.DataFrame:
     """
-    Fetch and combine all fundamental data for a ticker.
-    
-    Returns DataFrame with date, ticker, and all metrics.
+    Fetch and combine income statement + balance sheet for a ticker.
+    We'll calculate ratios locally from these.
     """
-    # Fetch both endpoints
-    metrics_df = fetch_key_metrics(ticker, api_key)
-    ratios_df = fetch_ratios(ticker, api_key)
+    income_df = fetch_income_statement(ticker, api_key)
+    balance_df = fetch_balance_sheet(ticker, api_key)
     
-    if metrics_df.empty and ratios_df.empty:
+    if income_df.empty and balance_df.empty:
         return pd.DataFrame()
     
     # Merge on date if both exist
-    if not metrics_df.empty and not ratios_df.empty:
+    if not income_df.empty and not balance_df.empty:
         # Remove duplicate columns before merge
-        common_cols = set(metrics_df.columns) & set(ratios_df.columns) - {'date', 'ticker'}
-        ratios_df = ratios_df.drop(columns=list(common_cols), errors='ignore')
+        common_cols = set(income_df.columns) & set(balance_df.columns) - {'date', 'ticker', 'symbol'}
+        balance_df = balance_df.drop(columns=list(common_cols), errors='ignore')
         
-        df = pd.merge(metrics_df, ratios_df, on=['date', 'ticker'], how='outer')
-    elif not metrics_df.empty:
-        df = metrics_df
+        df = pd.merge(income_df, balance_df, on=['date', 'ticker'], how='outer', suffixes=('', '_bs'))
+    elif not income_df.empty:
+        df = income_df
     else:
-        df = ratios_df
+        df = balance_df
+    
+    # Calculate key ratios locally
+    if not df.empty:
+        # Profitability
+        if 'revenue' in df.columns and 'netIncome' in df.columns:
+            df['profitMargin'] = df['netIncome'] / df['revenue'].replace(0, pd.NA)
+        if 'revenue' in df.columns and 'grossProfit' in df.columns:
+            df['grossMargin'] = df['grossProfit'] / df['revenue'].replace(0, pd.NA)
+        
+        # ROE = Net Income / Shareholders Equity
+        if 'netIncome' in df.columns and 'totalStockholdersEquity' in df.columns:
+            df['roe'] = df['netIncome'] / df['totalStockholdersEquity'].replace(0, pd.NA)
+        
+        # Debt to Equity
+        if 'totalDebt' in df.columns and 'totalStockholdersEquity' in df.columns:
+            df['debtToEquity'] = df['totalDebt'] / df['totalStockholdersEquity'].replace(0, pd.NA)
+        
+        # Current Ratio
+        if 'totalCurrentAssets' in df.columns and 'totalCurrentLiabilities' in df.columns:
+            df['currentRatio'] = df['totalCurrentAssets'] / df['totalCurrentLiabilities'].replace(0, pd.NA)
     
     return df
 
