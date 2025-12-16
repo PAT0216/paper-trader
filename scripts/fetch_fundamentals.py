@@ -1,37 +1,20 @@
 """
-Fetch Historical Fundamental Data from Financial Modeling Prep (FMP)
+Fetch Historical Fundamental Data via yfinance
 
-Fetches quarterly fundamentals going back to 2010 for S&P 500 stocks.
-Designed to run on GitHub Actions to maximize API calls.
-
-FMP Free Tier: 250 calls/day
-Each ticker needs ~2-3 calls, so process ~80-100 tickers per run.
+Fetches quarterly financials (income statement, balance sheet) from yfinance.
+Gets ~4-5 years of history which is enough for backtesting.
 
 Output: data/fundamentals_historical.csv
 """
 
 import pandas as pd
-import requests
+import yfinance as yf
 import os
 import time
 import json
 from datetime import datetime
-from typing import Optional, List
-
-
-# FMP API base URL
-FMP_BASE_URL = "https://financialmodelingprep.com/api/v3"
-
-
-def get_api_key() -> str:
-    """Get API key from environment or raise error."""
-    key = os.environ.get('FMP_API_KEY')
-    if not key:
-        raise ValueError(
-            "FMP_API_KEY not found in environment. "
-            "Set it with: export FMP_API_KEY=your_key"
-        )
-    return key
+from typing import List
+import traceback
 
 
 def load_tickers() -> List[str]:
@@ -43,159 +26,141 @@ def load_tickers() -> List[str]:
         print(f"📋 Loaded {len(tickers)} tickers from {txt_path}")
         return tickers
     
-    # Fallback
-    print("⚠️ No ticker file found, using sample")
-    return ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
-
-
-def fetch_income_statement(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
-    """
-    Fetch quarterly income statements from FMP (FREE endpoint).
-    """
-    url = f"{FMP_BASE_URL}/income-statement/{ticker}"
-    params = {
-        'period': 'quarter',
-        'limit': limit,
-        'apikey': api_key
-    }
-    
+    # Fallback: fetch from Wikipedia
+    print("📋 Fetching tickers from Wikipedia...")
     try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        
-        if not data:
-            return pd.DataFrame()
-        
-        df = pd.DataFrame(data)
-        df['ticker'] = ticker
-        return df
-        
+        tables = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+        tickers = tables[0]['Symbol'].tolist()
+        tickers = [t.replace('.', '-') for t in tickers]
+        print(f"   Got {len(tickers)} tickers")
+        return tickers
     except Exception as e:
-        print(f"   ⚠️ income-statement: {e}")
-        return pd.DataFrame()
+        print(f"❌ Failed to get tickers: {e}")
+        return []
 
 
-def fetch_balance_sheet(ticker: str, api_key: str, limit: int = 60) -> pd.DataFrame:
+def fetch_fundamentals_for_ticker(ticker: str, max_retries: int = 2) -> pd.DataFrame:
     """
-    Fetch quarterly balance sheets from FMP (FREE endpoint).
-    """
-    url = f"{FMP_BASE_URL}/balance-sheet-statement/{ticker}"
-    params = {
-        'period': 'quarter',
-        'limit': limit,
-        'apikey': api_key
-    }
+    Fetch quarterly fundamentals from yfinance.
     
-    try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        
-        if not data:
-            return pd.DataFrame()
-        
-        df = pd.DataFrame(data)
-        df['ticker'] = ticker
-        return df
-        
-    except Exception as e:
-        print(f"   ⚠️ balance-sheet: {e}")
-        return pd.DataFrame()
+    Returns DataFrame with quarterly data (income + balance sheet).
+    """
+    for attempt in range(max_retries):
+        try:
+            stock = yf.Ticker(ticker)
+            
+            # Get quarterly income statement
+            income = stock.quarterly_income_stmt
+            if income is None or income.empty:
+                return pd.DataFrame()
+            
+            # Get quarterly balance sheet
+            balance = stock.quarterly_balance_sheet
+            
+            # Transpose so dates are rows
+            income_t = income.T
+            income_t.index.name = 'date'
+            income_t = income_t.reset_index()
+            income_t['ticker'] = ticker
+            
+            if balance is not None and not balance.empty:
+                balance_t = balance.T
+                balance_t.index.name = 'date'
+                balance_t = balance_t.reset_index()
+                balance_t['ticker'] = ticker
+                
+                # Merge on date
+                common_cols = set(income_t.columns) & set(balance_t.columns) - {'date', 'ticker'}
+                balance_t = balance_t.drop(columns=list(common_cols), errors='ignore')
+                df = pd.merge(income_t, balance_t, on=['date', 'ticker'], how='outer')
+            else:
+                df = income_t
+            
+            # Calculate key ratios
+            if not df.empty:
+                # Profit Margin
+                if 'Total Revenue' in df.columns and 'Net Income' in df.columns:
+                    df['profitMargin'] = df['Net Income'] / df['Total Revenue'].replace(0, pd.NA)
+                
+                # Gross Margin
+                if 'Total Revenue' in df.columns and 'Gross Profit' in df.columns:
+                    df['grossMargin'] = df['Gross Profit'] / df['Total Revenue'].replace(0, pd.NA)
+                
+                # ROE
+                if 'Net Income' in df.columns and 'Stockholders Equity' in df.columns:
+                    df['roe'] = df['Net Income'] / df['Stockholders Equity'].replace(0, pd.NA)
+                
+                # Debt to Equity
+                if 'Total Debt' in df.columns and 'Stockholders Equity' in df.columns:
+                    df['debtToEquity'] = df['Total Debt'] / df['Stockholders Equity'].replace(0, pd.NA)
+                
+                # Current Ratio
+                if 'Current Assets' in df.columns and 'Current Liabilities' in df.columns:
+                    df['currentRatio'] = df['Current Assets'] / df['Current Liabilities'].replace(0, pd.NA)
+                
+                # EPS (if we have shares outstanding)
+                if 'Net Income' in df.columns and 'Ordinary Shares Number' in df.columns:
+                    df['eps'] = df['Net Income'] / df['Ordinary Shares Number'].replace(0, pd.NA)
+            
+            # Convert date column
+            df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
+            
+            return df
+            
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(1)
+            else:
+                return pd.DataFrame()
+    
+    return pd.DataFrame()
 
 
-def fetch_fundamentals_for_ticker(ticker: str, api_key: str) -> pd.DataFrame:
+def fetch_all_fundamentals(tickers: List[str], batch_size: int = 20) -> pd.DataFrame:
     """
-    Fetch and combine income statement + balance sheet for a ticker.
-    We'll calculate ratios locally from these.
-    """
-    income_df = fetch_income_statement(ticker, api_key)
-    balance_df = fetch_balance_sheet(ticker, api_key)
-    
-    if income_df.empty and balance_df.empty:
-        return pd.DataFrame()
-    
-    # Merge on date if both exist
-    if not income_df.empty and not balance_df.empty:
-        # Remove duplicate columns before merge
-        common_cols = set(income_df.columns) & set(balance_df.columns) - {'date', 'ticker', 'symbol'}
-        balance_df = balance_df.drop(columns=list(common_cols), errors='ignore')
-        
-        df = pd.merge(income_df, balance_df, on=['date', 'ticker'], how='outer', suffixes=('', '_bs'))
-    elif not income_df.empty:
-        df = income_df
-    else:
-        df = balance_df
-    
-    # Calculate key ratios locally
-    if not df.empty:
-        # Profitability
-        if 'revenue' in df.columns and 'netIncome' in df.columns:
-            df['profitMargin'] = df['netIncome'] / df['revenue'].replace(0, pd.NA)
-        if 'revenue' in df.columns and 'grossProfit' in df.columns:
-            df['grossMargin'] = df['grossProfit'] / df['revenue'].replace(0, pd.NA)
-        
-        # ROE = Net Income / Shareholders Equity
-        if 'netIncome' in df.columns and 'totalStockholdersEquity' in df.columns:
-            df['roe'] = df['netIncome'] / df['totalStockholdersEquity'].replace(0, pd.NA)
-        
-        # Debt to Equity
-        if 'totalDebt' in df.columns and 'totalStockholdersEquity' in df.columns:
-            df['debtToEquity'] = df['totalDebt'] / df['totalStockholdersEquity'].replace(0, pd.NA)
-        
-        # Current Ratio
-        if 'totalCurrentAssets' in df.columns and 'totalCurrentLiabilities' in df.columns:
-            df['currentRatio'] = df['totalCurrentAssets'] / df['totalCurrentLiabilities'].replace(0, pd.NA)
-    
-    return df
-
-
-def fetch_all_fundamentals(
-    tickers: List[str], 
-    api_key: str, 
-    max_tickers: Optional[int] = None,
-    start_idx: int = 0
-) -> pd.DataFrame:
-    """
-    Fetch fundamentals for multiple tickers with rate limiting.
-    
-    Args:
-        tickers: List of ticker symbols
-        api_key: FMP API key
-        max_tickers: Max tickers to process (for partial runs)
-        start_idx: Starting index (for resume)
+    Fetch fundamentals for all tickers with progress logging.
     """
     all_data = []
+    total = len(tickers)
+    success = 0
+    failed = 0
     
-    # Slice tickers for partial run
-    tickers_to_process = tickers[start_idx:]
-    if max_tickers:
-        tickers_to_process = tickers_to_process[:max_tickers]
-    
-    total = len(tickers_to_process)
-    print(f"\n🚀 Fetching fundamentals for {total} tickers")
-    print(f"   Starting at index {start_idx}")
+    print(f"\n🚀 Fetching fundamentals for {total} tickers via yfinance...")
     print("=" * 60)
     
-    for i, ticker in enumerate(tickers_to_process):
-        print(f"\n[{i+1}/{total}] {ticker}...")
+    for batch_start in range(0, total, batch_size):
+        batch_end = min(batch_start + batch_size, total)
+        batch_tickers = tickers[batch_start:batch_end]
         
-        try:
-            df = fetch_fundamentals_for_ticker(ticker, api_key)
-            
-            if not df.empty:
-                all_data.append(df)
-                quarters = len(df)
-                earliest = df['date'].min() if 'date' in df.columns else 'N/A'
-                print(f"   ✅ Got {quarters} quarters (back to {earliest})")
-            else:
-                print(f"   ⚠️ No data returned")
+        print(f"\n📦 Batch {batch_start//batch_size + 1}: "
+              f"Tickers {batch_start+1}-{batch_end} of {total}")
+        
+        for ticker in batch_tickers:
+            try:
+                df = fetch_fundamentals_for_ticker(ticker)
                 
-        except Exception as e:
-            print(f"   ❌ Error: {e}")
+                if not df.empty:
+                    all_data.append(df)
+                    quarters = len(df)
+                    print(f"   ✅ {ticker}: {quarters} quarters")
+                    success += 1
+                else:
+                    print(f"   ⚠️ {ticker}: No data")
+                    failed += 1
+                    
+            except Exception as e:
+                print(f"   ❌ {ticker}: {str(e)[:50]}")
+                failed += 1
+            
+            # Small delay to avoid rate limiting
+            time.sleep(0.5)
         
-        # Rate limit: ~1 request per second to stay under limits
-        time.sleep(1)
+        # Pause between batches
+        if batch_end < total:
+            print(f"   ⏳ Pausing 3s...")
+            time.sleep(3)
+    
+    print(f"\n📊 Results: {success} success, {failed} failed")
     
     if all_data:
         return pd.concat(all_data, ignore_index=True)
@@ -204,25 +169,24 @@ def fetch_all_fundamentals(
 
 def main():
     print("=" * 60)
-    print("HISTORICAL FUNDAMENTAL DATA FETCH (FMP)")
+    print("HISTORICAL FUNDAMENTAL DATA FETCH (yfinance)")
     print(f"Started: {datetime.now().isoformat()}")
     print("=" * 60)
     
-    # Get config from environment
-    api_key = get_api_key()
-    max_tickers = int(os.environ.get('MAX_TICKERS', 100))  # Default 100 per run
+    # Config from environment
+    max_tickers = int(os.environ.get('MAX_TICKERS', 500))
     start_idx = int(os.environ.get('START_INDEX', 0))
     
     # Load tickers
     tickers = load_tickers()
+    tickers = tickers[start_idx:start_idx + max_tickers]
+    
+    if not tickers:
+        print("❌ No tickers to process")
+        return
     
     # Fetch fundamentals
-    df = fetch_all_fundamentals(
-        tickers,
-        api_key,
-        max_tickers=max_tickers,
-        start_idx=start_idx
-    )
+    df = fetch_all_fundamentals(tickers)
     
     # Summary
     print("\n" + "=" * 60)
@@ -233,54 +197,37 @@ def main():
         print("❌ No data fetched")
         return
     
-    unique_tickers = df['ticker'].nunique() if 'ticker' in df.columns else 0
+    unique_tickers = df['ticker'].nunique()
     total_rows = len(df)
     
-    print(f"✅ Tickers processed: {unique_tickers}")
+    print(f"✅ Tickers with data: {unique_tickers}")
     print(f"✅ Total rows: {total_rows}")
     
     if 'date' in df.columns:
         print(f"📅 Date range: {df['date'].min()} to {df['date'].max()}")
     
-    # Print columns
-    print(f"\n📊 Columns ({len(df.columns)}):")
-    for col in sorted(df.columns):
-        print(f"   - {col}")
-    
     # Save
     os.makedirs('data', exist_ok=True)
     
-    output_path = f"data/fundamentals_historical_{start_idx}_{start_idx + max_tickers}.csv"
+    output_path = 'data/fundamentals_historical.csv'
     df.to_csv(output_path, index=False)
     print(f"\n💾 Saved to {output_path}")
-    
-    # Also save a combined file if it exists
-    combined_path = 'data/fundamentals_historical.csv'
-    if os.path.exists(combined_path):
-        existing = pd.read_csv(combined_path)
-        combined = pd.concat([existing, df], ignore_index=True)
-        combined = combined.drop_duplicates(subset=['ticker', 'date'])
-        combined.to_csv(combined_path, index=False)
-        print(f"💾 Updated {combined_path} (total: {len(combined)} rows)")
-    else:
-        df.to_csv(combined_path, index=False)
-        print(f"💾 Created {combined_path}")
     
     # Save metadata
     metadata = {
         'fetch_date': datetime.now().isoformat(),
         'tickers_processed': unique_tickers,
         'total_rows': total_rows,
-        'start_index': start_idx,
-        'max_tickers': max_tickers,
         'date_range': {
             'min': str(df['date'].min()) if 'date' in df.columns else None,
             'max': str(df['date'].max()) if 'date' in df.columns else None
-        }
+        },
+        'columns': list(df.columns)[:20]  # First 20 columns
     }
     with open('data/fundamentals_metadata.json', 'w') as f:
         json.dump(metadata, f, indent=2)
     
+    print(f"💾 Metadata saved")
     print(f"\n🏁 Completed: {datetime.now().isoformat()}")
 
 

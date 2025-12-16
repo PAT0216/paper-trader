@@ -1,4 +1,4 @@
-name: Fetch Historical Fundamentals (FMP)
+name: Fetch Historical Fundamentals (yfinance)
 
 on:
   workflow_dispatch:
@@ -8,14 +8,14 @@ on:
         required: false
         default: '0'
       max_tickers:
-        description: 'Max tickers to process per run (recommend 80-100)'
+        description: 'Max tickers to process (recommend 200-300 per run)'
         required: false
-        default: '100'
+        default: '250'
 
 jobs:
   fetch-fundamentals:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     
     steps:
       - name: Checkout repository
@@ -28,14 +28,13 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install pandas requests
+          pip install pandas yfinance lxml
       
       - name: Fetch historical fundamentals
         run: |
           python scripts/fetch_fundamentals.py
         env:
-          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
-          MAX_TICKERS: ${{ github.event.inputs.max_tickers || '100' }}
+          MAX_TICKERS: ${{ github.event.inputs.max_tickers || '250' }}
           START_INDEX: ${{ github.event.inputs.start_index || '0' }}
       
       - name: Display summary
@@ -46,16 +45,16 @@ jobs:
           fi
           echo ""
           echo "=== FILE SIZES ==="
-          ls -lh data/fundamentals*.csv 2>/dev/null || echo "No CSV files"
+          ls -lh data/fundamentals*.csv data/fundamentals*.json 2>/dev/null || echo "No files"
           echo ""
           echo "=== SAMPLE DATA (first 3 rows) ==="
-          head -4 data/fundamentals_historical.csv 2>/dev/null || echo "No data file"
+          head -4 data/fundamentals_historical.csv 2>/dev/null || echo "No data"
       
       - name: Upload fundamentals as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fundamentals-historical-${{ github.event.inputs.start_index || '0' }}
+          name: fundamentals-${{ github.event.inputs.start_index || '0' }}-${{ github.event.inputs.max_tickers || '250' }}
           path: |
-            data/fundamentals_historical*.csv
+            data/fundamentals_historical.csv
             data/fundamentals_metadata.json
           retention-days: 30
