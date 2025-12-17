@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-12-16T21:16:30.060607Z",
-  "price_date": "2025-12-15",
+  "timestamp": "2025-12-17T21:17:35.109657Z",
+  "price_date": "2025-12-17",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10141.97,
-      "return_pct": 1.42,
+      "value": 9888.49,
+      "return_pct": -1.12,
       "cash": 2329.49,
       "holdings": {
         "PLTR": 4,
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 9936.04,
-      "return_pct": -0.64,
+      "value": 9728.52,
+      "return_pct": -2.71,
       "cash": 239.64,
       "holdings": {
         "ALB": 8,
@@ -45,10 +45,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 668.45,
-    "end_price": 678.84,
-    "return_pct": 1.55,
-    "value": 10155.43,
+    "end_price": 671.4,
+    "return_pct": 0.44,
+    "value": 10044.13,
     "start_date": "2025-10-01",
-    "end_date": "2025-12-16"
+    "end_date": "2025-12-17"
   }
 }
