@@ -1,0 +1,13 @@
+{
+  "total_return": 5.5550315317169785,
+  "cagr": 0.2628187555064547,
+  "sharpe": 0.8362116189943695,
+  "max_drawdown": -0.36694557422462504,
+  "win_rate": 0.568019093078759,
+  "final_value": 667664.00466006,
+  "weeks_traded": 419,
+  "tickers_used": 505,
+  "retrain_freq": "monthly",
+  "rebalance_freq": "weekly",
+  "normalized_predictions": true
+}

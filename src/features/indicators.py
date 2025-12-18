@@ -176,9 +176,10 @@ def create_target(df, target_type='regression', horizon=1):
     close = df['Close']
     
     if target_type == 'regression':
-        # Predict next-day return (percentage)
+        # Predict N-day return (percentage)
+        # pct_change(horizon) calculates N-day return
         # shift(-horizon) looks into the future - ONLY use in training data
-        df['Target'] = close.pct_change().shift(-horizon)
+        df['Target'] = close.pct_change(horizon).shift(-horizon)
     else:
         # Binary classification: 1 if next close > current close
         df['Target'] = (close.shift(-horizon) > close).astype(int)

@@ -24,7 +24,7 @@ from datetime import datetime
 import yaml
 
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.data.loader import fetch_data, fetch_from_cache_only
 from src.data.validator import DataValidator

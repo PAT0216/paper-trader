@@ -10,7 +10,7 @@ import sys
 import os
 import json
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.data.cache import DataCache
 from src.data.universe import UniverseManager

@@ -1,16 +1,8 @@
-# Selected Features (importance >= 3%)
-RSI: 0.0664
-MACD: 0.0618
-MACD_signal: 0.0451
-MACD_hist: 0.0691
-BB_Width: 0.0353
-Dist_SMA50: 0.0672
-Dist_SMA200: 0.0386
-Return_1d: 0.0896
-Return_5d: 0.0758
-OBV_Momentum: 0.0452
-Volume_Ratio: 0.0697
-VWAP_Dev: 0.0654
-ATR_Pct: 0.0639
-BB_PctB: 0.1206
-Vol_Ratio: 0.0865
+# Selected Features (beat random noise baseline)
+MACD_signal: 0.0970
+MACD_hist: 0.1018
+Return_1d: 0.1675
+Volume_Ratio: 0.1329
+VWAP_Dev: 0.1234
+BB_PctB: 0.2477
+Vol_Ratio: 0.1297

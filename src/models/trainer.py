@@ -48,7 +48,7 @@ def select_features_better_than_noise(X, y, feature_names, n_noise=N_NOISE_FEATU
         List of feature names that beat random noise baseline
     """
     # Add random noise features
-    np.random.seed(None)  # Use random seed each time for true randomness
+    np.random.seed(42)  # Fixed seed for reproducible feature selection
     noise = np.random.randn(len(X), n_noise)
     X_with_noise = np.hstack([X, noise])
     
@@ -493,7 +493,15 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
         MIN_DATE = '2010-01-01'
         full_df = full_df[full_df.index >= MIN_DATE]
         
-        X = full_df[FEATURE_COLUMNS].values
+        # Add noise features for selection (matching fair_comparison approach)
+        noise_features = [f'NOISE_{i}' for i in range(5)]
+        np.random.seed(42)  # Fixed seed for reproducibility
+        for i in range(5):
+            full_df[f'NOISE_{i}'] = np.random.randn(len(full_df))
+        
+        all_with_noise = FEATURE_COLUMNS + noise_features
+        
+        X = full_df[all_with_noise].values
         y = full_df['Target'].values
         
         # Clean data: replace inf with NaN, then drop NaN rows
@@ -502,62 +510,76 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
         X = X[valid_rows]
         y = y[valid_rows]
         
-        print(f"   Samples: {len(full_df):,}")
+        print(f"   Samples: {len(X):,}")
         
-        # Cross-validation
-        tscv = TimeSeriesSplit(n_splits=n_splits)
-        fold_metrics = []
+        if len(X) < 1000:
+            print(f"   ❌ Insufficient samples for {horizon}-day horizon")
+            continue
         
-        for fold, (train_idx, test_idx) in enumerate(tscv.split(X)):
-            X_train, X_test = X[train_idx], X[test_idx]
-            y_train, y_test = y[train_idx], y[test_idx]
-            
-            model = xgb.XGBRegressor(
-                n_estimators=100,
-                learning_rate=0.05,
-                max_depth=5,
-                objective='reg:squarederror',
-                random_state=42
-            )
-            model.fit(X_train, y_train)
-            
-            y_pred = model.predict(X_test)
-            direction_correct = ((y_pred > 0) == (y_test > 0)).mean()
-            fold_metrics.append(direction_correct)
+        # STEP 1: Train quick model for feature selection (matching fair_comparison)
+        quick_model = xgb.XGBRegressor(
+            n_estimators=50, 
+            learning_rate=0.1, 
+            max_depth=4, 
+            random_state=42, 
+            verbosity=0
+        )
+        quick_model.fit(X, y)
         
-        avg_dir_acc = np.mean(fold_metrics)
-        print(f"   Avg Directional Accuracy: {avg_dir_acc:.2%}")
+        # STEP 2: Select features better than noise
+        importances = quick_model.feature_importances_
+        noise_baseline = np.mean(importances[-5:])  # Last 5 are noise features
         
-        # Train final model
+        selected_features = []
+        for i, feat in enumerate(FEATURE_COLUMNS):
+            if importances[i] > noise_baseline:
+                selected_features.append(feat)
+        
+        # Fallback: if no features beat noise, keep top 8
+        if not selected_features:
+            sorted_idx = np.argsort(importances[:len(FEATURE_COLUMNS)])[::-1]
+            selected_features = [FEATURE_COLUMNS[i] for i in sorted_idx[:8]]
+        
+        dropped = len(FEATURE_COLUMNS) - len(selected_features)
+        if dropped > 0:
+            print(f"   Dropped {dropped} features (worse than noise)")
+        
+        # Get indices of selected features for final training
+        selected_indices = [FEATURE_COLUMNS.index(f) for f in selected_features]
+        X_selected = X[:, selected_indices]
+        
+        # STEP 3: Calculate directional accuracy on held-out portion (last 20%)
+        split_idx = int(len(X_selected) * 0.8)
+        X_train, X_val = X_selected[:split_idx], X_selected[split_idx:]
+        y_train, y_val = y[:split_idx], y[split_idx:]
+        
+        val_model = xgb.XGBRegressor(
+            n_estimators=100,
+            learning_rate=0.05,
+            max_depth=5,
+            objective='reg:squarederror',
+            random_state=42,
+            verbosity=0
+        )
+        val_model.fit(X_train, y_train)
+        y_pred = val_model.predict(X_val)
+        dir_acc = ((y_pred > 0) == (y_val > 0)).mean()
+        print(f"   Directional Accuracy (validation): {dir_acc:.2%}")
+        
+        # STEP 4: Train final model on ALL selected data (matching fair_comparison)
         final_model = xgb.XGBRegressor(
             n_estimators=100,
             learning_rate=0.05,
             max_depth=5,
             objective='reg:squarederror',
-            random_state=42
+            random_state=42,
+            verbosity=0
         )
-        final_model.fit(X, y)
-        
-        # Noise-based feature selection (same as single model - Phase 3.7)
-        useful_features = select_features_better_than_noise(X, y, FEATURE_COLUMNS)
-        
-        dropped = len(FEATURE_COLUMNS) - len(useful_features)
-        if dropped > 0:
-            print(f"   Dropped {dropped} features (worse than noise)")
-            feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
-            X_selected = X[:, feature_indices]
-            final_model = xgb.XGBRegressor(
-                n_estimators=100,
-                learning_rate=0.05,
-                max_depth=5,
-                objective='reg:squarederror',
-                random_state=42
-            )
-            final_model.fit(X_selected, y)
+        final_model.fit(X_selected, y)
         
         ensemble['models'][horizon] = final_model
-        ensemble['selected_features'][horizon] = useful_features
-        print(f"   ✅ {horizon}-day model ready ({len(useful_features)} features)")
+        ensemble['selected_features'][horizon] = selected_features
+        print(f"   ✅ {horizon}-day model ready ({len(selected_features)} features)")
     
     # Save ensemble
     if save_model:
