@@ -802,7 +802,20 @@ with tab1:
         with cols[i]:
             strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble"
             st.markdown(f"**{strategy_name}**")
+            
+            # First try to get holdings from ledger
             holdings = get_holdings(df)
+            
+            # Fallback to snapshot if ledger has no trades
+            if holdings.empty and snapshot and 'portfolios' in snapshot:
+                if pid in snapshot['portfolios'] and 'holdings' in snapshot['portfolios'][pid]:
+                    snap_holdings = snapshot['portfolios'][pid]['holdings']
+                    if snap_holdings:
+                        holdings = pd.DataFrame([
+                            {'Ticker': k, 'Shares': int(v)}
+                            for k, v in snap_holdings.items()
+                        ])
+            
             if holdings.empty:
                 st.markdown("<p style='color: #64748b; font-style: italic;'>No current positions</p>", unsafe_allow_html=True)
             else:
