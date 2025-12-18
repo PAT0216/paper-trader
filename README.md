@@ -170,6 +170,7 @@ paper-trader/
 |----------|---------|
 | [COMPLETE_PROJECT_GUIDE.md](docs/COMPLETE_PROJECT_GUIDE.md) | Full system architecture |
 | [MOMENTUM_STRATEGY.md](docs/MOMENTUM_STRATEGY.md) | Momentum strategy details |
+| [ML_STRATEGY.md](docs/ML_STRATEGY.md) | ML ensemble strategy details |
 | [MANUAL.md](docs/MANUAL.md) | Technical reference |
 | [ML_ALIGNMENT_REPORT_2024-12-17.md](docs/ML_ALIGNMENT_REPORT_2024-12-17.md) | ML bug fixes & alignment |
 
