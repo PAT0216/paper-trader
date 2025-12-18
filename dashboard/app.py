@@ -762,7 +762,9 @@ for pid, df in data.items():
         pnl_pct = ((value / start) - 1) * 100
         holdings_count = len(get_holdings(df))
     
-    trades = len(df[df['ticker'] != 'CASH'])
+    # Filter out PORTFOLIO VALUE rows for trade counts
+    actual_trades = df[(df['ticker'] != 'CASH') & (df['action'] != 'VALUE')]
+    trades = len(actual_trades)
     buys = len(df[df['action'] == 'BUY'])
     sells = len(df[df['action'] == 'SELL'])
     
@@ -839,9 +841,11 @@ with tab2:
         selected = list(data.keys())[0]
     
     if selected:
-        trades_df = data[selected][data[selected]['ticker'] != 'CASH'].tail(15)
+        # Filter out CASH and PORTFOLIO VALUE rows - only show actual trades
+        actual_trades = data[selected][(data[selected]['ticker'] != 'CASH') & (data[selected]['action'] != 'VALUE')]
+        trades_df = actual_trades.tail(15)
         if trades_df.empty:
-            st.markdown("<p style='color: #64748b; font-style: italic;'>No trades recorded yet</p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #64748b; font-style: italic;'>No trades recorded yet (ML uses simulated backtest values)</p>", unsafe_allow_html=True)
         else:
             display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares']].copy()
             display_df['date'] = pd.to_datetime(display_df['date']).dt.strftime('%Y-%m-%d')
