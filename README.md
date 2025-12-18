@@ -19,26 +19,17 @@
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
 
-### Performance Summary
+### Performance Summary (2017-2025 Walk-Forward Backtest)
 
-#### Momentum Strategy (2015-2025 Backtest)
+| Metric | Momentum | ML Ensemble |
+|--------|----------|-------------|
+| **Total Return** | +1,099% | +556% |
+| **CAGR** | +25.6% | +26.3% |
+| **Sharpe Ratio** | 0.98 | 0.84 |
+| **Max Drawdown** | -27% | -37% |
+| **Win Rate** | — | 56.8% |
 
-| Metric | Momentum |
-|--------|----------|
-| **CAGR** | +25.6% |
-| **Total Return** | +1,099% |
-| **Sharpe Ratio** | 0.98 |
-| **Max Drawdown** | -27% |
-
-#### ML Strategy (Oct-Dec 2025 Live)
-
-| Metric | ML Ensemble |
-|--------|-------------|
-| **Return** | +7.64% |
-| **Alpha vs SPY** | +4.54% |
-| **Sharpe Ratio** | 1.37 |
-
-> Results use production risk management (15% stop-loss, position limits, drawdown controls).
+> Both strategies use production risk management (15% stop-loss, position limits, drawdown controls).
 
 ---
 
