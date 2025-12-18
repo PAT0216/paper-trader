@@ -8,16 +8,61 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 
 ---
 
-## Performance (Unbiased Point-in-Time Backtest 2016-2025)
+## 📊 Performance (Updated Dec 2025)
 
-| Metric | Momentum | S&P 500 |
-|--------|----------|---------|
-| **CAGR** | 17.3% | 15.0% |
-| **Total Return** | 391% | 303% |
-| **Best Year** | +40.0% (2017) | +31.1% (2019) |
-| **Worst Year** | +4.2% (2018) | -18.6% (2022) |
+### Full Backtest (2015-2025, Monthly Rebalancing)
 
-> ⚠️ **Note**: Results use **point-in-time S&P 500 universe** (survivorship bias removed). Strategy beat S&P 500 in 6/10 years.
+| Metric | Momentum Strategy |
+|--------|-------------------|
+| **Final Value** | $119,934 (from $10k) |
+| **Total Return** | +1,099% |
+| **CAGR** | +25.6% |
+| **Sharpe Ratio** | 0.98 |
+| **Max Drawdown** | -27.2% |
+| **Stop-Loss Triggers** | 65 |
+
+### Yearly Returns
+
+| Year | Return | Notes |
+|------|--------|-------|
+| 2015 | +18.4% |  |
+| 2016 | -5.7% | Only losing year |
+| 2017 | +42.6% | Strong tech rally |
+| 2018 | +19.5% |  |
+| 2019 | +16.1% |  |
+| 2020 | +0.9% | COVID volatility |
+| 2021 | +31.7% | Recovery rally |
+| 2022 | +10.2% | Beat market in down year |
+| 2023 | +21.4% |  |
+| 2024 | +136.0% | NVDA/AI boom |
+| 2025 | +29.5% | YTD |
+
+### Rebalance Frequency Comparison
+
+| Metric | Monthly | Weekly |
+|--------|---------|--------|
+| CAGR | **+25.6%** | -0.3% |
+| Sharpe | **0.98** | 0.01 |
+| Max DD | **-27%** | -28% |
+
+> ⚠️ Weekly rebalancing fails due to stop-losses triggering on short-term volatility.
+
+---
+
+## 🔝 Top Holdings Over Time
+
+The strategy naturally concentrates in high-momentum stocks:
+
+| Ticker | % of Periods Held | Notes |
+|--------|-------------------|-------|
+| NVDA | 44% | AI/GPU boom 2023-2024 |
+| AMD | 27% | Semiconductor momentum |
+| TPL | 26% | Energy/land play |
+| BLDR | 21% | Homebuilder momentum |
+| TTD | 20% | Ad-tech growth |
+| AXON | 17% | Law enforcement tech |
+| SMCI | 16% | AI infrastructure |
+| NFLX | 15% | Streaming rebound |
 
 ---
 
@@ -32,29 +77,31 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 4. Equal-weight allocation (~10% each)
 ```
 
-### 2. Risk Control (Daily)
-```
-For each position:
-  - Track entry price
-  - If current price drops 15% below entry → SELL immediately
-```
+### 2. Risk Management (Daily)
+
+| Control | Setting |
+|---------|---------|
+| **Stop-Loss** | 15% from entry price |
+| **Max Position** | 15% of portfolio |
+| **Max Sector** | 30% of portfolio |
+| **Drawdown Warning** | -15% → reduce sizes 50% |
+| **Drawdown Halt** | -20% → no new buys |
+| **Drawdown Liquidate** | -25% → force sell 50% |
 
 ---
 
 ## Configuration
 
-Edit `config/momentum_config.yaml`:
+Edit `config/settings.yaml`:
 
 ```yaml
-strategy:
-  lookback_days: 252  # 12-month momentum
-  n_stocks: 10        # Number of positions
-  
-capital:
-  initial: 100000     # Starting capital ($)
-  
 risk:
-  stop_loss_pct: 0.15 # 15% daily stop-loss
+  stop_loss_pct: 0.15       # 15% stop-loss
+  max_position_pct: 0.15    # Max 15% per stock
+  max_sector_pct: 0.30      # Max 30% per sector
+  drawdown_warning: 0.15    # Reduce at -15%
+  drawdown_halt: 0.20       # Stop at -20%
+  drawdown_liquidate: 0.25  # Liquidate at -25%
 ```
 
 ---
@@ -89,9 +136,25 @@ The workflow runs on days 1-3 to catch the first trading day regardless of weeke
 | File | Purpose |
 |------|---------|
 | `src/strategies/momentum_strategy.py` | Strategy implementation |
-| `config/momentum_config.yaml` | Configuration |
+| `config/settings.yaml` | Risk configuration |
 | `ledger_momentum.csv` | Trade history |
 | `.github/workflows/momentum_trade.yml` | Automation |
+| `scripts/validation/momentum_rebalance_comparison.py` | Backtest comparison |
+
+---
+
+## Data Flow
+
+```mermaid
+flowchart LR
+    A[S&P 500 Universe] --> B[market.db Cache]
+    B --> C[Calculate 12-1 Momentum]
+    C --> D[Rank & Select Top 10]
+    D --> E[Apply Risk Limits]
+    E --> F[Execute Trades]
+    F --> G[ledger_momentum.csv]
+    G --> H[Dashboard]
+```
 
 ---
 
@@ -99,12 +162,10 @@ The workflow runs on days 1-3 to catch the first trading day regardless of weeke
 
 This strategy runs independently alongside the ML strategy:
 
-| Portfolio | Ledger | Strategy |
-|-----------|--------|----------|
-| Momentum | `ledger_momentum.csv` | This strategy |
-| ML | `ledger_ml.csv` | XGBoost predictions |
+| Portfolio | Strategy | Ledger |
+|-----------|----------|--------|
+| Momentum | This strategy | `ledger_momentum.csv` |
+| ML | XGBoost ensemble | `ledger_ml.csv` |
 
-Compare performance in the **Streamlit Dashboard**:
-```bash
-cd dashboard && streamlit run app.py
-```
+### Live Dashboard
+View real-time comparison at: **[paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)**

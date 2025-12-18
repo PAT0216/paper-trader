@@ -915,5 +915,5 @@ reg_lambda: 1
 
 ---
 
-**Last Updated**: December 2024 (Phase 6 Complete - Deployment & Reliability)
+**Last Updated**: December 2025 (ML Alignment Complete + Momentum Backtest Validated)
 

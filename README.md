@@ -8,7 +8,9 @@
 **Paper Trader AI** is a production-grade algorithmic trading system featuring a **Dual Portfolio Architecture** that runs two independent strategies simultaneously for performance comparison.
 
 ### 🔴 [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
-> Real-time portfolio values, performance charts, and trade history updated daily.
+> Real-time portfolio values, performance charts with SPY benchmark, and trade history updated daily.
+
+---
 
 ## 🎯 Dual Portfolio System
 
@@ -17,16 +19,26 @@
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
 
-### Performance Summary (2016-2025 Unbiased Backtest)
+### Performance Summary
 
-| Metric | Momentum | S&P 500 |
-|--------|----------|---------|
-| **CAGR** | 17.3% | 15.0% |
-| **Total Return** | 391% | 303% |
-| **Best Year** | +40.0% (2017) | +31.1% (2019) |
-| **Worst Year** | +4.2% (2018) | -18.6% (2022) |
+#### Momentum Strategy (2015-2025 Backtest)
 
-> ⚠️ **Note**: Results are from an **unbiased point-in-time backtest** (survivorship bias removed). Strategy beat S&P 500 in 6/10 years.
+| Metric | Momentum |
+|--------|----------|
+| **CAGR** | +25.6% |
+| **Total Return** | +1,099% |
+| **Sharpe Ratio** | 0.98 |
+| **Max Drawdown** | -27% |
+
+#### ML Strategy (Oct-Dec 2025 Live)
+
+| Metric | ML Ensemble |
+|--------|-------------|
+| **Return** | +7.64% |
+| **Alpha vs SPY** | +4.54% |
+| **Sharpe Ratio** | 1.37 |
+
+> Results use production risk management (15% stop-loss, position limits, drawdown controls).
 
 ---
 
@@ -59,20 +71,20 @@ cd dashboard && streamlit run app.py
 
 ### 🤖 ML Strategy (Experimental)
 - **XGBoost Regressor** with 15 technical features
-- **Multi-horizon ensemble** (1-day, 5-day, 20-day predictions)
-- **VIX regime detection** for crisis protection
-- Daily trading on weekdays
+- **Multi-horizon ensemble** (1-day 50%, 5-day 30%, 20-day 20%)
+- **Noise-based feature selection** (only features that beat random)
+- Daily retraining and rebalancing
 
 ### 🛡️ Risk Management
 - **Position limits**: Max 15% per stock, 30% per sector
+- **Stop-loss**: 15% from entry price
 - **Portfolio drawdown control**: Warning at -15%, halt at -20%, liquidate at -25%
-- **Volatility-adjusted sizing**: Inverse weighting by 30-day volatility
 
 ### 📦 Infrastructure
-- **SQLite data cache**: 4.3M rows, 503 S&P 500 tickers
+- **SQLite data cache**: 4.3M+ rows, 503 S&P 500 tickers
 - **GitHub Actions**: Automated trading + universe sync
-- **Streamlit Dashboard**: Live portfolio comparison with daily snapshots
-- **Point-in-time Universe**: Monthly S&P 500 sync from Wikipedia
+- **Streamlit Dashboard**: Live comparison with SPY benchmark
+- **Point-in-time Universe**: Monthly S&P 500 sync
 
 ---
 
@@ -86,7 +98,7 @@ flowchart LR
     B --> C[Calculate Returns<br/>Skip Last Month]
     C --> D[Rank by Momentum]
     D --> E[Select Top 10]
-    E --> F[Equal Weight<br/>~10% Each]
+    E --> F[Apply Risk Limits]
     F --> G[Execute Trades]
     G --> H[Daily Stop-Loss<br/>Check 15%]
 ```
@@ -95,25 +107,18 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A[OHLCV Data] --> B[Generate 15<br/>Technical Features]
+    A[OHLCV Data] --> B[Generate 15<br/>Features]
     B --> C1[1-Day Model<br/>50% Weight]
     B --> C2[5-Day Model<br/>30% Weight]
     B --> C3[20-Day Model<br/>20% Weight]
-    C1 --> D[Weighted<br/>Blend]
+    C1 --> D[Weighted<br/>Ensemble]
     C2 --> D
     C3 --> D
-    D --> E[VIX Regime<br/>Check]
-    E --> F{Crisis?}
-    F -->|Yes| G[Reduce<br/>Position]
-    F -->|No| H[Full<br/>Position]
-    G --> I[Execute Trade]
-    H --> I
+    D --> E[Cross-Sectional<br/>Ranking]
+    E --> F[Top 10% Buy<br/>Bottom 10% Sell]
+    F --> G[Apply Risk<br/>Limits]
+    G --> H[Execute Trade]
 ```
-
-**Ensemble Logic:**
-- **3 XGBoost models** trained on different prediction horizons
-- **Weighted average**: 50% short-term + 30% weekly + 20% monthly
-- **Regime detection**: VIX > 30 = Crisis → conservative positioning
 
 ---
 
@@ -134,20 +139,27 @@ Run manually: **Actions** → Select workflow → **Run workflow**
 
 ```
 paper-trader/
-├── main.py                     # Core trading logic
+├── main.py                         # Core trading logic
 ├── config/
-│   └── momentum_config.yaml    # Strategy configuration
+│   └── settings.yaml               # All configuration
 ├── src/
-│   ├── strategies/             # Momentum strategy
-│   ├── models/                 # ML models (XGBoost)
-│   ├── trading/                # Portfolio management
-│   ├── analytics/              # Portfolio comparison
-│   └── data/                   # Data loading & caching
+│   ├── strategies/                 # Momentum strategy
+│   ├── models/                     # ML models (XGBoost)
+│   ├── trading/                    # Portfolio & risk management
+│   ├── features/                   # Technical indicators
+│   └── data/                       # Data loading & caching
+├── scripts/
+│   ├── backtests/                  # Backtest scripts
+│   ├── validation/                 # Validation scripts
+│   └── utils/                      # Utility scripts
 ├── dashboard/
-│   └── app.py                  # Streamlit dashboard
-├── tests/                      # Test suite (15 tests)
-├── docs/                       # Documentation
-└── .github/workflows/          # CI/CD automation
+│   └── app.py                      # Streamlit dashboard
+├── data/
+│   ├── market.db                   # SQLite price cache
+│   ├── portfolio_snapshot.json     # Dashboard metrics
+│   └── spy_benchmark.json          # SPY chart data
+├── .github/workflows/              # CI/CD automation
+└── docs/                           # Documentation
 ```
 
 ---
@@ -159,6 +171,7 @@ paper-trader/
 | [COMPLETE_PROJECT_GUIDE.md](docs/COMPLETE_PROJECT_GUIDE.md) | Full system architecture |
 | [MOMENTUM_STRATEGY.md](docs/MOMENTUM_STRATEGY.md) | Momentum strategy details |
 | [MANUAL.md](docs/MANUAL.md) | Technical reference |
+| [ML_ALIGNMENT_REPORT_2024-12-17.md](docs/ML_ALIGNMENT_REPORT_2024-12-17.md) | ML bug fixes & alignment |
 
 ---
 
@@ -168,9 +181,9 @@ paper-trader/
 # Run all tests
 python -m pytest tests/ -v
 
-# Run specific test suites
-python -m pytest tests/test_dual_portfolio.py -v   # Dual portfolio (7 tests)
-python -m pytest tests/test_momentum_no_bias.py -v  # Momentum validation (8 tests)
+# Run validation scripts
+python scripts/validation/momentum_rebalance_comparison.py  # Monthly vs Weekly comparison
+python scripts/validation/compare_ml_vs_momentum.py         # Strategy comparison
 ```
 
 ---
