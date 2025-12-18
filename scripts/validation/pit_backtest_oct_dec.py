@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Point-in-Time Backtest: Oct 1, 2024 to Today
+Point-in-Time Backtest: Oct 1, 2025 to Today()
 ============================================
 Simulates what production would have done with daily retraining + rebalancing.
 Updates ledger for production website.
@@ -128,8 +128,11 @@ def run_backtest():
     
     # Initialize
     portfolio_value = INITIAL_CASH
+    cash = INITIAL_CASH
+    holdings = {}  # {ticker: {'shares': int, 'entry_price': float}}
     daily_returns = []
     portfolio_history = [(trading_days[0], portfolio_value)]
+    all_trades = []  # Track all BUY/SELL trades
     model = None
     
     for day_idx in range(len(trading_days) - 1):
@@ -161,28 +164,81 @@ def run_backtest():
         
         # Select top N
         sorted_preds = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
-        selected = [t for t, _ in sorted_preds[:TOP_N]]
+        target_tickers = set(t for t, _ in sorted_preds[:TOP_N])
         
-        # Calculate daily returns
-        day_returns = []
-        for ticker in selected:
-            df = all_price_data[ticker]
-            if today not in df.index or next_day not in df.index:
-                continue
-            
-            entry = df.loc[today, 'Close']
-            exit_price = df.loc[next_day, 'Close']
-            ret = (exit_price / entry) - 1
-            day_returns.append(ret)
+        # Get current prices
+        current_prices = {}
+        for ticker, df in all_price_data.items():
+            if today in df.index:
+                current_prices[ticker] = df.loc[today, 'Close']
         
-        if day_returns:
-            avg_return = np.mean(day_returns)
-            daily_returns.append(avg_return)
-            portfolio_value *= (1 + avg_return)
-            portfolio_history.append((next_day, portfolio_value))
+        # SELL holdings not in target
+        for ticker in list(holdings.keys()):
+            if ticker not in target_tickers and ticker in current_prices:
+                pos = holdings[ticker]
+                sell_price = current_prices[ticker]
+                sell_value = pos['shares'] * sell_price
+                cash += sell_value
+                all_trades.append({
+                    'date': str(today.date()),
+                    'ticker': ticker,
+                    'action': 'SELL',
+                    'price': sell_price,
+                    'shares': pos['shares']
+                })
+                del holdings[ticker]
+        
+        # Calculate portfolio value for position sizing
+        portfolio_value = cash
+        for ticker, pos in holdings.items():
+            if ticker in current_prices:
+                portfolio_value += pos['shares'] * current_prices[ticker]
+        
+        # BUY new positions (equal weight)
+        new_tickers = target_tickers - set(holdings.keys())
+        if new_tickers:
+            position_size = portfolio_value * 0.10  # 10% per position
+            for ticker in new_tickers:
+                if ticker in current_prices and current_prices[ticker] > 0:
+                    buy_price = current_prices[ticker]
+                    shares = int(min(position_size, cash) / buy_price)
+                    if shares > 0:
+                        cost = shares * buy_price
+                        if cost <= cash:
+                            holdings[ticker] = {'shares': shares, 'entry_price': buy_price}
+                            cash -= cost
+                            all_trades.append({
+                                'date': str(today.date()),
+                                'ticker': ticker,
+                                'action': 'BUY',
+                                'price': buy_price,
+                                'shares': shares
+                            })
+        
+        # Get next day prices for return calculation
+        next_prices = {}
+        for ticker, df in all_price_data.items():
+            if next_day in df.index:
+                next_prices[ticker] = df.loc[next_day, 'Close']
+        
+        # Calculate portfolio value on next day
+        portfolio_value = cash
+        for ticker, pos in holdings.items():
+            price = 0
+            if ticker in next_prices:
+                price = next_prices[ticker]
+            elif ticker in current_prices:
+                # Fallback to current price if next price missing (avoid 100% loss simulation)
+                price = current_prices[ticker]
             
-            if day_idx % 10 == 0:
-                print(f"  {today.date()}: ${portfolio_value:,.2f} ({avg_return*100:+.2f}%)")
+            portfolio_value += pos['shares'] * price
+        
+        daily_return = (portfolio_value / (portfolio_history[-1][1] if portfolio_history else INITIAL_CASH)) - 1
+        daily_returns.append(daily_return)
+        portfolio_history.append((next_day, portfolio_value))
+        
+        if day_idx % 10 == 0:
+            print(f"  {today.date()}: ${portfolio_value:,.2f} ({daily_return*100:+.2f}%)")
     
     # Calculate metrics
     if not daily_returns:
@@ -250,15 +306,88 @@ def run_backtest():
         'win_rate': win_rate,
         'spy_return': spy_return,
         'trading_days': days,
-        'portfolio_history': [(str(d.date()), v) for d, v in portfolio_history]
+        'portfolio_history': [(str(d.date()), v) for d, v in portfolio_history],
+        'trades': all_trades,
+        'final_holdings': {t: h['shares'] for t, h in holdings.items()},
+        'final_cash': cash
     }
     
     os.makedirs('results', exist_ok=True)
-    with open('results/pit_backtest_oct_dec_2024.json', 'w') as f:
+    with open('results/pit_backtest_oct_dec_2025.json', 'w') as f:
         json.dump(results, f, indent=2)
     
+    # Generate ledger_ml.csv
+    ledger_rows = []
+    running_cash = INITIAL_CASH
+    
+    # Create value map for looking up portfolio value on trade dates
+    value_map = {str(d.date()): v for d, v in portfolio_history}
+    
+    # Add deposit
+    ledger_rows.append({
+        'date': START_DATE,
+        'ticker': 'CASH',
+        'action': 'DEPOSIT',
+        'price': 1.0,
+        'shares': INITIAL_CASH,
+        'amount': INITIAL_CASH,
+        'cash_balance': INITIAL_CASH,
+        'total_value': INITIAL_CASH,
+        'strategy': 'ml',
+        'momentum_score': ''
+    })
+    
+    # Add all trades
+    for trade in all_trades:
+        if trade['action'] == 'BUY':
+            amount = -trade['price'] * trade['shares']
+            running_cash -= trade['price'] * trade['shares']
+        else:
+            amount = trade['price'] * trade['shares']
+            running_cash += trade['price'] * trade['shares']
+        
+        ledger_rows.append({
+            'date': trade['date'],
+            'ticker': trade['ticker'],
+            'action': trade['action'],
+            'price': trade['price'],
+            'shares': trade['shares'],
+            'amount': abs(amount),
+            'cash_balance': running_cash,
+            'total_value': value_map.get(trade['date'], 0.0),
+            'strategy': 'ml',
+            'momentum_score': ''
+        })
+    
+    # Add portfolio values at end of day
+    for date, value in portfolio_history[1:]:
+        ledger_rows.append({
+            'date': str(date.date()),
+            'ticker': 'PORTFOLIO',
+            'action': 'VALUE',
+            'price': 1.0,
+            'shares': 0,
+            'amount': 0.0,
+            'cash_balance': 0.0,
+            'total_value': round(value, 2),
+            'strategy': 'ml',
+            'momentum_score': ''
+        })
+    
+    # Sort by date and write
+    ledger_df = pd.DataFrame(ledger_rows)
+    ledger_df['date'] = pd.to_datetime(ledger_df['date'])
+    ledger_df = ledger_df.sort_values('date')
+    ledger_df['date'] = ledger_df['date'].dt.strftime('%Y-%m-%d')
+    
+    ledger_df.to_csv('ledger_ml.csv', index=False)
+    
     print()
-    print(f"💾 Results saved to results/pit_backtest_oct_dec_2024.json")
+    print(f"💾 Results saved to results/pit_backtest_oct_dec_2025.json")
+    print(f"💾 Ledger saved to ledger_ml.csv ({len(all_trades)} trades)")
+    print(f"   Buys: {len([t for t in all_trades if t['action'] == 'BUY'])}")
+    print(f"   Sells: {len([t for t in all_trades if t['action'] == 'SELL'])}")
+    print(f"   Final holdings: {len(holdings)} positions")
     
     return results
 

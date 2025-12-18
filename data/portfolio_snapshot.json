@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-17T21:17:35.109657Z",
+  "timestamp": "2025-12-18T05:39:33.095989Z",
   "price_date": "2025-12-17",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,27 +22,31 @@
       "positions": 10
     },
     "ml": {
-      "value": 10763.50,
-      "return_pct": 7.64,
-      "cash": 1262.95,
+      "value": 10630.89,
+      "return_pct": 6.31,
+      "cash": 570.91,
       "holdings": {
-        "AKAM": 10,
-        "ALB": 8,
-        "AMGN": 2,
-        "BIIB": 6,
-        "CMI": 2,
-        "BMY": 19
+        "INTC": 26,
+        "COIN": 3,
+        "PSKY": 72,
+        "HOOD": 7,
+        "BAX": 58,
+        "CMG": 31,
+        "MOH": 6,
+        "ARE": 23,
+        "SMCI": 30,
+        "FISV": 15
       },
-      "positions": 6,
-      "note": "Values from aligned ML model PIT backtest (Oct 1 - Dec 12, 2025)"
+      "positions": 10,
+      "note": "Values from aligned ML model PIT backtest (2025-10-01 - 2025-12-17)"
     }
   },
   "benchmark": {
     "ticker": "SPY",
     "start_price": 668.45,
     "end_price": 689.17,
-    "return_pct": 3.10,
-    "value": 10310.00,
+    "return_pct": 3.1,
+    "value": 10309.97,
     "start_date": "2025-10-01",
     "end_date": "2025-12-17"
   }
