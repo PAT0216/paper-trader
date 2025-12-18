@@ -22,32 +22,27 @@
       "positions": 10
     },
     "ml": {
-      "value": 9728.52,
-      "return_pct": -2.71,
-      "cash": 239.64,
+      "value": 10763.50,
+      "return_pct": 7.64,
+      "cash": 1262.95,
       "holdings": {
+        "AKAM": 10,
         "ALB": 8,
-        "ADI": 3,
-        "ALGN": 6,
-        "AMAT": 3,
-        "BF-B": 33,
-        "ARES": 5,
-        "AVGO": 3,
-        "CFG": 17,
-        "APP": 1,
-        "APO": 6,
-        "AMD": 2,
-        "NFLX": 2
+        "AMGN": 2,
+        "BIIB": 6,
+        "CMI": 2,
+        "BMY": 19
       },
-      "positions": 12
+      "positions": 6,
+      "note": "Values from aligned ML model PIT backtest (Oct 1 - Dec 12, 2025)"
     }
   },
   "benchmark": {
     "ticker": "SPY",
     "start_price": 668.45,
-    "end_price": 671.4,
-    "return_pct": 0.44,
-    "value": 10044.13,
+    "end_price": 689.17,
+    "return_pct": 3.10,
+    "value": 10310.00,
     "start_date": "2025-10-01",
     "end_date": "2025-12-17"
   }
