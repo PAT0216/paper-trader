@@ -30,7 +30,7 @@ jobs:
 
       - name: Update Universe
         run: |
-          python scripts/update_universe.py
+          python scripts/utils/update_universe.py
 
       - name: Commit Changes
         run: |

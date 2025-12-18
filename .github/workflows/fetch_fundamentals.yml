@@ -32,7 +32,7 @@ jobs:
       
       - name: Fetch historical fundamentals
         run: |
-          python scripts/fetch_fundamentals.py
+          python scripts/utils/fetch_fundamentals.py
         env:
           MAX_TICKERS: ${{ github.event.inputs.max_tickers || '250' }}
           START_INDEX: ${{ github.event.inputs.start_index || '0' }}
