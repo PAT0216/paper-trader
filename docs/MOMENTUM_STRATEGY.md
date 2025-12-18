@@ -15,7 +15,7 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 | Metric | Momentum Strategy |
 |--------|-------------------|
 | **Final Value** | $119,934 (from $10k) |
-| **Total Return** | +1,099% |
+
 | **CAGR** | +25.6% |
 | **Sharpe Ratio** | 0.98 |
 | **Max Drawdown** | -27.2% |

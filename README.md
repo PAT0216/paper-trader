@@ -23,7 +23,6 @@
 
 | Metric | Momentum | ML Ensemble |
 |--------|----------|-------------|
-| **Total Return** | +1,099% | +556% |
 | **CAGR** | +25.6% | +26.3% |
 | **Sharpe Ratio** | 0.98 | 0.84 |
 | **Max Drawdown** | -27% | -37% |

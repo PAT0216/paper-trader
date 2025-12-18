@@ -15,7 +15,7 @@ Based on quantitative finance research combining technical analysis with machine
 | Metric | ML Ensemble |
 |--------|-------------|
 | **Final Value** | $10,764 (from $10k) |
-| **Total Return** | +7.64% |
+
 | **Annualized Return** | +43.8% |
 | **Sharpe Ratio** | 1.37 |
 | **Max Drawdown** | -16.5% |
@@ -29,7 +29,7 @@ Full 8-year walk-forward backtest with monthly retraining and weekly rebalancing
 | Metric | ML Strategy |
 |--------|-------------|
 | **Final Value** | $667,664 (from $100k) |
-| **Total Return** | +556% |
+
 | **CAGR** | +26.3% |
 | **Sharpe Ratio** | 0.84 |
 | **Max Drawdown** | -36.7% |

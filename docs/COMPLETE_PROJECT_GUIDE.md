@@ -56,7 +56,7 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 | Metric | Value |
 |--------|-------|
 | **CAGR** | +25.6% |
-| **Total Return** | +1,099% |
+
 | **Sharpe Ratio** | 0.98 |
 | **Max Drawdown** | -27% |
 
@@ -99,7 +99,7 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 
 | Metric | Value |
 |--------|-------|
-| **Total Return** | +7.64% |
+
 | **Annualized** | +43.8% |
 | **Sharpe Ratio** | 1.37 |
 | **Max Drawdown** | -16.5% |
@@ -110,7 +110,7 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 | Metric | Value |
 |--------|-------|
 | **Final Value** | $667,664 (from $100k) |
-| **Total Return** | +556% |
+
 | **CAGR** | +26.3% |
 | **Sharpe Ratio** | 0.84 |
 | **Max Drawdown** | -36.7% |
