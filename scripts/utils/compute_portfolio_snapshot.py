@@ -229,6 +229,24 @@ def main():
     with open(OUTPUT_PATH, 'w') as f:
         json.dump(snapshot, f, indent=2)
     
+    # Also save SPY benchmark history for the chart
+    if spy_df is not None and not spy_df.empty:
+        spy_history = {
+            'ticker': 'SPY',
+            'start_date': first_date,
+            'end_date': str(spy_df['date'].iloc[-1]),
+            'initial_value': INITIAL_CAPITAL,
+            'final_value': round(INITIAL_CAPITAL * (spy_df['price'].iloc[-1] / spy_df['price'].iloc[0]), 2),
+            'total_return': round(((spy_df['price'].iloc[-1] / spy_df['price'].iloc[0]) - 1) * 100, 2),
+            'portfolio_history': [
+                [str(row['date'])[:10], round(INITIAL_CAPITAL * (row['price'] / spy_df['price'].iloc[0]), 2)]
+                for _, row in spy_df.iterrows()
+            ]
+        }
+        with open('data/spy_benchmark.json', 'w') as f:
+            json.dump(spy_history, f, indent=2)
+        print(f"   Saved SPY history ({len(spy_history['portfolio_history'])} days) to data/spy_benchmark.json")
+    
     print(f"\n✅ Saved snapshot to {OUTPUT_PATH}")
     print(f"   Price date: {snapshot['price_date']}")
     

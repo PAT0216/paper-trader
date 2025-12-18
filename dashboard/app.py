@@ -339,6 +339,20 @@ def load_portfolio_snapshot() -> dict:
     return {}
 
 
+def load_spy_benchmark() -> pd.DataFrame:
+    """Load SPY benchmark price history from JSON file."""
+    for base in ["", "../", "../../"]:
+        path = base + "data/spy_benchmark.json"
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                data = json.load(f)
+                if 'portfolio_history' in data:
+                    df = pd.DataFrame(data['portfolio_history'], columns=['date', 'value'])
+                    df['date'] = pd.to_datetime(df['date'])
+                    return df
+    return pd.DataFrame()
+
+
 def get_portfolio_value(df: pd.DataFrame) -> float:
     if df.empty:
         return 0
@@ -661,6 +675,33 @@ for pid, df in data.items():
             fillcolor=f"rgba({int(colors.get(pid, '#10b981')[1:3], 16)}, {int(colors.get(pid, '#10b981')[3:5], 16)}, {int(colors.get(pid, '#10b981')[5:7], 16)}, 0.1)"
         ))
 
+# Add SPY benchmark line
+min_d, max_d = get_ledger_date_range(data)
+spy_chart_data = None
+
+# Try database first (localhost)
+if min_d and max_d:
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "market.db")
+    spy_data = load_benchmark_series("SPY", min_d, max_d, db_path)
+    
+    if not spy_data.empty:
+        start_price = spy_data['px'].iloc[0]
+        spy_data['value'] = (spy_data['px'] / start_price) * 10000
+        spy_chart_data = spy_data[['date', 'value']]
+
+# Fallback to JSON file (deployed site)
+if spy_chart_data is None or spy_chart_data.empty:
+    spy_chart_data = load_spy_benchmark()
+
+if spy_chart_data is not None and not spy_chart_data.empty:
+    fig.add_trace(go.Scatter(
+        x=spy_chart_data['date'],
+        y=spy_chart_data['value'],
+        name='SPY',
+        line=dict(color='#64748b', width=2, dash='dash'),
+        opacity=0.8
+    ))
+
 fig.update_layout(
     template='plotly_dark',
     paper_bgcolor='rgba(0,0,0,0)',
@@ -696,6 +737,7 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
 
 
 # ============ DETAILED METRICS ============
