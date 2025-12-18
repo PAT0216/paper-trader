@@ -24,15 +24,20 @@ Based on quantitative finance research combining technical analysis with machine
 
 ### Walk-Forward Validation (2017-2025)
 
+Full 8-year walk-forward backtest with monthly retraining and weekly rebalancing:
+
 | Metric | ML Strategy |
 |--------|-------------|
-| **CAGR** | +30.7% |
-| **Sharpe Ratio** | 0.91 |
-| **Max Drawdown** | -38.0% |
-| **Win Rate** | 57.0% |
-| **Total Return** | +764% |
+| **Final Value** | $667,664 (from $100k) |
+| **Total Return** | +556% |
+| **CAGR** | +26.3% |
+| **Sharpe Ratio** | 0.84 |
+| **Max Drawdown** | -36.7% |
+| **Win Rate** | 56.8% |
+| **Weeks Traded** | 419 |
+| **Tickers Used** | 505 |
 
-> Results use aligned production code with proper target calculation and feature selection.
+> Results from `results/walkforward_fair_comparison.json` using aligned production code.
 
 ---
 

@@ -105,6 +105,17 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 | **Max Drawdown** | -16.5% |
 | **Alpha vs SPY** | +4.54% |
 
+### Walk-Forward Validation (2017-2025)
+
+| Metric | Value |
+|--------|-------|
+| **Final Value** | $667,664 (from $100k) |
+| **Total Return** | +556% |
+| **CAGR** | +26.3% |
+| **Sharpe Ratio** | 0.84 |
+| **Max Drawdown** | -36.7% |
+| **Win Rate** | 56.8% |
+
 ### ML Model Details
 
 | Parameter | Value |
