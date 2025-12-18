@@ -1,15 +1,19 @@
 """
-Walk-Forward Backtest with Weekly Retraining
+Walk-Forward Backtest: Fair Comparison Version
+===============================================
+Changes from walkforward_weekly_ensemble.py:
+1. Monthly retrain (every 4 weeks) instead of weekly
+2. Weekly rebalancing (kept)
+3. FULL universe (all ~505 tickers) instead of 100
+4. Proper prediction normalization (divide by horizon)
+5. Full 8-year test period (2017-2025)
 
-Features:
-1. Weekly model retraining (every Monday)
-2. Multi-horizon ensemble (1/5/20 day returns)
-3. Dynamic noise-based feature selection at each training
-4. Production-like portfolio construction
+This provides a fair comparison to ml_improvement_experiments.py
 """
 
 import sys
-sys.path.insert(0, '.')
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
 import pandas as pd
@@ -29,6 +33,11 @@ ALL_FEATURES = [
 
 HORIZONS = [1, 5, 20]
 HORIZON_WEIGHTS = {1: 0.5, 5: 0.3, 20: 0.2}
+
+# Configuration
+RETRAIN_WEEKS = 4  # Monthly retrain (was 1 = weekly)
+TOP_N = 10
+INITIAL_CAPITAL = 100000
 
 
 def add_noise_features(df, n_noise=5):
@@ -83,7 +92,7 @@ def train_ensemble_with_noise_selection(train_df, all_features):
         # Create target for this horizon
         df = train_df.copy()
         df['Target'] = df.groupby('ticker')['Close'].transform(
-            lambda x: x.pct_change().shift(-horizon)
+            lambda x: x.pct_change(horizon).shift(-horizon)
         )
         df = df.dropna(subset=['Target'])
         
@@ -124,8 +133,17 @@ def train_ensemble_with_noise_selection(train_df, all_features):
     return ensemble
 
 
-def predict_ensemble(ensemble, X_df, all_features):
-    """Make weighted ensemble prediction."""
+def predict_ensemble_normalized(ensemble, X_df, all_features):
+    """
+    Make weighted ensemble prediction with PROPER NORMALIZATION.
+    
+    Key difference from original: 
+    - Divides each prediction by its horizon to normalize to daily return
+    - This makes predictions from different horizons comparable
+    """
+    if X_df.empty:
+        return np.array([])
+    
     predictions = np.zeros(len(X_df))
     total_weight = 0
     
@@ -139,37 +157,49 @@ def predict_ensemble(ensemble, X_df, all_features):
             X = np.where(np.isinf(X), 0, X)
             X = np.where(np.isnan(X), 0, X)
             
-            pred = model.predict(X)
-            predictions += weight * pred
+            raw_pred = model.predict(X)
+            
+            # NORMALIZE: Convert to daily return for fair comparison
+            # A 5-day prediction of 5% becomes 1% daily
+            # A 20-day prediction of 20% becomes 1% daily
+            daily_pred = raw_pred / horizon
+            
+            predictions += weight * daily_pred
             total_weight += weight
-        except Exception:
+        except Exception as e:
             continue
     
     return predictions / total_weight if total_weight > 0 else predictions
 
 
-def run_walkforward_backtest(full_df, all_features, top_n=10, initial_capital=10000):
+def run_walkforward_backtest(full_df, all_features, top_n=TOP_N, initial_capital=INITIAL_CAPITAL):
     """
-    Walk-forward backtest with weekly retraining.
+    Walk-forward backtest with MONTHLY retraining, WEEKLY rebalancing.
     """
     print('='*70)
-    print('WALK-FORWARD BACKTEST: Weekly Retrain + Ensemble + Noise Selection')
+    print('WALK-FORWARD BACKTEST: Fair Comparison')
     print('='*70)
+    print(f'Retrain: Monthly (every {RETRAIN_WEEKS} weeks)')
+    print(f'Rebalance: Weekly')
+    print(f'Universe: FULL ({full_df["ticker"].nunique()} tickers)')
+    print(f'Capital: ${initial_capital:,}')
+    print()
     
     # Add noise features to dataframe
     full_df = add_noise_features(full_df.copy())
     
     all_dates = sorted(full_df.index.unique())
     
-    # Find all Mondays for retraining
+    # Find all Mondays for rebalancing
     mondays = [d for d in all_dates if d.weekday() == 0]
     
     portfolio_value = initial_capital
     results = []
     ensemble = None
     week_count = 0
+    retrain_count = 0
     
-    # Start from 2017 (2 years training buffer)
+    # Start from 2017 (2 years training buffer from 2015)
     start_date = pd.Timestamp('2017-01-01')
     mondays = [m for m in mondays if m >= start_date]
     
@@ -180,25 +210,28 @@ def run_walkforward_backtest(full_df, all_features, top_n=10, initial_capital=10
     for i, monday in enumerate(mondays[:-1]):  # Skip last week
         next_monday = mondays[i + 1]
         
-        # Retrain every week
-        train_df = full_df[full_df.index < monday]
-        if len(train_df) < 5000:
+        # Retrain MONTHLY (every 4 weeks) instead of weekly
+        if i % RETRAIN_WEEKS == 0:
+            train_df = full_df[full_df.index < monday]
+            if len(train_df) < 5000:
+                continue
+            
+            ensemble = train_ensemble_with_noise_selection(train_df, all_features)
+            retrain_count += 1
+            
+            if retrain_count % 12 == 0:  # Print yearly
+                print(f'  Retrain #{retrain_count}: {monday.date()}')
+        
+        if ensemble is None or not ensemble['models']:
             continue
         
-        ensemble = train_ensemble_with_noise_selection(train_df, all_features)
-        
-        if not ensemble['models']:
-            continue
-        
-        # Get Friday before next Monday for prediction
-        week_df = full_df[(full_df.index >= monday) & (full_df.index < next_monday)]
-        if week_df.empty:
-            continue
-        
-        # Get latest data for each ticker on Monday
+        # Get latest data for each ticker on Monday (for prediction)
         monday_data = full_df[full_df.index == monday]
         if monday_data.empty:
             # Try next available day
+            week_df = full_df[(full_df.index >= monday) & (full_df.index < next_monday)]
+            if week_df.empty:
+                continue
             monday_data = week_df.groupby('ticker').first()
         else:
             monday_data = monday_data.set_index('ticker', append=True).reset_index(level=0, drop=True)
@@ -206,8 +239,11 @@ def run_walkforward_backtest(full_df, all_features, top_n=10, initial_capital=10
         if len(monday_data) < top_n:
             continue
         
-        # Predict using ensemble
-        predictions = predict_ensemble(ensemble, monday_data, all_features)
+        # Predict using ensemble WITH NORMALIZATION
+        predictions = predict_ensemble_normalized(ensemble, monday_data, all_features)
+        
+        if len(predictions) == 0:
+            continue
         
         # Select top N
         valid_tickers = monday_data.index.tolist()
@@ -216,6 +252,8 @@ def run_walkforward_backtest(full_df, all_features, top_n=10, initial_capital=10
         
         # Calculate weekly return for selected stocks
         week_returns = []
+        week_df = full_df[(full_df.index >= monday) & (full_df.index < next_monday)]
+        
         for ticker in selected_tickers:
             ticker_week = week_df[week_df['ticker'] == ticker]
             if len(ticker_week) >= 2:
@@ -235,38 +273,53 @@ def run_walkforward_backtest(full_df, all_features, top_n=10, initial_capital=10
             })
             
             week_count += 1
-            if week_count % 52 == 0:  # Print yearly progress
-                print(f'  Year {monday.year}: Value = ${portfolio_value:,.0f}')
+    
+    print(f'\nTotal retrains: {retrain_count}')
+    print(f'Total trading weeks: {week_count}')
     
     return pd.DataFrame(results)
 
 
 def main():
-    print('Loading data...')
+    print('='*70)
+    print('FAIR COMPARISON WALKFORWARD TEST')
+    print('='*70)
+    print()
+    
+    print('📦 Loading data from cache...')
     cache = DataCache()
-    tickers = cache.get_cached_tickers()[:100]
+    
+    # FULL UNIVERSE - not just 100!
+    tickers = cache.get_cached_tickers()
+    print(f'Found {len(tickers)} tickers in cache')
     
     all_data = []
+    valid_count = 0
     for ticker in tickers:
         df = cache.get_price_data(ticker)
         if df is not None and len(df) > 200:
             processed = generate_features(df, include_target=False)
-            processed['ticker'] = ticker
-            all_data.append(processed)
+            if len(processed) > 100:
+                processed['ticker'] = ticker
+                all_data.append(processed)
+                valid_count += 1
+    
+    print(f'Valid tickers after filtering: {valid_count}')
     
     full_df = pd.concat(all_data).sort_index()
-    full_df = full_df[full_df.index >= '2015-01-01']
+    full_df = full_df[full_df.index >= '2015-01-01']  # Keep 2 years buffer
     full_df = full_df.dropna()
     
     print(f'Total samples: {len(full_df):,}')
     print(f'Tickers: {full_df["ticker"].nunique()}')
+    print(f'Date range: {full_df.index.min().date()} to {full_df.index.max().date()}')
     print()
     
     # Run backtest
     results_df = run_walkforward_backtest(full_df, ALL_FEATURES)
     
     if results_df.empty:
-        print('No results!')
+        print('❌ No results!')
         return
     
     # Calculate overall metrics
@@ -283,8 +336,8 @@ def main():
     max_dd = (results_df['value'] / results_df['value'].cummax() - 1).min()
     win_rate = (results_df['return'] > 0).mean()
     
-    print(f'Total Return: {total_ret*100:.1f}%')
-    print(f'CAGR: {cagr*100:.2f}%')
+    print(f'Total Return: {total_ret*100:+.1f}%')
+    print(f'CAGR: {cagr*100:+.2f}%')
     print(f'Sharpe: {sharpe:.3f}')
     print(f'Max Drawdown: {max_dd*100:.1f}%')
     print(f'Win Rate: {win_rate*100:.1f}%')
@@ -310,9 +363,30 @@ def main():
         print(f'{year:<6} {row["annual_ret"]:>+8.1f}%    {row["sharpe"]:>+.2f}      {int(row["weeks"]):<8} {row["avg_features"]:.1f}')
     
     # Save results
-    results_df.to_csv('results/walkforward_weekly_ensemble.csv', index=False)
+    output_file = 'results/walkforward_fair_comparison.csv'
+    results_df.to_csv(output_file, index=False)
     print()
-    print('💾 Saved to results/walkforward_weekly_ensemble.csv')
+    print(f'💾 Saved to {output_file}')
+    
+    # Also save summary
+    summary = {
+        'total_return': total_ret,
+        'cagr': cagr,
+        'sharpe': sharpe,
+        'max_drawdown': max_dd,
+        'win_rate': win_rate,
+        'final_value': results_df['value'].iloc[-1],
+        'weeks_traded': len(results_df),
+        'tickers_used': full_df['ticker'].nunique(),
+        'retrain_freq': 'monthly',
+        'rebalance_freq': 'weekly',
+        'normalized_predictions': True
+    }
+    
+    import json
+    with open('results/walkforward_fair_comparison.json', 'w') as f:
+        json.dump(summary, f, indent=2)
+    print(f'💾 Summary saved to results/walkforward_fair_comparison.json')
 
 
 if __name__ == '__main__':

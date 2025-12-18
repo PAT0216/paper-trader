@@ -67,21 +67,21 @@ docker-down:
 .PHONY: backtest
 backtest:
 	@echo "$(YELLOW)📈 Running Backtest (2017-2024)...$(NC)"
-	conda run -n $(ENV_NAME) python run_backtest.py
+	conda run -n $(ENV_NAME) python scripts/backtests/run_backtest.py
 	@echo "$(GREEN)✅ Backtest complete - see results/$(NC)"
 
 # 📈 Quick Backtest (1 year)
 .PHONY: backtest-quick
 backtest-quick:
 	@echo "$(YELLOW)📈 Running Quick Backtest (2023-2024)...$(NC)"
-	conda run -n $(ENV_NAME) python run_backtest.py --start 2023-01-01 --end 2024-12-31
+	conda run -n $(ENV_NAME) python scripts/backtests/run_backtest.py --start 2023-01-01 --end 2024-12-31
 	@echo "$(GREEN)✅ Quick backtest complete$(NC)"
 
 # 🔬 Walk-Forward Backtest
 .PHONY: backtest-walkforward
 backtest-walkforward:
 	@echo "$(YELLOW)🔬 Running Walk-Forward Validation (yearly retraining)...$(NC)"
-	conda run -n $(ENV_NAME) python run_walkforward.py
+	conda run -n $(ENV_NAME) python scripts/backtests/run_walkforward.py
 	@echo "$(GREEN)✅ Walk-forward backtest complete$(NC)"
 
 # 🎯 Phase 7: Risk Control Testing
