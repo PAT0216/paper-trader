@@ -279,7 +279,7 @@ def main():
                     print(f"⚠️  {ticker}: Trade rejected - {reason}")
                     continue
                 
-                if pf.record_trade(ticker, "SELL", price, shares):
+                if pf.record_trade(ticker, "SELL", price, shares, strategy=args.strategy):
                     print(f"📉 SOLD {shares} of {ticker} at ${price:.2f}")
 
         # Buys with Risk-Adjusted Position Sizing
@@ -341,7 +341,7 @@ def main():
                         print(f"⚠️  {ticker}: Trade rejected - {validation_reason}")
                         continue
                     
-                    if pf.record_trade(ticker, "BUY", price, shares):
+                    if pf.record_trade(ticker, "BUY", price, shares, strategy=args.strategy):
                         print(f"📈 BOUGHT {shares} of {ticker} at ${price:.2f} | {sizing_reason}")
                         # Update for next iteration
                         current_holdings = pf.get_holdings()
