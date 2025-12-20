@@ -54,12 +54,20 @@ jobs:
             conda run --no-capture-output -n paper-trader \
             python main.py --mode trade --strategy momentum --portfolio momentum
 
+      - name: Update Portfolio Snapshot
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            paper-trader:latest \
+            conda run --no-capture-output -n paper-trader \
+            python scripts/utils/compute_portfolio_snapshot.py
+
       - name: Push Ledger Changes
         run: |
           git config user.name "PAT0216"
           git config user.email "28152569+PAT0216@users.noreply.github.com"
           
-          # Add ALL changes (ledger + any other files created by Docker)
+          # Add ALL changes (ledger + snapshot + any other files)
           git add -A
           
           # Check if there are changes
