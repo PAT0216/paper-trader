@@ -52,8 +52,11 @@ def get_current_holdings(ledger_path: str) -> tuple[dict, float]:
                 holdings[ticker] = holdings.get(ticker, 0) + shares
                 cash = row.get('cash_balance', 0)
             elif action == 'SELL':
+                shares_sold = row.get('shares', 0)
                 if ticker in holdings:
-                    del holdings[ticker]
+                    holdings[ticker] -= shares_sold
+                    if holdings[ticker] <= 0:
+                        del holdings[ticker]
                 cash = row.get('cash_balance', 0)
     
     return holdings, cash

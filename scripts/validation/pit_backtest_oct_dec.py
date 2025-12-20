@@ -24,6 +24,7 @@ warnings.filterwarnings('ignore')
 
 from src.data.cache import DataCache
 from src.features.indicators import generate_features, FEATURE_COLUMNS
+from src.backtesting.costs import TransactionCostModel
 
 # =============================================================================
 # CONFIGURATION - PRODUCTION (DAILY RETRAIN + DAILY REBALANCE)
@@ -115,6 +116,9 @@ def run_backtest():
     # Load data
     all_price_data, spy_data = load_data()
     
+    # Initialize cost model (5 bps slippage)
+    cost_model = TransactionCostModel()
+    
     # Get all trading days in range
     sample_df = list(all_price_data.values())[0]
     all_dates = sorted(sample_df.index)
@@ -176,7 +180,10 @@ def run_backtest():
         for ticker in list(holdings.keys()):
             if ticker not in target_tickers and ticker in current_prices:
                 pos = holdings[ticker]
-                sell_price = current_prices[ticker]
+                raw_price = current_prices[ticker]
+                # Apply slippage (5 bps) - receive less on sell
+                exec_price, _ = cost_model.calculate_execution_price('SELL', raw_price, pos['shares'])
+                sell_price = exec_price
                 sell_value = pos['shares'] * sell_price
                 cash += sell_value
                 all_trades.append({
@@ -200,9 +207,13 @@ def run_backtest():
             position_size = portfolio_value * 0.10  # 10% per position
             for ticker in new_tickers:
                 if ticker in current_prices and current_prices[ticker] > 0:
-                    buy_price = current_prices[ticker]
-                    shares = int(min(position_size, cash) / buy_price)
+                    raw_price = current_prices[ticker]
+                    # Calculate shares we can afford (estimate with slippage)
+                    est_exec_price, _ = cost_model.calculate_execution_price('BUY', raw_price, 1)
+                    shares = int(min(position_size, cash) / est_exec_price)
                     if shares > 0:
+                        # Apply slippage (5 bps) - pay more on buy
+                        buy_price, _ = cost_model.calculate_execution_price('BUY', raw_price, shares)
                         cost = shares * buy_price
                         if cost <= cash:
                             holdings[ticker] = {'shares': shares, 'entry_price': buy_price}

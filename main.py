@@ -8,6 +8,7 @@ from src.data.validator import DataValidator
 # Note: trainer and predictor are imported conditionally to avoid XGBoost issues
 from src.trading import portfolio
 from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
+from src.backtesting.costs import TransactionCostModel
 import numpy as np
 
 def main():
@@ -211,6 +212,7 @@ def main():
 
 
         pf = portfolio.Portfolio(portfolio_id=args.portfolio, start_cash=config['portfolio']['initial_cash'])
+        cost_model = TransactionCostModel()  # 5 bps slippage for realistic execution
         current_holdings = pf.get_holdings()
         
         # Load risk settings from config (Phase 7)
@@ -266,11 +268,13 @@ def main():
         for ticker, action in signals.items():
             if action == "SELL" and ticker in current_holdings:
                 shares = current_holdings[ticker]
-                price = current_prices[ticker]
+                raw_price = current_prices[ticker]
+                # Apply slippage (5 bps) - receive less on sell
+                exec_price, _ = cost_model.calculate_execution_price('SELL', raw_price, shares)
                 
                 # Validate trade
                 is_valid, reason = risk_mgr.validate_trade(
-                    ticker, "SELL", shares, price,
+                    ticker, "SELL", shares, exec_price,
                     current_holdings, current_prices,
                     pf.get_last_balance(), portfolio_value
                 )
@@ -279,8 +283,8 @@ def main():
                     print(f"⚠️  {ticker}: Trade rejected - {reason}")
                     continue
                 
-                if pf.record_trade(ticker, "SELL", price, shares, strategy=args.strategy):
-                    print(f"📉 SOLD {shares} of {ticker} at ${price:.2f}")
+                if pf.record_trade(ticker, "SELL", exec_price, shares, strategy=args.strategy):
+                    print(f"📉 SOLD {shares} of {ticker} at ${exec_price:.2f} (mkt: ${raw_price:.2f})")
 
         # Buys with Risk-Adjusted Position Sizing
         # CRITICAL: Sort by expected return (highest first) for priority allocation
@@ -306,12 +310,14 @@ def main():
                 print(f"\n💵 Available Cash for Buys: ${available_cash:.2f}")
                 
                 for ticker, exp_ret in buy_candidates:
-                    price = current_prices[ticker]
+                    raw_price = current_prices[ticker]
+                    # Apply slippage (5 bps) - pay more on buy
+                    exec_price, _ = cost_model.calculate_execution_price('BUY', raw_price, 1)
                     
-                    # Calculate risk-adjusted position size
+                    # Calculate risk-adjusted position size using execution price
                     shares, sizing_reason = risk_mgr.calculate_position_size(
                         ticker=ticker,
-                        current_price=price,
+                        current_price=exec_price,
                         available_cash=available_cash,
                         portfolio_value=portfolio_value,
                         historical_data=data_dict[ticker],
@@ -330,9 +336,12 @@ def main():
                         print(f"⚪️ {ticker}: Skip - {sizing_reason}")
                         continue
                     
+                    # Recalculate execution price with actual shares
+                    exec_price, _ = cost_model.calculate_execution_price('BUY', raw_price, shares)
+                    
                     # Validate trade
                     is_valid, validation_reason = risk_mgr.validate_trade(
-                        ticker, "BUY", shares, price,
+                        ticker, "BUY", shares, exec_price,
                         current_holdings, current_prices,
                         cash, portfolio_value
                     )
@@ -341,8 +350,8 @@ def main():
                         print(f"⚠️  {ticker}: Trade rejected - {validation_reason}")
                         continue
                     
-                    if pf.record_trade(ticker, "BUY", price, shares, strategy=args.strategy):
-                        print(f"📈 BOUGHT {shares} of {ticker} at ${price:.2f} | {sizing_reason}")
+                    if pf.record_trade(ticker, "BUY", exec_price, shares, strategy=args.strategy):
+                        print(f"📈 BOUGHT {shares} of {ticker} at ${exec_price:.2f} (mkt: ${raw_price:.2f}) | {sizing_reason}")
                         # Update for next iteration
                         current_holdings = pf.get_holdings()
                         cash = pf.get_last_balance()

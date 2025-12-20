@@ -2,14 +2,14 @@
   "start_date": "2025-10-01",
   "end_date": "2025-12-17",
   "initial_value": 10000,
-  "final_value": 10630.886536598206,
-  "total_return": 0.06308865365982053,
-  "annualized_return": 0.3529585889025231,
-  "sharpe": 1.2965948734065424,
-  "max_drawdown": -0.14019187598571836,
-  "win_rate": 0.5882352941176471,
+  "final_value": 10494.63664286185,
+  "total_return": 0.04946366428618498,
+  "annualized_return": 0.28848356796943286,
+  "sharpe": 1.039513070912951,
+  "max_drawdown": -0.1532812604851254,
+  "win_rate": 0.5208333333333334,
   "spy_return": 0.030997038409369626,
-  "trading_days": 51,
+  "trading_days": 48,
   "portfolio_history": [
     [
       "2025-10-01",
@@ -17,3610 +17,3430 @@
     ],
     [
       "2025-10-02",
-      10113.337573051453
+      10108.459914827825
     ],
     [
       "2025-10-03",
-      10234.349517822266
+      10224.859845160965
     ],
     [
       "2025-10-06",
-      10235.090476989746
+      10222.813314300063
     ],
     [
       "2025-10-07",
-      10226.004658699036
+      10211.961538198952
     ],
     [
       "2025-10-08",
-      10288.338021278381
+      10270.704941460135
     ],
     [
       "2025-10-09",
-      10180.027417182922
+      10158.302735912803
     ],
     [
       "2025-10-10",
-      9817.117856025696
+      9794.101208631995
     ],
     [
       "2025-10-13",
-      10019.304646492004
+      9992.203810955529
     ],
     [
       "2025-10-14",
-      9918.23160648346
+      9885.736184221749
     ],
     [
       "2025-10-15",
-      9982.051182746887
+      9946.2847124486
     ],
     [
       "2025-10-16",
-      9908.80593585968
+      9870.201457682137
     ],
     [
       "2025-10-17",
-      9893.275490760803
+      9849.218185511116
     ],
     [
       "2025-10-20",
-      10176.04703617096
+      10128.077344672685
     ],
     [
       "2025-10-21",
-      10160.304967880249
+      10107.0181410327
     ],
     [
       "2025-10-22",
-      10015.32942199707
+      9973.47324750424
     ],
     [
       "2025-10-23",
-      10261.049669265747
+      10215.504376593597
     ],
     [
       "2025-10-24",
-      10455.385639190674
+      10403.815077586181
     ],
     [
       "2025-10-27",
-      10646.73922920227
+      10586.929825837142
     ],
     [
       "2025-10-28",
-      10519.401124954224
+      10453.411153885849
     ],
     [
       "2025-10-29",
-      10486.930715560913
+      10416.051678925522
     ],
     [
       "2025-10-30",
-      10202.475904464722
+      10131.444211548813
     ],
     [
       "2025-10-31",
-      10228.485336303711
+      10152.123501326569
     ],
     [
       "2025-11-03",
-      10230.095174789429
+      10148.089231134421
     ],
     [
       "2025-11-04",
-      10086.547136306763
+      9999.439227727897
     ],
     [
       "2025-11-05",
-      10175.536680221558
+      10083.91691652871
     ],
     [
       "2025-11-06",
-      9901.545913696289
-    ],
-    [
-      "2025-11-07",
-      10025.774202346802
+      9806.671083518992
     ],
     [
       "2025-11-10",
-      10135.378080368042
+      9953.270068538674
     ],
     [
       "2025-11-11",
-      10193.308641433716
+      10009.487456080446
     ],
     [
       "2025-11-12",
-      10179.490270614624
+      9993.424265524873
     ],
     [
       "2025-11-13",
-      9840.203241348267
+      9667.047829463014
     ],
     [
       "2025-11-14",
-      9825.238744735718
+      9642.867427887926
     ],
     [
       "2025-11-17",
-      9573.868392944336
+      9390.187205548296
     ],
     [
       "2025-11-18",
-      9509.97333908081
+      9322.735974228868
     ],
     [
       "2025-11-19",
-      9555.357858657837
+      9364.724105969437
     ],
     [
       "2025-11-20",
-      9154.152883529663
-    ],
-    [
-      "2025-11-21",
-      9275.219663619995
+      8964.151877465256
     ],
     [
       "2025-11-24",
-      9463.680437088013
+      9345.67610992337
     ],
     [
       "2025-11-25",
-      9601.580509185791
+      9471.49234944821
     ],
     [
       "2025-11-26",
-      9881.983325958252
+      9746.303551337247
     ],
     [
       "2025-11-28",
-      10034.900659561157
+      9893.596834820752
     ],
     [
       "2025-12-01",
-      9948.439853668213
+      9803.083873522763
     ],
     [
       "2025-12-02",
-      9974.919788360596
+      9826.687550049784
     ],
     [
       "2025-12-03",
-      10201.839826583862
+      10048.681645131115
     ],
     [
       "2025-12-04",
-      10320.339776992798
-    ],
-    [
-      "2025-12-05",
-      10399.519868850708
+      10169.344788399701
     ],
     [
       "2025-12-08",
-      10555.029839515686
+      10435.029692664151
     ],
     [
       "2025-12-09",
-      10590.879822731018
+      10464.283509468085
     ],
     [
       "2025-12-10",
-      10689.29986667633
+      10558.104839071757
     ],
     [
       "2025-12-11",
-      10541.1365442276
+      10409.39458841849
     ],
     [
       "2025-12-12",
-      10630.886536598206
+      10494.63664286185
     ]
   ],
   "trades": [
     {
       "date": "2025-10-01",
-      "ticker": "UAL",
-      "action": "BUY",
-      "price": 93.1500015258789,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-01",
       "ticker": "WBD",
       "action": "BUY",
-      "price": 19.350000381469727,
+      "price": 19.359675381660463,
       "shares": 51
-    },
-    {
-      "date": "2025-10-01",
-      "ticker": "DOW",
-      "action": "BUY",
-      "price": 22.712587356567383,
-      "shares": 44
-    },
-    {
-      "date": "2025-10-01",
-      "ticker": "DXCM",
-      "action": "BUY",
-      "price": 66.08000183105469,
-      "shares": 15
-    },
-    {
-      "date": "2025-10-01",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 49.31999969482422,
-      "shares": 20
     },
     {
       "date": "2025-10-01",
       "ticker": "CCL",
       "action": "BUY",
-      "price": 28.360000610351562,
+      "price": 28.374180610656737,
       "shares": 35
     },
     {
       "date": "2025-10-01",
-      "ticker": "LYB",
+      "ticker": "DXCM",
       "action": "BUY",
-      "price": 47.06593704223633,
-      "shares": 21
-    },
-    {
-      "date": "2025-10-01",
-      "ticker": "DECK",
-      "action": "BUY",
-      "price": 101.18000030517578,
-      "shares": 9
-    },
-    {
-      "date": "2025-10-01",
-      "ticker": "PSKY",
-      "action": "BUY",
-      "price": 18.889999389648438,
-      "shares": 52
+      "price": 66.11304183197022,
+      "shares": 15
     },
     {
       "date": "2025-10-01",
       "ticker": "KVUE",
       "action": "BUY",
-      "price": 15.652823448181152,
+      "price": 15.660649859905243,
       "shares": 63
     },
     {
-      "date": "2025-10-02",
+      "date": "2025-10-01",
       "ticker": "UAL",
-      "action": "SELL",
-      "price": 94.83000183105469,
+      "action": "BUY",
+      "price": 93.19657652664185,
       "shares": 10
     },
     {
-      "date": "2025-10-02",
+      "date": "2025-10-01",
+      "ticker": "DECK",
+      "action": "BUY",
+      "price": 101.23059030532836,
+      "shares": 9
+    },
+    {
+      "date": "2025-10-01",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 49.344659694671634,
+      "shares": 20
+    },
+    {
+      "date": "2025-10-01",
+      "ticker": "LYB",
+      "action": "BUY",
+      "price": 47.089470010757445,
+      "shares": 21
+    },
+    {
+      "date": "2025-10-01",
+      "ticker": "PSKY",
+      "action": "BUY",
+      "price": 18.899444389343262,
+      "shares": 52
+    },
+    {
+      "date": "2025-10-01",
       "ticker": "DOW",
-      "action": "SELL",
-      "price": 23.343219757080078,
+      "action": "BUY",
+      "price": 22.723943650245666,
       "shares": 44
     },
     {
       "date": "2025-10-02",
       "ticker": "CCL",
       "action": "SELL",
-      "price": 28.850000381469727,
+      "price": 28.835575381278993,
       "shares": 35
     },
     {
       "date": "2025-10-02",
-      "ticker": "LYB",
+      "ticker": "UAL",
       "action": "SELL",
-      "price": 47.95049285888672,
-      "shares": 21
+      "price": 94.78258683013917,
+      "shares": 10
     },
     {
       "date": "2025-10-02",
       "ticker": "DECK",
       "action": "SELL",
-      "price": 103.80000305175781,
+      "price": 103.74810305023193,
       "shares": 9
     },
     {
       "date": "2025-10-02",
-      "ticker": "IT",
-      "action": "BUY",
-      "price": 257.2300109863281,
-      "shares": 3
+      "ticker": "LYB",
+      "action": "SELL",
+      "price": 47.926517612457275,
+      "shares": 21
     },
     {
       "date": "2025-10-02",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 194.25,
-      "shares": 5
+      "ticker": "DOW",
+      "action": "SELL",
+      "price": 23.331548147201538,
+      "shares": 44
     },
     {
       "date": "2025-10-02",
       "ticker": "ARES",
       "action": "BUY",
-      "price": 150.61000061035156,
+      "price": 150.68530561065674,
       "shares": 6
     },
     {
       "date": "2025-10-02",
       "ticker": "FDS",
       "action": "BUY",
-      "price": 280.76226806640625,
+      "price": 280.90264920043944,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-02",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 194.347125,
+      "shares": 5
+    },
+    {
+      "date": "2025-10-02",
+      "ticker": "IT",
+      "action": "BUY",
+      "price": 257.35862599182127,
       "shares": 3
     },
     {
       "date": "2025-10-02",
       "ticker": "CHTR",
       "action": "BUY",
-      "price": 269.6099853515625,
+      "price": 269.74479034423825,
       "shares": 3
-    },
-    {
-      "date": "2025-10-03",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 201.97000122070312,
-      "shares": 5
     },
     {
       "date": "2025-10-03",
       "ticker": "ARES",
       "action": "SELL",
-      "price": 152.39999389648438,
+      "price": 152.32379389953613,
       "shares": 6
+    },
+    {
+      "date": "2025-10-03",
+      "ticker": "MOH",
+      "action": "SELL",
+      "price": 201.86901622009276,
+      "shares": 5
     },
     {
       "date": "2025-10-03",
       "ticker": "CHTR",
       "action": "SELL",
-      "price": 280.010009765625,
+      "price": 279.8700047607422,
       "shares": 3
-    },
-    {
-      "date": "2025-10-03",
-      "ticker": "LULU",
-      "action": "BUY",
-      "price": 175.58999633789062,
-      "shares": 5
     },
     {
       "date": "2025-10-03",
       "ticker": "SNPS",
       "action": "BUY",
-      "price": 469.1700134277344,
+      "price": 469.40459843444825,
       "shares": 2
+    },
+    {
+      "date": "2025-10-03",
+      "ticker": "LULU",
+      "action": "BUY",
+      "price": 175.67779133605956,
+      "shares": 5
     },
     {
       "date": "2025-10-03",
       "ticker": "INTC",
       "action": "BUY",
-      "price": 36.83000183105469,
+      "price": 36.84841683197021,
       "shares": 27
     },
     {
       "date": "2025-10-06",
       "ticker": "WBD",
       "action": "SELL",
-      "price": 19.079999923706055,
+      "price": 19.070459923744203,
       "shares": 51
     },
     {
       "date": "2025-10-06",
       "ticker": "SNPS",
       "action": "SELL",
-      "price": 478.2200012207031,
+      "price": 477.98089122009276,
       "shares": 2
     },
     {
       "date": "2025-10-06",
       "ticker": "APP",
       "action": "BUY",
-      "price": 587.0,
+      "price": 587.2935,
       "shares": 1
     },
     {
       "date": "2025-10-06",
       "ticker": "DOW",
       "action": "BUY",
-      "price": 23.077173233032227,
+      "price": 23.088711819648744,
       "shares": 44
     },
     {
       "date": "2025-10-07",
       "ticker": "KVUE",
       "action": "SELL",
-      "price": 16.018218994140625,
+      "price": 16.010209884643555,
       "shares": 63
     },
     {
       "date": "2025-10-07",
       "ticker": "IT",
       "action": "SELL",
-      "price": 245.27000427246094,
+      "price": 245.1473692703247,
       "shares": 3
     },
     {
       "date": "2025-10-07",
       "ticker": "APP",
       "action": "SELL",
-      "price": 631.8499755859375,
+      "price": 631.5340505981445,
       "shares": 1
     },
     {
       "date": "2025-10-07",
       "ticker": "DOW",
       "action": "SELL",
-      "price": 22.170639038085938,
+      "price": 22.159553718566894,
       "shares": 44
-    },
-    {
-      "date": "2025-10-07",
-      "ticker": "WBD",
-      "action": "BUY",
-      "price": 18.600000381469727,
-      "shares": 54
-    },
-    {
-      "date": "2025-10-07",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 283.7475891113281,
-      "shares": 3
     },
     {
       "date": "2025-10-07",
       "ticker": "SNPS",
       "action": "BUY",
-      "price": 477.8299865722656,
+      "price": 478.06890156555176,
       "shares": 2
+    },
+    {
+      "date": "2025-10-07",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 283.88946290588376,
+      "shares": 3
     },
     {
       "date": "2025-10-07",
       "ticker": "MOH",
       "action": "BUY",
-      "price": 203.25999450683594,
+      "price": 203.36162450408935,
       "shares": 5
+    },
+    {
+      "date": "2025-10-07",
+      "ticker": "WBD",
+      "action": "BUY",
+      "price": 18.60930038166046,
+      "shares": 54
     },
     {
       "date": "2025-10-08",
       "ticker": "DXCM",
       "action": "SELL",
-      "price": 67.77999877929688,
+      "price": 67.74610877990723,
       "shares": 15
     },
     {
       "date": "2025-10-08",
       "ticker": "FDS",
       "action": "SELL",
-      "price": 280.3539123535156,
+      "price": 280.2137353973389,
       "shares": 3
     },
     {
       "date": "2025-10-08",
       "ticker": "INTC",
       "action": "SELL",
-      "price": 37.43000030517578,
+      "price": 37.41128530502319,
       "shares": 27
-    },
-    {
-      "date": "2025-10-08",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 288.1300048828125,
-      "shares": 3
     },
     {
       "date": "2025-10-08",
       "ticker": "SNPS",
       "action": "SELL",
-      "price": 489.3599853515625,
+      "price": 489.1153053588867,
       "shares": 2
     },
     {
       "date": "2025-10-08",
-      "ticker": "IT",
-      "action": "BUY",
-      "price": 243.99000549316406,
-      "shares": 4
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 287.9859398803711,
+      "shares": 3
     },
     {
       "date": "2025-10-08",
       "ticker": "STX",
       "action": "BUY",
-      "price": 224.35000610351562,
+      "price": 224.46218110656739,
       "shares": 4
     },
     {
       "date": "2025-10-08",
       "ticker": "WDC",
       "action": "BUY",
-      "price": 121.0826416015625,
+      "price": 121.14318292236328,
       "shares": 8
+    },
+    {
+      "date": "2025-10-08",
+      "ticker": "IT",
+      "action": "BUY",
+      "price": 244.11200049591065,
+      "shares": 4
     },
     {
       "date": "2025-10-08",
       "ticker": "APP",
       "action": "BUY",
-      "price": 629.7000122070312,
+      "price": 630.0148622131347,
       "shares": 1
     },
     {
       "date": "2025-10-09",
       "ticker": "APP",
       "action": "SELL",
-      "price": 600.3200073242188,
+      "price": 600.0198473205567,
       "shares": 1
     },
     {
       "date": "2025-10-09",
       "ticker": "DOW",
       "action": "BUY",
-      "price": 21.75678825378418,
+      "price": 21.76766664791107,
       "shares": 46
     },
     {
       "date": "2025-10-09",
       "ticker": "INTC",
       "action": "BUY",
-      "price": 37.79999923706055,
+      "price": 37.81889923667908,
       "shares": 26
     },
     {
       "date": "2025-10-10",
       "ticker": "TTD",
       "action": "SELL",
-      "price": 52.36000061035156,
+      "price": 52.33382061004639,
       "shares": 20
     },
     {
       "date": "2025-10-10",
       "ticker": "LULU",
       "action": "SELL",
-      "price": 167.50999450683594,
+      "price": 167.42623950958253,
       "shares": 5
     },
     {
       "date": "2025-10-10",
       "ticker": "MOH",
       "action": "SELL",
-      "price": 194.0500030517578,
+      "price": 193.95297805023193,
       "shares": 5
     },
     {
       "date": "2025-10-10",
       "ticker": "DOW",
       "action": "SELL",
-      "price": 20.347719192504883,
+      "price": 20.33754533290863,
       "shares": 46
     },
     {
       "date": "2025-10-10",
       "ticker": "INTC",
       "action": "SELL",
-      "price": 36.369998931884766,
+      "price": 36.35181393241882,
       "shares": 26
-    },
-    {
-      "date": "2025-10-10",
-      "ticker": "TER",
-      "action": "BUY",
-      "price": 131.9802703857422,
-      "shares": 7
-    },
-    {
-      "date": "2025-10-10",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 138.9600067138672,
-      "shares": 7
     },
     {
       "date": "2025-10-10",
       "ticker": "BAX",
       "action": "BUY",
-      "price": 21.938392639160156,
+      "price": 21.949361835479735,
       "shares": 44
+    },
+    {
+      "date": "2025-10-10",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 139.02948671722413,
+      "shares": 7
+    },
+    {
+      "date": "2025-10-10",
+      "ticker": "TER",
+      "action": "BUY",
+      "price": 132.04626052093505,
+      "shares": 7
     },
     {
       "date": "2025-10-10",
       "ticker": "APP",
       "action": "BUY",
-      "price": 569.8900146484375,
+      "price": 570.1749596557618,
       "shares": 1
-    },
-    {
-      "date": "2025-10-13",
-      "ticker": "IT",
-      "action": "SELL",
-      "price": 245.36000061035156,
-      "shares": 4
     },
     {
       "date": "2025-10-13",
       "ticker": "STX",
       "action": "SELL",
-      "price": 219.50999450683594,
+      "price": 219.40023950958252,
       "shares": 4
     },
     {
       "date": "2025-10-13",
       "ticker": "WDC",
       "action": "SELL",
-      "price": 118.7645034790039,
+      "price": 118.7051212272644,
       "shares": 8
     },
     {
       "date": "2025-10-13",
-      "ticker": "TER",
+      "ticker": "IT",
       "action": "SELL",
-      "price": 139.0249481201172,
-      "shares": 7
+      "price": 245.2373206100464,
+      "shares": 4
     },
     {
       "date": "2025-10-13",
       "ticker": "BAX",
       "action": "SELL",
-      "price": 22.098308563232422,
+      "price": 22.087259408950807,
       "shares": 44
+    },
+    {
+      "date": "2025-10-13",
+      "ticker": "TER",
+      "action": "SELL",
+      "price": 138.95543564605714,
+      "shares": 7
     },
     {
       "date": "2025-10-13",
       "ticker": "APP",
       "action": "SELL",
-      "price": 590.1099853515625,
+      "price": 589.8149303588867,
       "shares": 1
     },
     {
       "date": "2025-10-13",
-      "ticker": "COIN",
+      "ticker": "SWK",
       "action": "BUY",
-      "price": 356.989990234375,
-      "shares": 2
+      "price": 63.773451753616335,
+      "shares": 15
+    },
+    {
+      "date": "2025-10-13",
+      "ticker": "INTC",
+      "action": "BUY",
+      "price": 37.23861122131348,
+      "shares": 26
+    },
+    {
+      "date": "2025-10-13",
+      "ticker": "MOS",
+      "action": "BUY",
+      "price": 30.723743476867675,
+      "shares": 32
     },
     {
       "date": "2025-10-13",
       "ticker": "TTD",
       "action": "BUY",
-      "price": 51.275001525878906,
+      "price": 51.300639026641846,
       "shares": 19
     },
     {
       "date": "2025-10-13",
-      "ticker": "INTC",
+      "ticker": "COIN",
       "action": "BUY",
-      "price": 37.220001220703125,
-      "shares": 26
+      "price": 357.1684852294922,
+      "shares": 2
     },
     {
       "date": "2025-10-13",
       "ticker": "LULU",
       "action": "BUY",
-      "price": 169.85000610351562,
+      "price": 169.93493110656738,
       "shares": 5
-    },
-    {
-      "date": "2025-10-13",
-      "ticker": "MOS",
-      "action": "BUY",
-      "price": 30.708389282226562,
-      "shares": 32
-    },
-    {
-      "date": "2025-10-13",
-      "ticker": "SWK",
-      "action": "BUY",
-      "price": 63.741580963134766,
-      "shares": 15
     },
     {
       "date": "2025-10-14",
       "ticker": "HOOD",
       "action": "SELL",
-      "price": 134.9499969482422,
+      "price": 134.88252194976806,
       "shares": 7
+    },
+    {
+      "date": "2025-10-14",
+      "ticker": "SWK",
+      "action": "SELL",
+      "price": 66.20909690856934,
+      "shares": 15
     },
     {
       "date": "2025-10-14",
       "ticker": "INTC",
       "action": "SELL",
-      "price": 35.630001068115234,
+      "price": 35.61218606758118,
       "shares": 26
-    },
-    {
-      "date": "2025-10-14",
-      "ticker": "SWK",
-      "action": "SELL",
-      "price": 66.24221801757812,
-      "shares": 15
-    },
-    {
-      "date": "2025-10-14",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 96.23999786376953,
-      "shares": 10
     },
     {
       "date": "2025-10-14",
       "ticker": "SMCI",
       "action": "BUY",
-      "price": 53.11000061035156,
+      "price": 53.136555610656735,
       "shares": 18
+    },
+    {
+      "date": "2025-10-14",
+      "ticker": "APA",
+      "action": "BUY",
+      "price": 22.667673540115356,
+      "shares": 43
+    },
+    {
+      "date": "2025-10-14",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 96.28811786270141,
+      "shares": 10
     },
     {
       "date": "2025-10-14",
       "ticker": "HUM",
       "action": "BUY",
-      "price": 261.6099853515625,
+      "price": 261.7407903442383,
       "shares": 3
-    },
-    {
-      "date": "2025-10-14",
-      "ticker": "APA",
-      "action": "BUY",
-      "price": 22.65634536743164,
-      "shares": 43
     },
     {
       "date": "2025-10-15",
       "ticker": "WBD",
       "action": "SELL",
-      "price": 18.450000762939453,
+      "price": 18.440775762557983,
       "shares": 54
-    },
-    {
-      "date": "2025-10-15",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 98.16000366210938,
-      "shares": 10
     },
     {
       "date": "2025-10-15",
       "ticker": "APA",
       "action": "SELL",
-      "price": 22.98269271850586,
+      "price": 22.971201372146606,
       "shares": 43
+    },
+    {
+      "date": "2025-10-15",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 98.11092366027832,
+      "shares": 10
     },
     {
       "date": "2025-10-15",
       "ticker": "SNPS",
       "action": "BUY",
-      "price": 435.8999938964844,
+      "price": 436.1179438934326,
       "shares": 2
     },
     {
       "date": "2025-10-15",
       "ticker": "ALGN",
       "action": "BUY",
-      "price": 128.42999267578125,
+      "price": 128.49420767211913,
       "shares": 7
     },
     {
       "date": "2025-10-15",
       "ticker": "HOOD",
       "action": "BUY",
-      "price": 134.14999389648438,
+      "price": 134.2170688934326,
       "shares": 7
     },
     {
       "date": "2025-10-16",
       "ticker": "MOS",
       "action": "SELL",
-      "price": 29.162565231323242,
+      "price": 29.14798394870758,
       "shares": 32
     },
     {
       "date": "2025-10-16",
       "ticker": "HUM",
       "action": "SELL",
-      "price": 267.2799987792969,
+      "price": 267.14635877990725,
       "shares": 3
     },
     {
       "date": "2025-10-16",
       "ticker": "SNPS",
       "action": "SELL",
-      "price": 440.20001220703125,
+      "price": 439.97991220092774,
       "shares": 2
     },
     {
       "date": "2025-10-16",
       "ticker": "ALGN",
       "action": "SELL",
-      "price": 129.83999633789062,
+      "price": 129.7750763397217,
       "shares": 7
-    },
-    {
-      "date": "2025-10-16",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 95.29000091552734,
-      "shares": 10
     },
     {
       "date": "2025-10-16",
       "ticker": "HPE",
       "action": "BUY",
-      "price": 22.5,
-      "shares": 44
-    },
-    {
-      "date": "2025-10-16",
-      "ticker": "DELL",
-      "action": "BUY",
-      "price": 150.7727813720703,
-      "shares": 6
+      "price": 22.51125,
+      "shares": 43
     },
     {
       "date": "2025-10-16",
       "ticker": "PYPL",
       "action": "BUY",
-      "price": 65.89766693115234,
-      "shares": 15
+      "price": 65.93061576461793,
+      "shares": 14
+    },
+    {
+      "date": "2025-10-16",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 95.3376459159851,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-16",
+      "ticker": "DELL",
+      "action": "BUY",
+      "price": 150.84816776275636,
+      "shares": 6
     },
     {
       "date": "2025-10-17",
       "ticker": "COIN",
       "action": "SELL",
-      "price": 336.0199890136719,
+      "price": 335.851979019165,
       "shares": 2
     },
     {
       "date": "2025-10-17",
       "ticker": "HPE",
       "action": "SELL",
-      "price": 22.959999084472656,
-      "shares": 44
+      "price": 22.94851908493042,
+      "shares": 43
     },
     {
       "date": "2025-10-17",
       "ticker": "PYPL",
       "action": "SELL",
-      "price": 67.25453186035156,
-      "shares": 15
-    },
-    {
-      "date": "2025-10-17",
-      "ticker": "ANET",
-      "action": "BUY",
-      "price": 143.10000610351562,
-      "shares": 6
+      "price": 67.22090459442138,
+      "shares": 14
     },
     {
       "date": "2025-10-17",
       "ticker": "IT",
       "action": "BUY",
-      "price": 235.72999572753906,
+      "price": 235.84786072540282,
       "shares": 4
+    },
+    {
+      "date": "2025-10-17",
+      "ticker": "ANET",
+      "action": "BUY",
+      "price": 143.17155610656738,
+      "shares": 6
     },
     {
       "date": "2025-10-17",
       "ticker": "MRNA",
       "action": "BUY",
-      "price": 26.010000228881836,
-      "shares": 38
+      "price": 26.023005228996276,
+      "shares": 37
     },
     {
       "date": "2025-10-20",
       "ticker": "PSKY",
       "action": "SELL",
-      "price": 16.989999771118164,
+      "price": 16.981504771232604,
       "shares": 52
     },
     {
       "date": "2025-10-20",
       "ticker": "LULU",
       "action": "SELL",
-      "price": 172.42999267578125,
+      "price": 172.34377767944335,
       "shares": 5
     },
     {
       "date": "2025-10-20",
       "ticker": "SMCI",
       "action": "SELL",
-      "price": 55.040000915527344,
+      "price": 55.01248091506958,
       "shares": 18
     },
     {
       "date": "2025-10-20",
       "ticker": "HOOD",
       "action": "SELL",
-      "price": 135.8000030517578,
+      "price": 135.73210305023193,
       "shares": 7
-    },
-    {
-      "date": "2025-10-20",
-      "ticker": "ANET",
-      "action": "SELL",
-      "price": 146.47999572753906,
-      "shares": 6
     },
     {
       "date": "2025-10-20",
       "ticker": "IT",
       "action": "SELL",
-      "price": 239.47999572753906,
+      "price": 239.3602557296753,
       "shares": 4
     },
     {
       "date": "2025-10-20",
-      "ticker": "AES",
-      "action": "BUY",
-      "price": 14.219228744506836,
-      "shares": 71
+      "ticker": "ANET",
+      "action": "SELL",
+      "price": 146.4067557296753,
+      "shares": 6
     },
     {
       "date": "2025-10-20",
       "ticker": "APA",
       "action": "BUY",
-      "price": 22.240995407104492,
+      "price": 22.252115904808043,
       "shares": 45
     },
     {
       "date": "2025-10-20",
       "ticker": "WDC",
       "action": "BUY",
-      "price": 121.43235778808594,
+      "price": 121.49307396697998,
       "shares": 8
     },
     {
       "date": "2025-10-20",
       "ticker": "CEG",
       "action": "BUY",
-      "price": 369.575927734375,
+      "price": 369.76071569824217,
       "shares": 2
     },
     {
       "date": "2025-10-20",
       "ticker": "FFIV",
       "action": "BUY",
-      "price": 296.5,
+      "price": 296.64825,
       "shares": 3
+    },
+    {
+      "date": "2025-10-20",
+      "ticker": "AES",
+      "action": "BUY",
+      "price": 14.22633835887909,
+      "shares": 71
     },
     {
       "date": "2025-10-21",
       "ticker": "ALB",
       "action": "SELL",
-      "price": 91.33999633789062,
+      "price": 91.29432633972168,
       "shares": 10
     },
     {
       "date": "2025-10-21",
       "ticker": "DELL",
       "action": "SELL",
-      "price": 149.42999267578125,
+      "price": 149.35527767944336,
       "shares": 6
     },
     {
       "date": "2025-10-21",
       "ticker": "MRNA",
       "action": "SELL",
-      "price": 27.489999771118164,
+      "price": 27.476254771232604,
+      "shares": 37
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "APA",
+      "action": "SELL",
+      "price": 22.318834923744202,
+      "shares": 45
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "WDC",
+      "action": "SELL",
+      "price": 121.25180562210083,
+      "shares": 8
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "FFIV",
+      "action": "SELL",
+      "price": 299.0603864593506,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "AES",
+      "action": "SELL",
+      "price": 14.133162923336029,
+      "shares": 71
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 275.2875688934326,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 131.90591633605956,
+      "shares": 7
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 585.6226820983886,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "KVUE",
+      "action": "BUY",
+      "price": 14.751640551567078,
+      "shares": 68
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 54.84740969467163,
+      "shares": 18
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 338.78930511474607,
+      "shares": 2
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "PSKY",
+      "action": "BUY",
+      "price": 16.518255228996278,
+      "shares": 61
+    },
+    {
+      "date": "2025-10-21",
+      "ticker": "DOW",
+      "action": "BUY",
+      "price": 21.442333545684814,
+      "shares": 47
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "KVUE",
+      "action": "SELL",
+      "price": 14.993532312870025,
+      "shares": 68
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 52.47375,
+      "shares": 18
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 320.1698215789795,
+      "shares": 2
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "DOW",
+      "action": "SELL",
+      "price": 21.371659746170042,
+      "shares": 47
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "VST",
+      "action": "BUY",
+      "price": 185.9229168319702,
+      "shares": 5
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 91.31563164138794,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "UAL",
+      "action": "BUY",
+      "price": 96.31813164138794,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-22",
+      "ticker": "WDC",
+      "action": "BUY",
+      "price": 120.43340132904052,
+      "shares": 8
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "CEG",
+      "action": "SELL",
+      "price": 365.19804693603515,
+      "shares": 2
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 134.26283683013915,
+      "shares": 7
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 594.8524494018554,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "VST",
+      "action": "SELL",
+      "price": 191.2743101196289,
+      "shares": 5
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 97.31132061004638,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "WDC",
+      "action": "SELL",
+      "price": 125.55618616867065,
+      "shares": 8
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "ON",
+      "action": "BUY",
+      "price": 51.80588877868652,
+      "shares": 19
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "KVUE",
+      "action": "BUY",
+      "price": 14.909728131294251,
+      "shares": 68
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 26.263125,
       "shares": 38
     },
     {
-      "date": "2025-10-21",
-      "ticker": "AES",
+      "date": "2025-10-23",
+      "ticker": "AMD",
+      "action": "BUY",
+      "price": 235.10750049591064,
+      "shares": 4
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 161.0805,
+      "shares": 6
+    },
+    {
+      "date": "2025-10-23",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 322.9213897705078,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "ORCL",
       "action": "SELL",
-      "price": 14.140233039855957,
+      "price": 283.18832157897947,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "UAL",
+      "action": "SELL",
+      "price": 99.26034255981445,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 26.726629771232606,
+      "shares": 38
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "AMD",
+      "action": "SELL",
+      "price": 252.79353816986085,
+      "shares": 4
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 354.2827614593506,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "TPL",
+      "action": "BUY",
+      "price": 927.3744051818848,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 584.6822096557618,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "MCHP",
+      "action": "BUY",
+      "price": 62.63661882019043,
+      "shares": 16
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 48.31414591598511,
+      "shares": 21
+    },
+    {
+      "date": "2025-10-24",
+      "ticker": "DECK",
+      "action": "BUY",
+      "price": 86.98347244262695,
+      "shares": 11
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "PSKY",
+      "action": "SELL",
+      "price": 16.561714694976807,
+      "shares": 61
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "TPL",
+      "action": "SELL",
+      "price": 927.215664642334,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 584.0978196411132,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "MCHP",
+      "action": "SELL",
+      "price": 63.94099782180786,
+      "shares": 16
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 51.54421469497681,
+      "shares": 21
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "DECK",
+      "action": "SELL",
+      "price": 90.42476622009278,
+      "shares": 11
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 281.5406938934326,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 96.27811835861206,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "CNC",
+      "action": "BUY",
+      "price": 33.16657652664185,
+      "shares": 31
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "UAL",
+      "action": "BUY",
+      "price": 98.8494030532837,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "LULU",
+      "action": "BUY",
+      "price": 181.48069438934326,
+      "shares": 5
+    },
+    {
+      "date": "2025-10-27",
+      "ticker": "FCX",
+      "action": "BUY",
+      "price": 41.120548473358156,
+      "shares": 25
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 280.6895715789795,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 96.63166030502319,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "UAL",
+      "action": "SELL",
+      "price": 94.89253244018555,
+      "shares": 10
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "LULU",
+      "action": "SELL",
+      "price": 179.8900057296753,
+      "shares": 5
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "FCX",
+      "action": "SELL",
+      "price": 41.14941316986084,
+      "shares": 25
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 571.2654704589844,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "EG",
+      "action": "BUY",
+      "price": 305.06245866394045,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "DECK",
+      "action": "BUY",
+      "price": 87.65380561065673,
+      "shares": 11
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "ARE",
+      "action": "BUY",
+      "price": 62.971468626022336,
+      "shares": 16
+    },
+    {
+      "date": "2025-10-28",
+      "ticker": "URI",
+      "action": "BUY",
+      "price": 874.2736493225098,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "CNC",
+      "action": "SELL",
+      "price": 37.3213301525116,
+      "shares": 31
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "EG",
+      "action": "SELL",
+      "price": 309.29528720092776,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "URI",
+      "action": "SELL",
+      "price": 868.522552734375,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 52.716343626022336,
+      "shares": 19
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "BRO",
+      "action": "BUY",
+      "price": 80.17233694839477,
+      "shares": 12
+    },
+    {
+      "date": "2025-10-29",
+      "ticker": "FISV",
+      "action": "BUY",
+      "price": 70.63529847335815,
+      "shares": 14
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "ON",
+      "action": "SELL",
+      "price": 50.82457347488403,
+      "shares": 19
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "MOH",
+      "action": "SELL",
+      "price": 151.02445610046388,
+      "shares": 6
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 573.7829723205566,
+      "shares": 1
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "ARE",
+      "action": "SELL",
+      "price": 56.34181393241882,
+      "shares": 16
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 50.34481393241882,
+      "shares": 19
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "BRO",
+      "action": "SELL",
+      "price": 80.24181092834473,
+      "shares": 12
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "BAX",
+      "action": "BUY",
+      "price": 19.159442945480347,
+      "shares": 52
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "ZBRA",
+      "action": "BUY",
+      "price": 261.5006801147461,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "FFIV",
+      "action": "BUY",
+      "price": 256.81834744262693,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "CMG",
+      "action": "BUY",
+      "price": 32.54626377868652,
+      "shares": 31
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "CI",
+      "action": "BUY",
+      "price": 245.8425711593628,
+      "shares": 4
+    },
+    {
+      "date": "2025-10-30",
+      "ticker": "SW",
+      "action": "BUY",
+      "price": 36.05802091598511,
+      "shares": 28
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "DECK",
+      "action": "SELL",
+      "price": 81.45925,
+      "shares": 11
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "FISV",
+      "action": "SELL",
+      "price": 66.65665744018554,
+      "shares": 14
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "ZBRA",
+      "action": "SELL",
+      "price": 269.115375,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "CMG",
+      "action": "SELL",
+      "price": 31.67415553379059,
+      "shares": 31
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "CI",
+      "action": "SELL",
+      "price": 242.9232164001465,
+      "shares": 4
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "SW",
+      "action": "SELL",
+      "price": 36.90153816986084,
+      "shares": 28
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 262.7412903442383,
+      "shares": 3
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "GRMN",
+      "action": "BUY",
+      "price": 214.04697244262695,
+      "shares": 4
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "MO",
+      "action": "BUY",
+      "price": 56.408191068649295,
+      "shares": 17
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "DXCM",
+      "action": "BUY",
+      "price": 58.24911122131348,
+      "shares": 17
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 27.173579847335816,
+      "shares": 37
+    },
+    {
+      "date": "2025-10-31",
+      "ticker": "MPWR",
+      "action": "BUY",
+      "price": 1005.5025,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 49.09543893241882,
+      "shares": 19
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "KVUE",
+      "action": "SELL",
+      "price": 15.931245099067688,
+      "shares": 68
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "MO",
+      "action": "SELL",
+      "price": 56.64166316986084,
+      "shares": 17
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "DXCM",
+      "action": "SELL",
+      "price": 60.399785305023194,
+      "shares": 17
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 24.897544847488405,
+      "shares": 37
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "MPWR",
+      "action": "SELL",
+      "price": 1003.4280276794434,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "GNRC",
+      "action": "BUY",
+      "price": 163.831875,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "RCL",
+      "action": "BUY",
+      "price": 277.9388877868652,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 147.10351377868653,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "AJG",
+      "action": "BUY",
+      "price": 242.45759399414064,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "IP",
+      "action": "BUY",
+      "price": 36.4969686126709,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-03",
+      "ticker": "CHTR",
+      "action": "BUY",
+      "price": 222.3110969467163,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "FFIV",
+      "action": "SELL",
+      "price": 241.2593148803711,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "MOH",
+      "action": "SELL",
+      "price": 151.61415744018555,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "AJG",
+      "action": "SELL",
+      "price": 250.90780853271485,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "IP",
+      "action": "SELL",
+      "price": 36.09519410705566,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "CHTR",
+      "action": "SELL",
+      "price": 220.79954866027833,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 23.761875,
+      "shares": 42
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "META",
+      "action": "BUY",
+      "price": 627.6336673278809,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 307.47366732788083,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "NCLH",
+      "action": "BUY",
+      "price": 18.79939591598511,
+      "shares": 53
+    },
+    {
+      "date": "2025-11-04",
+      "ticker": "LULU",
+      "action": "BUY",
+      "price": 160.74033366394042,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "GRMN",
+      "action": "SELL",
+      "price": 205.37725572967528,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "GNRC",
+      "action": "SELL",
+      "price": 159.10040267944336,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "RCL",
+      "action": "SELL",
+      "price": 256.5016898803711,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 23.54821946620941,
+      "shares": 42
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "META",
+      "action": "SELL",
+      "price": 635.6320372009277,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 319.14033779907226,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "LULU",
+      "action": "SELL",
+      "price": 167.50620133972168,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "SNPS",
+      "action": "BUY",
+      "price": 409.31454034423825,
+      "shares": 2
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "AXON",
+      "action": "BUY",
+      "price": 639.8497943115234,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "DXCM",
+      "action": "BUY",
+      "price": 59.30963877868653,
+      "shares": 16
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "FISV",
+      "action": "BUY",
+      "price": 64.032,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 42.051013778686524,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "ANET",
+      "action": "BUY",
+      "price": 140.4902081680298,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-05",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 149.824875,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "BAX",
+      "action": "SELL",
+      "price": 17.981487089157106,
+      "shares": 52
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "NCLH",
+      "action": "SELL",
+      "price": 19.060464694976808,
+      "shares": 53
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "AXON",
+      "action": "SELL",
+      "price": 602.2087547607422,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "DXCM",
+      "action": "SELL",
+      "price": 54.9725,
+      "shares": 16
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "ANET",
+      "action": "SELL",
+      "price": 134.58266889953615,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "MOH",
+      "action": "SELL",
+      "price": 151.98396755981446,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "EL",
+      "action": "BUY",
+      "price": 87.4659370651245,
+      "shares": 11
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 24.55227091598511,
+      "shares": 40
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "SWKS",
+      "action": "BUY",
+      "price": 68.83222758865357,
+      "shares": 14
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 43.0215,
+      "shares": 22
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "XYZ",
+      "action": "BUY",
+      "price": 65.48272194671631,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-07",
+      "ticker": "PAYC",
+      "action": "BUY",
+      "price": 161.8558508605957,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 240.70958683013916,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 40.16990362739563,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "EL",
+      "action": "SELL",
+      "price": 89.25055656051636,
+      "shares": 11
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "XYZ",
+      "action": "SELL",
+      "price": 66.76660305023194,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "PAYC",
+      "action": "SELL",
+      "price": 166.33100798034667,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "AXON",
+      "action": "BUY",
+      "price": 584.982347442627,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "HUM",
+      "action": "BUY",
+      "price": 238.53920816802977,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "MCHP",
+      "action": "BUY",
+      "price": 54.94214163780212,
+      "shares": 18
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "DELL",
+      "action": "BUY",
+      "price": 142.76134744262694,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-10",
+      "ticker": "DOW",
+      "action": "BUY",
+      "price": 21.78738322734833,
+      "shares": 45
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 26.396794847488405,
+      "shares": 40
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 44.17790076255798,
+      "shares": 22
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "HUM",
+      "action": "SELL",
+      "price": 243.34826622009277,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "MCHP",
+      "action": "SELL",
+      "price": 54.19383297920227,
+      "shares": 18
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 38.83940969467163,
+      "shares": 25
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 131.99595767211915,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 143.59176427459718,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-11",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 304.1620147705078,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "SNPS",
+      "action": "SELL",
+      "price": 398.61059255981445,
+      "shares": 2
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "DELL",
+      "action": "SELL",
+      "price": 140.63965171051026,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "DOW",
+      "action": "SELL",
+      "price": 21.844396129608153,
+      "shares": 45
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 132.91350572967528,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 227.10350049591065,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "STX",
+      "action": "BUY",
+      "price": 283.4016397705078,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "VST",
+      "action": "BUY",
+      "price": 178.35913927459717,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-12",
+      "ticker": "ARE",
+      "action": "BUY",
+      "price": 53.80688877868652,
+      "shares": 16
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "AXON",
+      "action": "SELL",
+      "price": 557.0113330383301,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "MOH",
+      "action": "SELL",
+      "price": 138.4107557296753,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 282.9984446411133,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "STX",
+      "action": "SELL",
+      "price": 262.42871755981446,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "DELL",
+      "action": "BUY",
+      "price": 134.00697244262696,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "SW",
+      "action": "BUY",
+      "price": 35.09754183197021,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "TER",
+      "action": "BUY",
+      "price": 169.5466602859497,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-13",
+      "ticker": "XYZ",
+      "action": "BUY",
+      "price": 62.331149236679074,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "SWKS",
+      "action": "SELL",
+      "price": 65.81840032577514,
+      "shares": 14
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 36.401788169860836,
+      "shares": 25
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 222.73858110046388,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "VST",
+      "action": "SELL",
+      "price": 174.60265744018554,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "APP",
+      "action": "BUY",
+      "price": 557.9788622131348,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "AXON",
+      "action": "BUY",
+      "price": 554.6471801147461,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 24.782385457992554,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-14",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 284.142,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "ARE",
+      "action": "SELL",
+      "price": 50.814580152511596,
+      "shares": 16
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "SW",
+      "action": "SELL",
+      "price": 33.90303816986084,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "XYZ",
+      "action": "SELL",
+      "price": 58.86055438995361,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 34.11704847335815,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 116.02798622131348,
+      "shares": 8
+    },
+    {
+      "date": "2025-11-17",
+      "ticker": "EXPE",
+      "action": "BUY",
+      "price": 243.87494355010986,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "DELL",
+      "action": "SELL",
+      "price": 122.62865744018555,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "TER",
+      "action": "SELL",
+      "price": 163.5145763244629,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "AXON",
+      "action": "SELL",
+      "price": 533.5031345214844,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 34.882551525115964,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "EXPE",
+      "action": "SELL",
+      "price": 239.48020610046387,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "PLTR",
+      "action": "BUY",
+      "price": 167.4136668319702,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "INTC",
+      "action": "BUY",
+      "price": 34.34716683197021,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "WDC",
+      "action": "BUY",
+      "price": 152.81356647491455,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "ANET",
+      "action": "BUY",
+      "price": 123.5117219467163,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-18",
+      "ticker": "MPWR",
+      "action": "BUY",
+      "price": 857.3885019836425,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "FISV",
+      "action": "SELL",
+      "price": 61.13941316986084,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 118.10092366027833,
+      "shares": 8
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "INTC",
+      "action": "SELL",
+      "price": 35.09244561004639,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "WDC",
+      "action": "SELL",
+      "price": 153.76937506866454,
+      "shares": 6
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "ANET",
+      "action": "SELL",
+      "price": 124.74759255981445,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "MPWR",
+      "action": "SELL",
+      "price": 884.2076994018555,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "FSLR",
+      "action": "BUY",
+      "price": 251.9959301147461,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "AMD",
+      "action": "BUY",
+      "price": 223.66177805328368,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 33.746864542007444,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 40.21009362602234,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "DELL",
+      "action": "BUY",
+      "price": 119.43968725204468,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-19",
+      "ticker": "BLDR",
+      "action": "BUY",
+      "price": 95.797875,
+      "shares": 9
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 23.708139313697814,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 240.2897986602783,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "PLTR",
+      "action": "SELL",
+      "price": 154.77258110046387,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "FSLR",
+      "action": "SELL",
+      "price": 249.7850486602783,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "AMD",
+      "action": "SELL",
+      "price": 203.67810877990723,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 32.17390362739563,
+      "shares": 27
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 39.630176525115964,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "DELL",
+      "action": "SELL",
+      "price": 122.44874713516235,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "BLDR",
+      "action": "SELL",
+      "price": 101.56919274520874,
+      "shares": 9
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 198.85937450408935,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "NRG",
+      "action": "BUY",
+      "price": 159.2795969467163,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 116.87840969467163,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "AXON",
+      "action": "BUY",
+      "price": 522.2509852294922,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 556.1179468688965,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "DDOG",
+      "action": "BUY",
+      "price": 157.6287780532837,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "J",
+      "action": "BUY",
+      "price": 128.52403825378417,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "FISV",
+      "action": "BUY",
+      "price": 60.87042015266418,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-21",
+      "ticker": "TSLA",
+      "action": "BUY",
+      "price": 391.28554133605957,
+      "shares": 2
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "APP",
+      "action": "SELL",
+      "price": 559.5200877990723,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "NRG",
+      "action": "SELL",
+      "price": 166.76658110046387,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 580.1997452392578,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "J",
+      "action": "SELL",
+      "price": 132.4836517944336,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "TSLA",
+      "action": "SELL",
+      "price": 417.5711087799072,
+      "shares": 2
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "DASH",
+      "action": "BUY",
+      "price": 188.17404183197021,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 24.16207461833954,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 33.33665969467163,
+      "shares": 28
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 39.07953137397766,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-24",
+      "ticker": "LULU",
+      "action": "BUY",
+      "price": 169.7548331680298,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 125.19737213516235,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "AXON",
+      "action": "SELL",
+      "price": 528.6255696411133,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "FISV",
+      "action": "SELL",
+      "price": 60.72961832237244,
+      "shares": 15
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "DASH",
+      "action": "SELL",
+      "price": 195.39226049041747,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 24.737625,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 39.0704551525116,
+      "shares": 23
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "LULU",
+      "action": "SELL",
+      "price": 177.4212395095825,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "TPL",
+      "action": "BUY",
+      "price": 863.2411582946777,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 115.62778469467163,
+      "shares": 8
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 572.846277557373,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "AMD",
+      "action": "BUY",
+      "price": 206.2330698852539,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "VST",
+      "action": "BUY",
+      "price": 170.92541633605958,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 254.2470551147461,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-25",
+      "ticker": "APP",
+      "action": "BUY",
+      "price": 556.3080443115234,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 204.85752671051026,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 128.13589694976807,
+      "shares": 8
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "AMD",
+      "action": "SELL",
+      "price": 214.1328854904175,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 264.83751622009277,
+      "shares": 3
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "APP",
+      "action": "SELL",
+      "price": 586.0768101196289,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 126.97345866394043,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "PLTR",
+      "action": "BUY",
+      "price": 165.85288927459717,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 25.022505228996277,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "CEG",
+      "action": "BUY",
+      "price": 359.26954133605955,
+      "shares": 2
+    },
+    {
+      "date": "2025-11-26",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 39.12955561065674,
+      "shares": 24
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "DDOG",
+      "action": "SELL",
+      "price": 159.92998950958253,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 33.83307347488403,
+      "shares": 28
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 599.4701345214844,
+      "shares": 1
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 129.9250104904175,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 25.96700954246521,
+      "shares": 38
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "ORCL",
+      "action": "BUY",
+      "price": 202.05097194671632,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 128.55425049591065,
+      "shares": 7
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "NVDA",
+      "action": "BUY",
+      "price": 177.07863789367676,
+      "shares": 5
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "AMD",
+      "action": "BUY",
+      "price": 217.63876377868652,
+      "shares": 4
+    },
+    {
+      "date": "2025-11-28",
+      "ticker": "PSKY",
+      "action": "BUY",
+      "price": 16.028010457992554,
+      "shares": 61
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "CEG",
+      "action": "SELL",
+      "price": 358.87046279907224,
+      "shares": 2
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 123.17837786483764,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "NVDA",
+      "action": "SELL",
+      "price": 179.82003340911865,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "SMCI",
+      "action": "BUY",
+      "price": 33.42670484733581,
+      "shares": 29
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 577.1884744262695,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-01",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 24.172079847335816,
+      "shares": 40
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "PLTR",
+      "action": "SELL",
+      "price": 170.60465744018555,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "PSKY",
+      "action": "SELL",
+      "price": 15.812089694976807,
+      "shares": 61
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 601.2792270812988,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 126.0129719467163,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "NRG",
+      "action": "BUY",
+      "price": 164.1620418319702,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-02",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 263.3916397705078,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "TPL",
+      "action": "SELL",
+      "price": 914.2626107177734,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 38.59069561004639,
+      "shares": 24
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "ORCL",
+      "action": "SELL",
+      "price": 207.62613072967528,
+      "shares": 4
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 25.167410305023193,
+      "shares": 40
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 133.57317938995362,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "NRG",
+      "action": "SELL",
+      "price": 166.6866192703247,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 276.78155342102053,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "ALB",
+      "action": "BUY",
+      "price": 126.55324286270141,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "STX",
+      "action": "BUY",
+      "price": 258.79934843444823,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "GEV",
+      "action": "BUY",
+      "price": 602.2709556884765,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "SNDK",
+      "action": "BUY",
+      "price": 194.4771948852539,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "FISV",
+      "action": "BUY",
+      "price": 66.9834719467163,
+      "shares": 14
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "XYZ",
+      "action": "BUY",
+      "price": 61.14055561065674,
+      "shares": 16
+    },
+    {
+      "date": "2025-12-03",
+      "ticker": "REGN",
+      "action": "BUY",
+      "price": 724.0318179016114,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "VST",
+      "action": "SELL",
+      "price": 167.08641316986083,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "SMCI",
+      "action": "SELL",
+      "price": 34.67265362739563,
+      "shares": 29
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "ALB",
+      "action": "SELL",
+      "price": 125.12740744018555,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "STX",
+      "action": "SELL",
+      "price": 278.65061354064943,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "GEV",
+      "action": "SELL",
+      "price": 631.0043473205567,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "SNDK",
+      "action": "SELL",
+      "price": 228.35576622009276,
+      "shares": 5
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "REGN",
+      "action": "SELL",
+      "price": 718.0008053588867,
+      "shares": 1
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 132.01597194671632,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "MRNA",
+      "action": "BUY",
+      "price": 27.713850763320924,
+      "shares": 37
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "DDOG",
+      "action": "BUY",
+      "price": 151.48570866394044,
+      "shares": 6
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "ARE",
+      "action": "BUY",
+      "price": 45.50273954200745,
+      "shares": 22
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "COIN",
+      "action": "BUY",
+      "price": 269.8648759918213,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "PSKY",
+      "action": "BUY",
+      "price": 13.376684885501861,
+      "shares": 76
+    },
+    {
+      "date": "2025-12-05",
+      "ticker": "WRB",
+      "action": "BUY",
+      "price": 66.75336122131348,
+      "shares": 15
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "HOOD",
+      "action": "SELL",
+      "price": 136.36177767944335,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "MRNA",
+      "action": "SELL",
+      "price": 27.956014313697814,
+      "shares": 37
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "DDOG",
+      "action": "SELL",
+      "price": 154.20285877990722,
+      "shares": 6
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "COIN",
+      "action": "SELL",
+      "price": 274.0629122009277,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "PSKY",
+      "action": "SELL",
+      "price": 14.562714694976806,
+      "shares": 76
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "WRB",
+      "action": "SELL",
+      "price": 66.57669561004639,
+      "shares": 15
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "BAX",
+      "action": "BUY",
+      "price": 18.169079847335816,
+      "shares": 57
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "INTC",
+      "action": "BUY",
+      "price": 40.32014923667908,
+      "shares": 25
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "WDC",
+      "action": "BUY",
+      "price": 169.86488877868652,
+      "shares": 6
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "TTD",
+      "action": "BUY",
+      "price": 39.369673473358155,
+      "shares": 26
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "LYB",
+      "action": "BUY",
+      "price": 42.30113877868652,
+      "shares": 24
+    },
+    {
+      "date": "2025-12-08",
+      "ticker": "PODD",
+      "action": "BUY",
+      "price": 296.338097442627,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "BAX",
+      "action": "SELL",
+      "price": 18.150919847488403,
+      "shares": 57
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "TTD",
+      "action": "SELL",
+      "price": 39.38030152511597,
+      "shares": 26
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "LYB",
+      "action": "SELL",
+      "price": 42.75860877990723,
+      "shares": 24
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "PODD",
+      "action": "SELL",
+      "price": 294.0529122009277,
+      "shares": 3
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "HOOD",
+      "action": "BUY",
+      "price": 135.7778617172241,
+      "shares": 7
+    },
+    {
+      "date": "2025-12-09",
+      "ticker": "PSKY",
+      "action": "BUY",
+      "price": 14.647320343494416,
       "shares": 71
     },
     {
-      "date": "2025-10-21",
-      "ticker": "APA",
-      "action": "SELL",
-      "price": 22.329999923706055,
-      "shares": 45
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "WDC",
-      "action": "SELL",
-      "price": 121.31246185302734,
-      "shares": 8
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "FFIV",
-      "action": "SELL",
-      "price": 299.2099914550781,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 338.6199951171875,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "DOW",
-      "action": "BUY",
-      "price": 21.431617736816406,
-      "shares": 47
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 131.83999633789062,
-      "shares": 7
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 275.1499938964844,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 585.3300170898438,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 54.81999969482422,
-      "shares": 18
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "PSKY",
-      "action": "BUY",
-      "price": 16.510000228881836,
-      "shares": 61
-    },
-    {
-      "date": "2025-10-21",
-      "ticker": "KVUE",
-      "action": "BUY",
-      "price": 14.744268417358398,
-      "shares": 68
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 320.3299865722656,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "DOW",
-      "action": "SELL",
-      "price": 21.38235092163086,
-      "shares": 47
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 52.5,
-      "shares": 18
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "KVUE",
-      "action": "SELL",
-      "price": 15.001032829284668,
-      "shares": 68
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 91.2699966430664,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "VST",
-      "action": "BUY",
-      "price": 185.8300018310547,
-      "shares": 5
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "WDC",
-      "action": "BUY",
-      "price": 120.37321472167969,
-      "shares": 8
-    },
-    {
-      "date": "2025-10-22",
-      "ticker": "UAL",
-      "action": "BUY",
-      "price": 96.2699966430664,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "CEG",
-      "action": "SELL",
-      "price": 365.3807373046875,
-      "shares": 2
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 134.3300018310547,
-      "shares": 7
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 595.1500244140625,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 97.36000061035156,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "VST",
-      "action": "SELL",
-      "price": 191.3699951171875,
-      "shares": 5
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "WDC",
-      "action": "SELL",
-      "price": 125.6189956665039,
-      "shares": 8
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 322.760009765625,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 26.25,
-      "shares": 39
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 161.0,
-      "shares": 6
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "ON",
-      "action": "BUY",
-      "price": 51.779998779296875,
-      "shares": 19
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "AMD",
-      "action": "BUY",
-      "price": 234.99000549316406,
-      "shares": 4
-    },
-    {
-      "date": "2025-10-23",
-      "ticker": "KVUE",
-      "action": "BUY",
-      "price": 14.902276992797852,
-      "shares": 68
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 283.3299865722656,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "UAL",
-      "action": "SELL",
-      "price": 99.30999755859375,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 354.4599914550781,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 26.739999771118164,
-      "shares": 39
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "AMD",
-      "action": "SELL",
-      "price": 252.9199981689453,
-      "shares": 4
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "MCHP",
-      "action": "BUY",
-      "price": 62.605316162109375,
-      "shares": 16
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "TPL",
-      "action": "BUY",
-      "price": 926.9109497070312,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 584.3900146484375,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "DECK",
-      "action": "BUY",
-      "price": 86.94000244140625,
-      "shares": 12
-    },
-    {
-      "date": "2025-10-24",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 48.290000915527344,
-      "shares": 21
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "PSKY",
-      "action": "SELL",
-      "price": 16.56999969482422,
-      "shares": 61
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "MCHP",
-      "action": "SELL",
-      "price": 63.972984313964844,
-      "shares": 16
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "TPL",
-      "action": "SELL",
-      "price": 927.6795043945312,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 584.3900146484375,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "DECK",
-      "action": "SELL",
-      "price": 90.47000122070312,
-      "shares": 12
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 51.56999969482422,
-      "shares": 21
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "UAL",
-      "action": "BUY",
-      "price": 98.80000305175781,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "CNC",
-      "action": "BUY",
-      "price": 33.150001525878906,
-      "shares": 32
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 96.2300033569336,
-      "shares": 11
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "LULU",
-      "action": "BUY",
-      "price": 181.38999938964844,
-      "shares": 5
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 281.3999938964844,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-27",
-      "ticker": "FCX",
-      "action": "BUY",
-      "price": 41.099998474121094,
-      "shares": 25
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "UAL",
-      "action": "SELL",
-      "price": 94.94000244140625,
-      "shares": 10
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 96.68000030517578,
-      "shares": 11
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "LULU",
-      "action": "SELL",
-      "price": 179.97999572753906,
-      "shares": 5
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 280.8299865722656,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "FCX",
-      "action": "SELL",
-      "price": 41.16999816894531,
-      "shares": 25
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "ARE",
-      "action": "BUY",
-      "price": 62.939998626708984,
-      "shares": 16
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "EG",
-      "action": "BUY",
-      "price": 304.9100036621094,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "URI",
-      "action": "BUY",
-      "price": 873.8367309570312,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 570.97998046875,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-28",
-      "ticker": "DECK",
-      "action": "BUY",
-      "price": 87.61000061035156,
-      "shares": 12
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "CNC",
-      "action": "SELL",
-      "price": 37.34000015258789,
-      "shares": 32
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "EG",
-      "action": "SELL",
-      "price": 309.45001220703125,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "URI",
-      "action": "SELL",
-      "price": 868.95703125,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 52.689998626708984,
-      "shares": 19
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "BRO",
-      "action": "BUY",
-      "price": 80.13227081298828,
-      "shares": 13
-    },
-    {
-      "date": "2025-10-29",
-      "ticker": "FISV",
-      "action": "BUY",
-      "price": 70.5999984741211,
-      "shares": 14
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 151.10000610351562,
-      "shares": 6
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "ON",
-      "action": "SELL",
-      "price": 50.849998474121094,
-      "shares": 19
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "ARE",
-      "action": "SELL",
-      "price": 56.369998931884766,
-      "shares": 16
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 574.0700073242188,
-      "shares": 1
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 50.369998931884766,
-      "shares": 19
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "BRO",
-      "action": "SELL",
-      "price": 80.28195190429688,
-      "shares": 13
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "SW",
-      "action": "BUY",
-      "price": 36.040000915527344,
-      "shares": 28
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "BAX",
-      "action": "BUY",
-      "price": 19.14986801147461,
-      "shares": 53
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "FFIV",
-      "action": "BUY",
-      "price": 256.69000244140625,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "CI",
-      "action": "BUY",
-      "price": 245.71971130371094,
-      "shares": 4
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "ZBRA",
-      "action": "BUY",
-      "price": 261.3699951171875,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-30",
-      "ticker": "CMG",
-      "action": "BUY",
-      "price": 32.529998779296875,
-      "shares": 31
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "DECK",
-      "action": "SELL",
-      "price": 81.5,
-      "shares": 12
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "FISV",
-      "action": "SELL",
-      "price": 66.69000244140625,
-      "shares": 14
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "SW",
-      "action": "SELL",
-      "price": 36.91999816894531,
-      "shares": 28
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "CI",
-      "action": "SELL",
-      "price": 243.04473876953125,
-      "shares": 4
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "ZBRA",
-      "action": "SELL",
-      "price": 269.25,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "CMG",
-      "action": "SELL",
-      "price": 31.690000534057617,
-      "shares": 31
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 27.15999984741211,
-      "shares": 37
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "DXCM",
-      "action": "BUY",
-      "price": 58.220001220703125,
-      "shares": 17
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "GRMN",
-      "action": "BUY",
-      "price": 213.94000244140625,
-      "shares": 4
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 262.6099853515625,
-      "shares": 3
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "MO",
-      "action": "BUY",
-      "price": 56.380001068115234,
-      "shares": 18
-    },
-    {
-      "date": "2025-10-31",
-      "ticker": "MPWR",
-      "action": "BUY",
-      "price": 1005.0,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 49.119998931884766,
-      "shares": 19
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "KVUE",
-      "action": "SELL",
-      "price": 15.939214706420898,
-      "shares": 68
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 24.90999984741211,
-      "shares": 37
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "DXCM",
-      "action": "SELL",
-      "price": 60.43000030517578,
-      "shares": 17
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "MO",
-      "action": "SELL",
-      "price": 56.66999816894531,
-      "shares": 18
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "MPWR",
-      "action": "SELL",
-      "price": 1003.9299926757812,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "GNRC",
-      "action": "BUY",
-      "price": 163.75,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 147.02999877929688,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "IP",
-      "action": "BUY",
-      "price": 36.478729248046875,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "AJG",
-      "action": "BUY",
-      "price": 242.33642578125,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "CHTR",
-      "action": "BUY",
-      "price": 222.1999969482422,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-03",
-      "ticker": "RCL",
-      "action": "BUY",
-      "price": 277.79998779296875,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "FFIV",
-      "action": "SELL",
-      "price": 241.3800048828125,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 151.69000244140625,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "IP",
-      "action": "SELL",
-      "price": 36.113250732421875,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "AJG",
-      "action": "SELL",
-      "price": 251.0333251953125,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "CHTR",
-      "action": "SELL",
-      "price": 220.91000366210938,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 307.32000732421875,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "NCLH",
-      "action": "BUY",
-      "price": 18.790000915527344,
-      "shares": 53
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "META",
-      "action": "BUY",
-      "price": 627.3200073242188,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 23.75,
-      "shares": 42
-    },
-    {
-      "date": "2025-11-04",
-      "ticker": "LULU",
-      "action": "BUY",
-      "price": 160.66000366210938,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "GRMN",
-      "action": "SELL",
-      "price": 205.47999572753906,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "GNRC",
-      "action": "SELL",
-      "price": 159.17999267578125,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "RCL",
-      "action": "SELL",
-      "price": 256.6300048828125,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 319.29998779296875,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "META",
-      "action": "SELL",
-      "price": 635.9500122070312,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 23.559999465942383,
-      "shares": 42
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "LULU",
-      "action": "SELL",
-      "price": 167.58999633789062,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "ANET",
-      "action": "BUY",
-      "price": 140.4199981689453,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 149.75,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "DXCM",
-      "action": "BUY",
-      "price": 59.279998779296875,
-      "shares": 17
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "AXON",
-      "action": "BUY",
-      "price": 639.530029296875,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 42.029998779296875,
-      "shares": 24
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "SNPS",
-      "action": "BUY",
-      "price": 409.1099853515625,
-      "shares": 2
-    },
-    {
-      "date": "2025-11-05",
-      "ticker": "FISV",
-      "action": "BUY",
-      "price": 64.0,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "BAX",
-      "action": "SELL",
-      "price": 17.970491409301758,
-      "shares": 53
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 243.8000030517578,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "ANET",
-      "action": "SELL",
-      "price": 134.02000427246094,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 147.1199951171875,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 295.2200012207031,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "POOL",
-      "action": "BUY",
-      "price": 247.14920043945312,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "GNRC",
-      "action": "BUY",
-      "price": 153.7899932861328,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-06",
-      "ticker": "DASH",
-      "action": "BUY",
-      "price": 196.4600067138672,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "NCLH",
-      "action": "SELL",
-      "price": 19.06999969482422,
-      "shares": 53
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "DXCM",
-      "action": "SELL",
-      "price": 55.0,
-      "shares": 17
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "AXON",
-      "action": "SELL",
-      "price": 602.510009765625,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 309.1400146484375,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "POOL",
-      "action": "SELL",
-      "price": 250.77130126953125,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "GNRC",
-      "action": "SELL",
-      "price": 155.2899932861328,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "DASH",
-      "action": "SELL",
-      "price": 204.30999755859375,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 24.540000915527344,
-      "shares": 40
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 43.0,
-      "shares": 23
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "EL",
-      "action": "BUY",
-      "price": 87.42222595214844,
-      "shares": 11
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 239.25999450683594,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "PAYC",
-      "action": "BUY",
-      "price": 161.77496337890625,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "XYZ",
-      "action": "BUY",
-      "price": 65.44999694824219,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-07",
-      "ticker": "SWKS",
-      "action": "BUY",
-      "price": 68.7978286743164,
-      "shares": 14
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 40.189998626708984,
-      "shares": 24
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "EL",
-      "action": "SELL",
-      "price": 89.29520416259766,
-      "shares": 11
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 240.8300018310547,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "PAYC",
-      "action": "SELL",
-      "price": 166.41421508789062,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "XYZ",
-      "action": "SELL",
-      "price": 66.80000305175781,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "DOW",
-      "action": "BUY",
-      "price": 21.7764949798584,
-      "shares": 46
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "HUM",
-      "action": "BUY",
-      "price": 238.4199981689453,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "MCHP",
-      "action": "BUY",
-      "price": 54.9146842956543,
-      "shares": 18
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "DELL",
-      "action": "BUY",
-      "price": 142.69000244140625,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-10",
-      "ticker": "AXON",
-      "action": "BUY",
-      "price": 584.6900024414062,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 26.40999984741211,
-      "shares": 40
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 44.20000076293945,
-      "shares": 23
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "HUM",
-      "action": "SELL",
-      "price": 243.47000122070312,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "MCHP",
-      "action": "SELL",
-      "price": 54.220943450927734,
-      "shares": 18
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 304.010009765625,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 38.81999969482422,
-      "shares": 26
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 143.52000427246094,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-11",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 131.92999267578125,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "SNPS",
-      "action": "SELL",
-      "price": 398.80999755859375,
-      "shares": 2
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "DOW",
-      "action": "SELL",
-      "price": 21.855323791503906,
-      "shares": 46
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "DELL",
-      "action": "SELL",
-      "price": 140.7100067138672,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 132.97999572753906,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "VST",
-      "action": "BUY",
-      "price": 178.27000427246094,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 226.99000549316406,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "ARE",
-      "action": "BUY",
-      "price": 53.779998779296875,
-      "shares": 17
-    },
-    {
-      "date": "2025-11-12",
-      "ticker": "STX",
-      "action": "BUY",
-      "price": 283.260009765625,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "AXON",
-      "action": "SELL",
-      "price": 557.2899780273438,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 283.1400146484375,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 138.47999572753906,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "STX",
-      "action": "SELL",
-      "price": 262.55999755859375,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "DELL",
-      "action": "BUY",
-      "price": 133.94000244140625,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "SW",
-      "action": "BUY",
-      "price": 35.08000183105469,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "XYZ",
-      "action": "BUY",
-      "price": 62.29999923706055,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-13",
-      "ticker": "TER",
-      "action": "BUY",
-      "price": 169.46192932128906,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "SWKS",
-      "action": "SELL",
-      "price": 65.85132598876953,
-      "shares": 14
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 36.41999816894531,
-      "shares": 26
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "VST",
-      "action": "SELL",
-      "price": 174.69000244140625,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 222.85000610351562,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 284.0,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "APP",
-      "action": "BUY",
-      "price": 557.7000122070312,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "AXON",
-      "action": "BUY",
-      "price": 554.3699951171875,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-14",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 24.770000457763672,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "ARE",
-      "action": "SELL",
-      "price": 50.84000015258789,
-      "shares": 17
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "SW",
-      "action": "SELL",
-      "price": 33.91999816894531,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "XYZ",
-      "action": "SELL",
-      "price": 58.88999938964844,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 34.099998474121094,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "EXPE",
-      "action": "BUY",
-      "price": 243.75306701660156,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-17",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 115.97000122070312,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "DELL",
-      "action": "SELL",
-      "price": 122.69000244140625,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "TER",
-      "action": "SELL",
-      "price": 163.59637451171875,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "AXON",
-      "action": "SELL",
-      "price": 533.77001953125,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 34.900001525878906,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "EXPE",
-      "action": "SELL",
-      "price": 239.60000610351562,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "ANET",
-      "action": "BUY",
-      "price": 123.44999694824219,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "INTC",
-      "action": "BUY",
-      "price": 34.33000183105469,
-      "shares": 27
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "WDC",
-      "action": "BUY",
-      "price": 152.73719787597656,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "PLTR",
-      "action": "BUY",
-      "price": 167.3300018310547,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-18",
-      "ticker": "MPWR",
-      "action": "BUY",
-      "price": 856.9600219726562,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "FISV",
-      "action": "SELL",
-      "price": 61.16999816894531,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 118.16000366210938,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "ANET",
-      "action": "SELL",
-      "price": 124.80999755859375,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "INTC",
-      "action": "SELL",
-      "price": 35.11000061035156,
-      "shares": 27
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "WDC",
-      "action": "SELL",
-      "price": 153.84629821777344,
-      "shares": 6
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "MPWR",
-      "action": "SELL",
-      "price": 884.6500244140625,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "FSLR",
-      "action": "BUY",
-      "price": 251.8699951171875,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 40.189998626708984,
-      "shares": 23
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "DELL",
-      "action": "BUY",
-      "price": 119.37999725341797,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "BLDR",
-      "action": "BUY",
-      "price": 95.75,
-      "shares": 9
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 33.72999954223633,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-19",
-      "ticker": "AMD",
-      "action": "BUY",
-      "price": 223.5500030517578,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "APP",
-      "action": "SELL",
-      "price": 520.8200073242188,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 22.360000610351562,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "PLTR",
-      "action": "SELL",
-      "price": 155.7449951171875,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "FSLR",
-      "action": "SELL",
-      "price": 245.83999633789062,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 38.349998474121094,
-      "shares": 23
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "DELL",
-      "action": "SELL",
-      "price": 117.4000015258789,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 106.20999908447266,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "MU",
-      "action": "BUY",
-      "price": 201.3699951171875,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "DDOG",
-      "action": "BUY",
-      "price": 159.57000732421875,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "AXON",
-      "action": "BUY",
-      "price": 519.6099853515625,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "HPE",
-      "action": "BUY",
-      "price": 20.020000457763672,
-      "shares": 45
-    },
-    {
-      "date": "2025-11-20",
-      "ticker": "J",
-      "action": "BUY",
-      "price": 128.8588409423828,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 240.41000366210938,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "BLDR",
-      "action": "SELL",
-      "price": 101.62000274658203,
-      "shares": 9
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 32.189998626708984,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "AMD",
-      "action": "SELL",
-      "price": 203.77999877929688,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 107.30000305175781,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "MU",
-      "action": "SELL",
-      "price": 207.3699951171875,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "HPE",
-      "action": "SELL",
-      "price": 20.520000457763672,
-      "shares": 45
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 116.81999969482422,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "TSLA",
-      "action": "BUY",
-      "price": 391.0899963378906,
-      "shares": 2
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 198.75999450683594,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 555.8400268554688,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "NRG",
-      "action": "BUY",
-      "price": 159.1999969482422,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "APP",
-      "action": "BUY",
-      "price": 520.260009765625,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-21",
-      "ticker": "FISV",
-      "action": "BUY",
-      "price": 60.84000015258789,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "J",
-      "action": "SELL",
-      "price": 132.5499267578125,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "TSLA",
-      "action": "SELL",
-      "price": 417.7799987792969,
-      "shares": 2
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 580.489990234375,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "NRG",
-      "action": "SELL",
-      "price": 166.85000610351562,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "APP",
-      "action": "SELL",
-      "price": 559.7999877929688,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 24.149999618530273,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 39.060001373291016,
-      "shares": 24
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "DASH",
-      "action": "BUY",
-      "price": 188.0800018310547,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "LULU",
-      "action": "BUY",
-      "price": 169.6699981689453,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-24",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 33.31999969482422,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "AXON",
-      "action": "SELL",
-      "price": 528.8900146484375,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 125.26000213623047,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "FISV",
-      "action": "SELL",
-      "price": 60.7599983215332,
-      "shares": 15
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 24.75,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 39.09000015258789,
-      "shares": 24
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "DASH",
-      "action": "SELL",
-      "price": 195.49000549316406,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "LULU",
-      "action": "SELL",
-      "price": 177.50999450683594,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 254.1199951171875,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "VST",
-      "action": "BUY",
-      "price": 170.83999633789062,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 115.56999969482422,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "TPL",
-      "action": "BUY",
-      "price": 862.8097534179688,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 572.5599975585938,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "APP",
-      "action": "BUY",
-      "price": 556.030029296875,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-25",
-      "ticker": "AMD",
-      "action": "BUY",
-      "price": 206.1300048828125,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 204.9600067138672,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 264.9700012207031,
-      "shares": 3
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 128.1999969482422,
-      "shares": 8
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "APP",
-      "action": "SELL",
-      "price": 586.3699951171875,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "AMD",
-      "action": "SELL",
-      "price": 214.24000549316406,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 25.010000228881836,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 39.11000061035156,
-      "shares": 25
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 126.91000366210938,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "CEG",
-      "action": "BUY",
-      "price": 359.0899963378906,
-      "shares": 2
-    },
-    {
-      "date": "2025-11-26",
-      "ticker": "PLTR",
-      "action": "BUY",
-      "price": 165.77000427246094,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "DDOG",
-      "action": "SELL",
-      "price": 160.00999450683594,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 33.849998474121094,
-      "shares": 28
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 599.77001953125,
-      "shares": 1
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 25.979999542236328,
-      "shares": 39
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 129.99000549316406,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "NVDA",
-      "action": "BUY",
-      "price": 176.99014282226562,
-      "shares": 5
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 128.49000549316406,
-      "shares": 7
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "ORCL",
-      "action": "BUY",
-      "price": 201.9499969482422,
-      "shares": 4
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "PSKY",
-      "action": "BUY",
-      "price": 16.020000457763672,
-      "shares": 62
-    },
-    {
-      "date": "2025-11-28",
-      "ticker": "AMD",
-      "action": "BUY",
-      "price": 217.52999877929688,
-      "shares": 4
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "CEG",
-      "action": "SELL",
-      "price": 359.04998779296875,
-      "shares": 2
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "NVDA",
-      "action": "SELL",
-      "price": 179.9099884033203,
-      "shares": 5
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 123.23999786376953,
-      "shares": 7
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "SMCI",
-      "action": "BUY",
-      "price": 33.40999984741211,
-      "shares": 29
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 576.9000244140625,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-01",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 24.15999984741211,
-      "shares": 41
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "PLTR",
-      "action": "SELL",
-      "price": 170.69000244140625,
-      "shares": 5
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "PSKY",
-      "action": "SELL",
-      "price": 15.819999694824219,
-      "shares": 62
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 601.5800170898438,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 263.260009765625,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "NRG",
-      "action": "BUY",
-      "price": 164.0800018310547,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-02",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 125.94999694824219,
-      "shares": 7
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "TPL",
-      "action": "SELL",
-      "price": 914.719970703125,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 38.61000061035156,
-      "shares": 25
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "ORCL",
-      "action": "SELL",
-      "price": 207.72999572753906,
-      "shares": 4
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 25.18000030517578,
-      "shares": 41
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 276.9200134277344,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "NRG",
-      "action": "SELL",
-      "price": 166.77000427246094,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 133.63999938964844,
-      "shares": 7
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "STX",
-      "action": "BUY",
-      "price": 258.6700134277344,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "ALB",
-      "action": "BUY",
-      "price": 126.48999786376953,
-      "shares": 8
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "FISV",
-      "action": "BUY",
-      "price": 66.94999694824219,
-      "shares": 15
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "SNDK",
-      "action": "BUY",
-      "price": 194.3800048828125,
-      "shares": 5
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "GEV",
-      "action": "BUY",
-      "price": 601.969970703125,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "XYZ",
-      "action": "BUY",
-      "price": 61.11000061035156,
-      "shares": 16
-    },
-    {
-      "date": "2025-12-03",
-      "ticker": "REGN",
-      "action": "BUY",
-      "price": 723.6699829101562,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "VST",
-      "action": "SELL",
-      "price": 176.07000732421875,
-      "shares": 5
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "SMCI",
-      "action": "SELL",
-      "price": 34.22999954223633,
-      "shares": 29
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "STX",
-      "action": "SELL",
-      "price": 265.6300048828125,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "ALB",
-      "action": "SELL",
-      "price": 119.13999938964844,
-      "shares": 8
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "SNDK",
-      "action": "SELL",
-      "price": 213.30999755859375,
-      "shares": 5
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "GEV",
-      "action": "SELL",
-      "price": 629.1099853515625,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "REGN",
-      "action": "SELL",
-      "price": 722.7999877929688,
-      "shares": 1
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 274.04998779296875,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "MRNA",
-      "action": "BUY",
-      "price": 25.489999771118164,
-      "shares": 40
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 150.57000732421875,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "ARE",
-      "action": "BUY",
-      "price": 46.59000015258789,
-      "shares": 22
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "MU",
-      "action": "BUY",
-      "price": 226.64999389648438,
-      "shares": 4
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "DDOG",
-      "action": "BUY",
-      "price": 153.0,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-04",
-      "ticker": "CMG",
-      "action": "BUY",
-      "price": 34.150001525878906,
-      "shares": 30
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "MOH",
-      "action": "SELL",
-      "price": 151.86000061035156,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "MU",
-      "action": "SELL",
-      "price": 237.22000122070312,
-      "shares": 4
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "CMG",
-      "action": "SELL",
-      "price": 33.939998626708984,
-      "shares": 30
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "PSKY",
-      "action": "BUY",
-      "price": 13.369999885559082,
-      "shares": 77
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "WRB",
-      "action": "BUY",
-      "price": 66.72000122070312,
-      "shares": 15
-    },
-    {
-      "date": "2025-12-05",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 131.9499969482422,
-      "shares": 7
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "COIN",
-      "action": "SELL",
-      "price": 274.20001220703125,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "MRNA",
-      "action": "SELL",
-      "price": 27.969999313354492,
-      "shares": 40
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "DDOG",
-      "action": "SELL",
-      "price": 154.27999877929688,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "PSKY",
-      "action": "SELL",
-      "price": 14.569999694824219,
-      "shares": 77
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "WRB",
-      "action": "SELL",
-      "price": 66.61000061035156,
-      "shares": 15
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "HOOD",
-      "action": "SELL",
-      "price": 136.42999267578125,
-      "shares": 7
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "PODD",
-      "action": "BUY",
-      "price": 296.19000244140625,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "TTD",
-      "action": "BUY",
-      "price": 39.349998474121094,
-      "shares": 26
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "BAX",
-      "action": "BUY",
-      "price": 18.15999984741211,
-      "shares": 58
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "INTC",
-      "action": "BUY",
-      "price": 40.29999923706055,
-      "shares": 26
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "WDC",
-      "action": "BUY",
-      "price": 169.77999877929688,
-      "shares": 6
-    },
-    {
-      "date": "2025-12-08",
-      "ticker": "LYB",
-      "action": "BUY",
-      "price": 42.279998779296875,
-      "shares": 24
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "PODD",
-      "action": "SELL",
-      "price": 294.20001220703125,
-      "shares": 3
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "TTD",
-      "action": "SELL",
-      "price": 39.400001525878906,
-      "shares": 26
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "BAX",
-      "action": "SELL",
-      "price": 18.15999984741211,
-      "shares": 58
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "LYB",
-      "action": "SELL",
-      "price": 42.779998779296875,
-      "shares": 24
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "COIN",
-      "action": "BUY",
-      "price": 277.3599853515625,
-      "shares": 3
-    },
-    {
       "date": "2025-12-09",
       "ticker": "NFLX",
       "action": "BUY",
-      "price": 96.70999908447266,
+      "price": 96.7583540840149,
       "shares": 10
     },
     {
       "date": "2025-12-09",
-      "ticker": "PSKY",
+      "ticker": "COIN",
       "action": "BUY",
-      "price": 14.640000343322754,
-      "shares": 72
-    },
-    {
-      "date": "2025-12-09",
-      "ticker": "HOOD",
-      "action": "BUY",
-      "price": 135.7100067138672,
-      "shares": 7
+      "price": 277.4986653442383,
+      "shares": 3
     },
     {
       "date": "2025-12-10",
       "ticker": "FISV",
       "action": "SELL",
-      "price": 66.56999969482422,
-      "shares": 15
+      "price": 66.53671469497681,
+      "shares": 14
     },
     {
       "date": "2025-12-10",
       "ticker": "XYZ",
       "action": "SELL",
-      "price": 63.290000915527344,
+      "price": 63.25835591506958,
       "shares": 16
     },
     {
       "date": "2025-12-10",
       "ticker": "ARE",
       "action": "SELL",
-      "price": 46.470001220703125,
+      "price": 46.446766220092776,
       "shares": 22
     },
     {
       "date": "2025-12-10",
       "ticker": "WDC",
       "action": "SELL",
-      "price": 181.9499969482422,
+      "price": 181.85902194976808,
+      "shares": 6
+    },
+    {
+      "date": "2025-12-10",
+      "ticker": "CMG",
+      "action": "BUY",
+      "price": 33.95696862602234,
+      "shares": 31
+    },
+    {
+      "date": "2025-12-10",
+      "ticker": "BAX",
+      "action": "BUY",
+      "price": 18.26913022899628,
+      "shares": 57
+    },
+    {
+      "date": "2025-12-10",
+      "ticker": "MOH",
+      "action": "BUY",
+      "price": 160.60026427459718,
       "shares": 6
     },
     {
       "date": "2025-12-10",
       "ticker": "TTD",
       "action": "BUY",
-      "price": 39.220001220703125,
-      "shares": 27
-    },
-    {
-      "date": "2025-12-10",
-      "ticker": "BAX",
-      "action": "BUY",
-      "price": 18.260000228881836,
-      "shares": 58
-    },
-    {
-      "date": "2025-12-10",
-      "ticker": "CMG",
-      "action": "BUY",
-      "price": 33.939998626708984,
-      "shares": 31
-    },
-    {
-      "date": "2025-12-10",
-      "ticker": "MOH",
-      "action": "BUY",
-      "price": 160.52000427246094,
-      "shares": 6
+      "price": 39.239611221313474,
+      "shares": 26
     },
     {
       "date": "2025-12-11",
       "ticker": "AMD",
       "action": "SELL",
-      "price": 217.55999755859375,
+      "price": 217.45121755981447,
       "shares": 4
     },
     {
       "date": "2025-12-11",
       "ticker": "NFLX",
       "action": "SELL",
-      "price": 94.08999633789062,
+      "price": 94.04295133972168,
       "shares": 10
     },
     {
       "date": "2025-12-11",
       "ticker": "TTD",
       "action": "SELL",
-      "price": 37.2047004699707,
-      "shares": 27
-    },
-    {
-      "date": "2025-12-11",
-      "ticker": "ARE",
-      "action": "BUY",
-      "price": 45.56999969482422,
-      "shares": 23
+      "price": 37.18609811973572,
+      "shares": 26
     },
     {
       "date": "2025-12-11",
       "ticker": "SMCI",
       "action": "BUY",
-      "price": 34.02000045776367,
+      "price": 34.03701045799255,
       "shares": 30
+    },
+    {
+      "date": "2025-12-11",
+      "ticker": "ARE",
+      "action": "BUY",
+      "price": 45.59278469467163,
+      "shares": 22
     },
     {
       "date": "2025-12-11",
       "ticker": "FISV",
       "action": "BUY",
-      "price": 68.28500366210938,
+      "price": 68.31914616394043,
       "shares": 15
     }
   ],
   "final_holdings": {
-    "INTC": 26,
-    "COIN": 3,
-    "PSKY": 72,
+    "INTC": 25,
     "HOOD": 7,
-    "BAX": 58,
+    "PSKY": 71,
+    "COIN": 3,
     "CMG": 31,
+    "BAX": 57,
     "MOH": 6,
-    "ARE": 23,
     "SMCI": 30,
+    "ARE": 22,
     "FISV": 15
   },
-  "final_cash": 570.9116563796997
+  "final_cash": 554.081759858615
 }
