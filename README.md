@@ -7,32 +7,32 @@
 
 **Paper Trader AI** is a production-grade algorithmic trading system featuring a **Dual Portfolio Architecture** that runs two independent strategies simultaneously for performance comparison.
 
-### 🔴 [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
+### [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
 > Real-time portfolio values, performance charts with SPY benchmark, and trade history updated daily.
 
 ---
 
-## 🎯 Dual Portfolio System
+## Dual Portfolio System
 
 | Portfolio | Strategy | Schedule | Ledger |
 |-----------|----------|----------|--------|
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
 
-### Performance Summary (2017-2025 Walk-Forward Backtest)
+### Performance With Transaction Costs (Oct 1 - Dec 19, 2025)
 
-| Metric | Momentum | ML Ensemble |
-|--------|----------|-------------|
-| **CAGR** | +25.6% | +26.3% |
-| **Sharpe Ratio** | 0.98 | 0.84 |
-| **Max Drawdown** | -27% | -37% |
-| **Win Rate** | — | 56.8% |
+| Metric | Momentum | ML Ensemble | SPY |
+|--------|----------|-------------|-----|
+| **Return** | +7.20% | +1.58% | +3.10% |
+| **Excess vs SPY** | +4.10% | -1.52% | — |
+| **Total Trades** | 50 | 526 | — |
+| **Slippage** | 5 bps | 5 bps | — |
 
-> Both strategies use production risk management (15% stop-loss, position limits, drawdown controls).
+> Both strategies include realistic transaction costs (5 basis points slippage on all trades).
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone and setup
@@ -51,26 +51,40 @@ cd dashboard && streamlit run app.py
 
 ---
 
-## 📋 Features
+## Features
 
-### 📈 Momentum Strategy (Primary)
+### Modular Strategy Architecture (NEW)
+- **BaseStrategy** abstract class for consistent interface
+- **Strategy Registry** with factory pattern
+- Add new strategies without modifying main.py:
+  ```python
+  from src.strategies import get_strategy
+  strategy = get_strategy("momentum")  # or "ml"
+  ```
+
+### Momentum Strategy (Primary)
 - **12-month momentum factor** with Fama-French methodology
 - **15% daily stop-loss** for downside protection
 - **Monthly rebalancing** on first trading day
 - Top 10 stocks from S&P 500 universe
 
-### 🤖 ML Strategy (Experimental)
+### ML Strategy (Experimental)
 - **XGBoost Regressor** with 15 technical features
 - **Multi-horizon ensemble** (1-day 50%, 5-day 30%, 20-day 20%)
 - **Noise-based feature selection** (only features that beat random)
 - Daily retraining and rebalancing
 
-### 🛡️ Risk Management
+### Transaction Costs
+- **5 basis points slippage** on all BUY and SELL trades
+- Modeled via `TransactionCostModel` class
+- Applied consistently in backtests and live trading
+
+### Risk Management
 - **Position limits**: Max 15% per stock, 30% per sector
 - **Stop-loss**: 15% from entry price
 - **Portfolio drawdown control**: Warning at -15%, halt at -20%, liquidate at -25%
 
-### 📦 Infrastructure
+### Infrastructure
 - **SQLite data cache**: 4.3M+ rows, 503 S&P 500 tickers
 - **GitHub Actions**: Automated trading + universe sync
 - **Streamlit Dashboard**: Live comparison with SPY benchmark
@@ -78,9 +92,27 @@ cd dashboard && streamlit run app.py
 
 ---
 
-## 🏗️ Strategy Architecture
+## Strategy Architecture
 
-### Momentum Strategy (Monthly)
+### Adding a New Strategy
+
+```python
+# 1. Create src/strategies/my_strategy.py
+from src.strategies.base import BaseStrategy
+
+class MyStrategy(BaseStrategy):
+    def get_name(self): return "my_strategy"
+    def needs_training(self): return False
+    def rank_universe(self, data_dict): ...
+    def generate_signals(self, data_dict): ...
+
+# 2. Register in src/strategies/registry.py
+STRATEGIES["my_strategy"] = MyStrategy
+
+# Done! No main.py changes needed.
+```
+
+### Momentum Strategy Flow (Monthly)
 
 ```mermaid
 flowchart LR
@@ -89,11 +121,11 @@ flowchart LR
     C --> D[Rank by Momentum]
     D --> E[Select Top 10]
     E --> F[Apply Risk Limits]
-    F --> G[Execute Trades]
+    F --> G[Execute Trades<br/>5 bps Slippage]
     G --> H[Daily Stop-Loss<br/>Check 15%]
 ```
 
-### ML Ensemble Strategy (Daily)
+### ML Ensemble Strategy Flow (Daily)
 
 ```mermaid
 flowchart LR
@@ -106,13 +138,12 @@ flowchart LR
     C3 --> D
     D --> E[Cross-Sectional<br/>Ranking]
     E --> F[Top 10% Buy<br/>Bottom 10% Sell]
-    F --> G[Apply Risk<br/>Limits]
-    G --> H[Execute Trade]
+    F --> G[Execute Trade<br/>5 bps Slippage]
 ```
 
 ---
 
-## 📊 GitHub Actions Workflows
+## GitHub Actions Workflows
 
 | Workflow | Purpose | Schedule |
 |----------|---------|----------|
@@ -121,26 +152,31 @@ flowchart LR
 | **Momentum Strategy Trade** | Monthly momentum rebalance | 1st-3rd of month, 9:30 PM UTC |
 | **ML Strategy Trade** | Daily ML predictions | Mon-Fri, 9:30 PM UTC |
 
-Run manually: **Actions** → Select workflow → **Run workflow**
+Run manually: **Actions** > Select workflow > **Run workflow**
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 paper-trader/
 ├── main.py                         # Core trading logic
 ├── config/
-│   └── settings.yaml               # All configuration
+│   └── trading.yaml                # All configuration
 ├── src/
-│   ├── strategies/                 # Momentum strategy
+│   ├── strategies/                 # Strategy infrastructure
+│   │   ├── base.py                 # BaseStrategy ABC
+│   │   ├── momentum_strategy.py    # Momentum implementation
+│   │   ├── ml_strategy.py          # ML implementation
+│   │   └── registry.py             # Strategy factory
 │   ├── models/                     # ML models (XGBoost)
 │   ├── trading/                    # Portfolio & risk management
 │   ├── features/                   # Technical indicators
+│   ├── backtesting/                # Costs & performance metrics
 │   └── data/                       # Data loading & caching
 ├── scripts/
 │   ├── backtests/                  # Backtest scripts
-│   ├── validation/                 # Validation scripts
+│   ├── validation/                 # PIT validation scripts
 │   └── utils/                      # Utility scripts
 ├── dashboard/
 │   └── app.py                      # Streamlit dashboard
@@ -154,37 +190,40 @@ paper-trader/
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 | Document | Purpose |
 |----------|---------|
 | [COMPLETE_PROJECT_GUIDE.md](docs/COMPLETE_PROJECT_GUIDE.md) | Full system architecture |
+| [MANUAL.md](docs/MANUAL.md) | Technical reference with all functions |
 | [MOMENTUM_STRATEGY.md](docs/MOMENTUM_STRATEGY.md) | Momentum strategy details |
 | [ML_STRATEGY.md](docs/ML_STRATEGY.md) | ML ensemble strategy details |
-| [MANUAL.md](docs/MANUAL.md) | Technical reference |
-| [ML_ALIGNMENT_REPORT_2024-12-17.md](docs/ML_ALIGNMENT_REPORT_2024-12-17.md) | ML bug fixes & alignment |
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
 python -m pytest tests/ -v
 
 # Run validation scripts
-python scripts/validation/momentum_rebalance_comparison.py  # Monthly vs Weekly comparison
-python scripts/validation/compare_ml_vs_momentum.py         # Strategy comparison
+python scripts/validation/pit_momentum_oct_dec.py    # Momentum PIT backtest
+python scripts/validation/pit_backtest_oct_dec.py   # ML PIT backtest
 ```
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This is a **paper trading** system for educational purposes. Past performance does not guarantee future results. Do not trade real money based on this system.
 
 ---
 
-## 📄 License
+## License
 
 MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+*Built by Prabuddha Tamhane - December 2025*
