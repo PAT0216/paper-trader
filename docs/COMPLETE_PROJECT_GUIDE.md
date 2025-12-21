@@ -2,44 +2,31 @@
 
 > **Private Documentation** - Comprehensive guide to the entire system architecture.
 
+**Last Updated**: December 2025  
+**Transaction Costs**: 5 bps slippage on all trades
+
 ---
 
 ## 🏗️ System Overview
 
 Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
-1. Runs **two independent strategies** simultaneously (Momentum & ML)
-2. Maintains **separate ledgers** for each strategy
-3. Provides a **Streamlit dashboard** for real-time comparison
-4. Automates trading via **GitHub Actions**
+- Runs **two independent strategies** (Momentum + ML) in parallel
+- Uses **SQLite caching** to store 4M+ rows of market data
+- Applies **realistic transaction costs** (5 basis points slippage)
+- Deploys via **GitHub Actions** for automated daily trading
+- Displays results on a **Streamlit dashboard**
 
-### 🔴 [Live Dashboard](https://paper-trader-ai.streamlit.app/)
-
----
-
-## 🎯 Dual Portfolio Architecture
-
-### Portfolio Isolation
-
-| Portfolio | Strategy | Ledger | Workflow | Rebalance |
-|-----------|----------|--------|----------|-----------|
-| **Momentum** | 12-month momentum + 15% SL | `ledger_momentum.csv` | `momentum_trade.yml` | Monthly |
-| **ML** | XGBoost ensemble | `ledger_ml.csv` | `ml_trade.yml` | Daily |
-
-### Why Dual Portfolios?
-
-1. **Fair comparison**: Same capital, same universe, different strategies
-2. **No interference**: Momentum trades don't affect ML portfolio
-3. **Performance tracking**: Clear attribution of returns
-4. **Risk isolation**: One strategy failing doesn't affect the other
+### Live Dashboard
+🌐 [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
 
 ---
 
 ## 📈 Strategy 1: Momentum (Primary)
 
 ### Theory
-- Based on Jegadeesh & Titman (1993) academic research
-- Fama-French factor: stocks that went up keep going up
-- 12-month lookback (skip last month to avoid reversal)
+- Based on **Jegadeesh & Titman (1993)** academic research
+- Stocks that performed well continue to outperform
+- 12-month lookback, skip last month to avoid reversal
 
 ### Implementation
 ```python
@@ -48,73 +35,49 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 2. Skip last month (reversal effect)
 3. Rank by momentum score
 4. Buy top 10 stocks (equal weight)
-5. Apply 15% stop-loss + position limits
+5. Apply 5 bps slippage to all trades
 ```
 
-### Performance (2015-2025 Backtest)
+### Performance (Oct 1 - Dec 19, 2025 with Transaction Costs)
 
 | Metric | Value |
 |--------|-------|
-| **CAGR** | +25.6% |
-
-| **Sharpe Ratio** | 0.98 |
-| **Max Drawdown** | -27% |
-
-### Yearly Returns
-
-| Year | Return |
-|------|--------|
-| 2015 | +18.4% |
-| 2016 | -5.7% |
-| 2017 | +42.6% |
-| 2018 | +19.5% |
-| 2019 | +16.1% |
-| 2020 | +0.9% |
-| 2021 | +31.7% |
-| 2022 | +10.2% |
-| 2023 | +21.4% |
-| 2024 | +136.0% |
-| 2025 | +29.5% |
+| **Initial Capital** | $10,000 |
+| **Final Value** | $10,720 |
+| **Total Return** | +7.20% |
+| **vs SPY** | +4.10% excess |
+| **Total Trades** | 50 |
+| **Rebalance Freq** | Monthly |
 
 ---
 
 ## 🤖 Strategy 2: ML Ensemble
 
 ### Theory
-- XGBoost predicts N-day returns (multi-horizon)
-- 15 technical features (momentum, volume, volatility)
-- Noise-based feature selection (only features better than random)
+- XGBoost regression predicting next-day returns
+- Multi-horizon ensemble (1d, 5d, 20d)
+- 15 technical indicator features
 
 ### Implementation
 ```python
-# Daily trading
-1. Generate 15 features from OHLCV
-2. Train 3 models: 1-day (50%), 5-day (30%), 20-day (20%)
-3. Weighted ensemble prediction
-4. Rank stocks by predicted return
-5. Buy top 10%, apply risk limits
+# Daily rebalance
+1. Generate 15 technical indicators
+2. Predict returns using XGBoost ensemble
+3. Rank by expected return
+4. Buy top 10 predicted stocks
+5. Apply 5 bps slippage to all trades
 ```
 
-### Performance (Oct 2025 - Dec 2025 PIT Backtest)
+### Performance (Oct 1 - Dec 19, 2025 with Transaction Costs)
 
 | Metric | Value |
 |--------|-------|
-
-| **Annualized** | +43.8% |
-| **Sharpe Ratio** | 1.37 |
-| **Max Drawdown** | -16.5% |
-| **Alpha vs SPY** | +4.54% |
-
-### Walk-Forward Validation (2017-2025)
-
-| Metric | Value |
-|--------|-------|
-| **Final Value** | $667,664 (from $100k) |
-
-| **CAGR** | +26.3% |
-| **Sharpe Ratio** | 0.84 |
-| **Max Drawdown** | -36.7% |
-| **Win Rate** | 56.8% |
+| **Initial Capital** | $10,000 |
+| **Final Value** | $10,158 |
+| **Total Return** | +1.58% |
+| **vs SPY** | -1.52% underperform |
+| **Total Trades** | 526 |
+| **Rebalance Freq** | Daily |
 
 ### ML Model Details
 
@@ -123,31 +86,30 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 | Algorithm | XGBoost Regressor |
 | Horizons | 1d (50%), 5d (30%), 20d (20%) |
 | Features | 15 technical indicators |
-| Feature Selection | Noise-based (beat random features) |
-| Retraining | Daily |
-| Universe | S&P 500 |
+| Training | TimeSeriesSplit (5-fold) |
 
 ---
 
-## 📊 Feature Engineering (ML Strategy)
+## 💰 Transaction Costs
 
-### 15 Production Features
+### Cost Model
+All trades include **5 basis points (0.05%) slippage**:
 
-| Category | Features |
-|----------|----------|
-| **Momentum** | RSI, MACD, MACD_signal, MACD_hist |
-| **Trend** | BB_Width, Dist_SMA50, Dist_SMA200, Return_1d, Return_5d |
-| **Volume** | OBV_Momentum, Volume_Ratio, VWAP_Dev |
-| **Volatility** | ATR_Pct, BB_PctB, Vol_Ratio |
-
-### Feature Selection Process
 ```python
-1. Add 5 random noise features to training data
-2. Train quick XGBoost model
-3. Keep only features with importance > max(noise features)
-4. Fallback: if none beat noise, keep top 8 by importance
-5. Train final model on selected features only
+# BUY: Pay slightly more
+execution_price = quote_price × 1.0005
+
+# SELL: Receive slightly less  
+execution_price = quote_price × 0.9995
 ```
+
+### Impact Analysis
+| Strategy | Trades | Est. Cost Impact |
+|----------|--------|------------------|
+| Momentum | 50 | ~$25 (0.25%) |
+| ML | 526 | ~$260 (2.6%) |
+
+**Insight**: High-turnover ML strategy suffers more from transaction costs.
 
 ---
 
@@ -155,8 +117,8 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 
 ### Portfolio-Level Controls
 
-| Level | Trigger | Action |
-|-------|---------|--------|
+| Control | Threshold | Action |
+|---------|-----------|--------|
 | Warning | -15% drawdown | Reduce position sizes 50% |
 | Halt | -20% drawdown | No new buys, sells only |
 | Liquidate | -25% drawdown | Force sell 50% |
@@ -167,8 +129,8 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 |---------|-------|
 | Max position | 15% of portfolio |
 | Max sector | 30% of portfolio |
-| Stop-loss | 15% from entry |
-| Slippage | 10 bps assumed |
+| Stop-loss | 8% from entry |
+| Slippage | 5 bps on all trades |
 
 ---
 
@@ -181,109 +143,70 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 | Database | `data/market.db` |
 | Tickers | 503 (S&P 500) |
 | Total Rows | 4.3M+ |
-| Date Range | 2010-2025 |
+| Date Range | 2010 - Present |
 
-### Data Flow
+### Key Functions
+```python
+from src.data.cache import get_cache
+from src.data.loader import fetch_data, update_cache
 
-```mermaid
-flowchart TD
-    A[yfinance API] -->|Daily Refresh| B[market.db]
-    B --> C{Strategy?}
-    C -->|Momentum| D[12-1 Calculation]
-    C -->|ML| E[Feature Generation]
-    D --> F[Portfolio Manager]
-    E --> G[XGBoost Ensemble]
-    G --> F
-    F --> H[Ledger CSV]
-    H --> I[Dashboard]
+# Fetch with caching
+data = fetch_data(['AAPL', 'GOOGL'], period='2y')
+
+# Cache-only (for backtesting)
+data = fetch_from_cache_only(['AAPL'], '2024-01-01', '2025-01-01')
 ```
-
----
-
-## 🔄 GitHub Actions Workflows
-
-| Workflow | Schedule | Purpose |
-|----------|----------|---------|
-| **Universe Refresh** | 1st of month, 8 PM UTC | Update S&P 500 list |
-| **Cache Refresh** | Mon-Fri, 9 PM UTC | Update prices + compute snapshot |
-| **Momentum Trade** | 1st-3rd of month, 9:30 PM UTC | Monthly rebalance |
-| **ML Trade** | Mon-Fri, 9:30 PM UTC | Daily trading |
-
-### Workflow Data Updates
-
-The `cache_refresh.yml` workflow now updates:
-- `data/market.db` - Price cache
-- `data/portfolio_snapshot.json` - Dashboard metrics
-- `data/spy_benchmark.json` - SPY chart data
 
 ---
 
 ## 📊 Streamlit Dashboard
 
 ### Features
-- **Portfolio comparison**: Momentum vs ML vs SPY
-- **Performance chart**: All 3 strategies with SPY benchmark
-- **Holdings table**: Current positions per strategy
-- **Trade history**: Recent trades
+- **Portfolio Overview**: Momentum vs ML vs SPY cards
+- **Performance Chart**: All 3 strategies with daily values
+- **Holdings Tables**: Current positions per strategy
+- **Trade History**: Recent trades with prices
 
-### URL: [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
+### Data Flow
+```
+GitHub Actions → main.py → ledger_*.csv → dashboard/app.py
+                         → portfolio_snapshot.json
+```
 
 ---
 
-## 📁 File Structure (Updated Dec 2025)
+## 📁 File Structure
 
 ```
 paper-trader/
 ├── main.py                              # Core orchestrator
 ├── config/
-│   └── settings.yaml                    # All configuration
-├── src/
-│   ├── strategies/
-│   │   └── momentum_strategy.py         # Momentum implementation
-│   ├── models/
-│   │   ├── trainer.py                   # XGBoost training + feature selection
-│   │   └── predictor.py                 # Ensemble predictions
-│   ├── trading/
-│   │   ├── portfolio.py                 # Portfolio management
-│   │   └── risk_manager.py              # Risk controls
-│   ├── features/
-│   │   └── indicators.py                # Feature generation
-│   └── data/
-│       ├── loader.py                    # Data fetching
-│       └── cache.py                     # SQLite cache
-├── scripts/
-│   ├── backtests/                       # Backtest scripts
-│   │   ├── run_backtest.py
-│   │   ├── run_walkforward.py
-│   │   ├── ml_walkforward.py
-│   │   ├── momentum_backtest.py
-│   │   └── momentum_vs_spy.py
-│   ├── validation/                      # Validation scripts
-│   │   ├── momentum_rebalance_comparison.py
-│   │   ├── compare_ml_vs_momentum.py
-│   │   ├── pit_backtest_oct_dec.py
-│   │   └── validate_ml_trainer.py
-│   └── utils/                           # Utility scripts
-│       ├── compute_portfolio_snapshot.py
-│       ├── update_universe.py
-│       ├── fetch_fundamentals.py
-│       └── backfill_ledgers.py
-├── dashboard/
-│   └── app.py                           # Streamlit app
-├── .github/workflows/
-│   ├── cache_refresh.yml                # Daily data refresh
-│   ├── momentum_trade.yml               # Monthly momentum
-│   ├── ml_trade.yml                     # Daily ML
-│   └── universe_refresh.yml             # Monthly universe
+│   └── trading.yaml                     # Strategy configuration
 ├── data/
 │   ├── market.db                        # SQLite cache
-│   ├── sp500_tickers.txt                # Ticker list
-│   ├── portfolio_snapshot.json          # Dashboard metrics
-│   └── spy_benchmark.json               # SPY chart data
-├── ledger_momentum.csv                  # Momentum trades
-├── ledger_ml.csv                        # ML trades
-├── results/                             # Backtest outputs
-└── docs/                                # Documentation
+│   ├── portfolio_snapshot.json          # Dashboard data
+│   ├── spy_benchmark.json               # SPY history
+│   └── sp500_tickers.txt                # Universe
+├── src/
+│   ├── data/                            # Cache & loader
+│   ├── features/                        # Technical indicators
+│   ├── models/                          # XGBoost training & prediction
+│   ├── trading/                         # Portfolio & risk management
+│   └── backtesting/                     # Costs & performance
+├── scripts/
+│   ├── backtests/                       # Walk-forward backtests
+│   ├── validation/                      # PIT backtests
+│   └── utils/                           # Utility scripts
+├── dashboard/
+│   └── app.py                           # Streamlit application
+├── models/
+│   ├── xgb_ensemble.joblib              # Trained model
+│   └── model_metadata.json              # Features & metrics
+├── ledger_ml.csv                        # ML trade history
+├── ledger_momentum.csv                  # Momentum trade history
+└── docs/
+    ├── MANUAL.md                        # Technical reference
+    └── COMPLETE_PROJECT_GUIDE.md        # This file
 ```
 
 ---
@@ -304,52 +227,53 @@ python main.py --mode train --strategy ml
 python main.py --mode backtest --strategy momentum
 ```
 
-### Arguments
-
-| Arg | Options | Default |
-|-----|---------|---------|
-| `--strategy` | `momentum`, `ml` | `momentum` |
-| `--portfolio` | any string | `default` |
-| `--mode` | `trade`, `train`, `backtest` | `trade` |
-
 ---
 
-## 🧪 Testing
+## 🔧 Make Commands
 
 ```bash
-# Run all tests
-python -m pytest tests/ -v
-
-# Specific validation scripts
-python scripts/validation/momentum_rebalance_comparison.py
-python scripts/validation/compare_ml_vs_momentum.py
+make train      # Train ML model
+make trade      # Execute daily trades
+make backtest   # Run historical backtest
+make docker-up  # Start Docker container
+make clean      # Clean artifacts
 ```
 
 ---
 
-## 🚀 Recent Updates (Dec 2025)
+## ⚙️ GitHub Actions
 
-1. **ML Alignment**: Fixed critical bugs in target calculation and feature selection
-2. **SPY Benchmark**: Added SPY line to performance chart
-3. **File Reorganization**: Scripts organized into `backtests/`, `validation/`, `utils/`
-4. **Workflow Fixes**: Updated all workflow paths for new structure
-5. **Momentum Analysis**: Complete rebalance frequency comparison with risk management
+### Scheduled Workflows
+
+| Workflow | Schedule | Action |
+|----------|----------|--------|
+| `momentum.yml` | 1st of month, 2pm PT | Monthly momentum rebalance |
+| `ml_strategy.yml` | Daily, 1pm PT | Daily ML trades |
+| `update_cache.yml` | Daily, 6am PT | Refresh market data |
+
+### Secrets Required
+- `GH_TOKEN` - For pushing ledger updates
 
 ---
 
-## ⚠️ Known Limitations
+## 📝 Assumptions & Limitations
 
-1. **Paper trading only**: No real money integration
-2. **US market only**: S&P 500 universe only
-3. **Daily resolution**: No intraday trading
-4. **End-of-day data**: Trades execute at next open
+1. **Paper trading only** - No real broker integration
+2. **End-of-day data** - Trades execute at next open
+3. **5 bps slippage** - Conservative estimate for liquid stocks
+4. **No dividends** - Returns based on price only
+5. **S&P 500 universe** - No small caps or international
 
 ---
 
 ## 🔮 Future Improvements
 
-- [ ] Add sector rotation strategy
 - [ ] Real broker integration (Alpaca, IBKR)
 - [ ] Intraday trading capability
+- [ ] Sector rotation strategy
 - [ ] International market support
 - [ ] Mobile app for monitoring
+
+---
+
+*Built by Prabuddha Tamhane • December 2025*

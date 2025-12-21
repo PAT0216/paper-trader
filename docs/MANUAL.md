@@ -1,919 +1,663 @@
 # Paper Trader AI - Technical Manual
 
-This document provides comprehensive technical documentation for the Paper Trader AI system, including architecture, risk management, data pipelines, and operational workflows.
+> **Complete Technical Reference** - All functions, classes, and modules documented
+
+**Last Updated**: December 2025  
+**Version**: 2.0 (with Transaction Costs)
 
 ---
 
-## 🏗 System Architecture
+## Table of Contents
 
-The application follows a modular, production-ready architecture designed for extensibility, testability, and risk control.
-
-### Core Components
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         Main Trading Loop                                │
-│                           (main.py)                                      │
-└─────────────────────────────────────────────────────────────────────────┘
-                                    │
-        ┌───────────────────────────┼───────────────────────────┐
-        ▼                           ▼                           ▼
-┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│   Data Layer     │       │   Model Layer    │       │  Trading Layer   │
-│                  │       │                  │       │                  │
-│ • loader.py      │       │ • trainer.py     │       │ • portfolio.py   │
-│ • cache.py ✨    │──────▶│ • predictor.py   │──────▶│ • risk_manager   │
-│ • universe.py ✨ │       │   (Ensemble) ✨  │       │ • regime.py ✨   │
-│ • validator.py   │       │                  │       │                  │
-│ • macro.py       │       │                  │       │                  │
-└──────────────────┘       └──────────────────┘       └──────────────────┘
-        │                           │                           │
-        ▼                           ▼                           ▼
-┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│ market.db (SQLite)│       │ XGBoost Models   │       │ ledger.csv       │
-│ • 503 tickers ✨  │       │ • 1d/5d/20d ✨   │       │ Trade History    │
-│ • 4.3M rows       │       │ • Ensemble       │       │                  │
-└──────────────────┘       └──────────────────┘       └──────────────────┘
-        │
-        ▼
-┌──────────────────┐
-│ S&P 500 Universe │
-│ (Wikipedia) ✨   │
-└──────────────────┘
-
-✨ = New in Phase 3.6 / Phase 4
-```
+1. [System Architecture](#system-architecture)
+2. [Data Pipeline](#data-pipeline)
+3. [Feature Engineering](#feature-engineering)
+4. [Machine Learning Pipeline](#machine-learning-pipeline)
+5. [Prediction & Signals](#prediction--signals)
+6. [Portfolio Management](#portfolio-management)
+7. [Risk Management](#risk-management)
+8. [Transaction Costs](#transaction-costs)
+9. [Backtesting Framework](#backtesting-framework)
+10. [Dashboard](#dashboard)
+11. [CLI Reference](#cli-reference)
 
 ---
 
-## 📦 Component Reference
+## System Architecture
 
-### 1. Data Pipeline
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         PAPER TRADER AI                             │
+│                    Dual-Portfolio Trading System                    │
+└─────────────────────────────────────────────────────────────────────┘
+                                  │
+        ┌─────────────────────────┴─────────────────────────┐
+        ▼                                                   ▼
+┌───────────────────┐                           ┌───────────────────┐
+│  MOMENTUM STRATEGY │                           │   ML STRATEGY     │
+│  • 12-1 Momentum   │                           │  • XGBoost Ensemble│
+│  • Monthly Rebal   │                           │  • Daily Rebalance │
+│  • 10 Positions    │                           │  • 10 Positions    │
+│  ledger_momentum.csv│                           │  ledger_ml.csv     │
+└───────────────────┘                           └───────────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────┐
+                    │   SHARED INFRASTRUCTURE  │
+                    │  • SQLite Cache (market.db)│
+                    │  • Risk Manager           │
+                    │  • Transaction Cost Model │
+                    │  • Streamlit Dashboard    │
+                    └─────────────────────────┘
+```
 
-#### **Data Loader** (`src/data/loader.py`)
-- **Purpose**: Fetches historical OHLCV data from Yahoo Finance
-- **API**: `yfinance` library
-- **Caching**: Optimized to minimize redundant API calls
-- **Output**: Dictionary of `{ticker: DataFrame}` with DatetimeIndex
+### Core Entry Point: `main.py`
 
-**Key Function**:
+The main orchestrator for all trading operations.
+
+#### `main()`
+**Purpose**: Entry point that routes to train, trade, or backtest modes.
+
+**Arguments** (CLI):
+| Argument | Options | Default | Description |
+|----------|---------|---------|-------------|
+| `--mode` | train, trade, backtest | trade | Operation mode |
+| `--strategy` | momentum, ml | momentum | Which strategy to use |
+| `--portfolio` | momentum, ml | Default | Which ledger to use |
+
+**Flow**:
+1. Load configuration from `config/trading.yaml`
+2. Initialize Portfolio with specified ledger
+3. Fetch market data via cache-first loading
+4. Execute strategy-specific logic
+5. Apply transaction costs (5 bps slippage)
+6. Record trades to CSV ledger
+
+#### `calculate_momentum_12_1(df)`
+**Purpose**: Calculate Fama-French 12-1 month momentum factor.
+
+**Parameters**:
+- `df`: DataFrame with 'Close' column, minimum 252 trading days
+
+**Returns**: Float momentum score (typically -0.5 to 3.0)
+
+**Formula**:
 ```python
-fetch_data(tickers, period="3y", interval="1d") -> Dict[str, pd.DataFrame]
-```
-
-#### **Data Validator** (`src/data/validator.py`) ✨ *New in Phase 1*
-- **Purpose**: Ensures data quality before model training
-- **Checks Performed**: 10 comprehensive validations
-- **Output**: `ValidationResult` with errors and warnings
-
-**Validation Checks**:
-
-| Check | Threshold | Action on Fail |
-|-------|-----------|----------------|
-| Empty DataFrame | N/A | Critical Error |
-| Missing Columns | Must have OHLC, Volume | Critical Error |
-| Data Freshness | < 48 hours old | Warning |
-| Missing Values | < 5% missing | Error if > 5% |
-| Price Validity | Prices > $0.01 | Critical Error |
-| OHLC Relationships | High ≥ Low, etc. | Critical Error |
-| Outlier Detection | Returns > 10σ | Warning |
-| Volume Validity | No negative volume | Warning |
-| Duplicates | No duplicate dates | Critical Error |
-| DateTime Index | Must be DatetimeIndex | Critical Error |
-
-**Usage Example**:
-```python
-from src.data.validator import DataValidator
-
-validator = DataValidator(
-    max_missing_pct=0.05,       # Max 5% missing
-    outlier_std_threshold=10.0, # Flag >10σ returns
-    max_data_age_hours=48       # Data < 48h old
-)
-
-results = validator.validate_data_dict(data_dict)
-validator.print_validation_summary(results)
+momentum = (price_12_months_ago / price_1_month_ago) - 1
 ```
 
 ---
 
-### 2. Feature Engineering ✨ *Updated in Phase 3.5*
+## Data Pipeline
 
-#### **Technical Indicators** (`src/features/indicators.py`)
+### Module: `src/data/cache.py`
 
-The model uses **15 features** across 4 categories. All features use only past data (no look-ahead bias).
+SQLite-based caching system to avoid API rate limits and enable fast backtesting.
 
----
-
-**MOMENTUM INDICATORS** (4 features)
-
-| Feature | Formula | Trading Interpretation |
-|---------|---------|----------------------|
-| **RSI** | 100 - 100/(1 + RS) where RS = AvgGain/AvgLoss | >70 = overbought, <30 = oversold |
-| **MACD** | EMA(12) - EMA(26) | Positive = bullish momentum |
-| **MACD_signal** | EMA(9) of MACD | Crossover signals |
-| **MACD_hist** | MACD - Signal | Histogram divergence |
-
----
-
-**TREND INDICATORS** (5 features)
-
-| Feature | Formula | Trading Interpretation |
-|---------|---------|----------------------|
-| **BB_Width** | (Upper - Lower) / Close | Low = consolidation, high = volatility |
-| **Dist_SMA50** | Close / SMA_50 - 1 | >0 = above trend, <0 = below |
-| **Dist_SMA200** | Close / SMA_200 - 1 | Long-term trend direction |
-| **Return_1d** | Close.pct_change() | Yesterday's return |
-| **Return_5d** | Close.pct_change(5) | Week momentum |
-
----
-
-**VOLUME INDICATORS** (3 features) *(New in Phase 3.5)*
-
-| Feature | Formula | Trading Interpretation |
-|---------|---------|----------------------|
-| **OBV_Momentum** | pct_change(OBV, 10) | Rising OBV = buying pressure |
-| **Volume_Ratio** | Vol(5d avg) / Vol(20d avg) | >1 = unusual volume |
-| **VWAP_Dev** | Close / VWAP - 1 | >0 = trading above fair value |
-
----
-
-**VOLATILITY INDICATORS** (3 features) *(New in Phase 3.5)*
-
-| Feature | Formula | Trading Interpretation |
-|---------|---------|----------------------|
-| **ATR_Pct** | ATR(14) / Close | Normalized volatility measure |
-| **BB_PctB** | (Close - Lower) / (Upper - Lower) | 0-1 position in bands |
-| **Vol_Ratio** | Vol(10d) / Vol(60d) | >1 = volatility expansion |
-
----
-
-**Target Variable** *(Phase 3)*:
-- **Regression**: Next-day return (percentage)
-- Created SEPARATELY from features to prevent look-ahead bias
-
----
-
-### 3. Machine Learning Pipeline ✨ *Updated in Phase 3.5*
-
-#### **Model Trainer** (`src/models/trainer.py`)
-- **Algorithm**: XGBoost Regressor (predicts return magnitude)
-- **Features**: 15 technical indicators (dynamically filtered)
-- **Target**: Next-day return (continuous)
-- **Cross-Validation**: 5-fold TimeSeriesSplit (proper walk-forward)
-- **Anti-Leakage**: Target created AFTER feature generation
-
-**Hyperparameters**:
-- `n_estimators=100`
-- `learning_rate=0.05`
-- `max_depth=5`
-- `objective='reg:squarederror'`
-
-**Dynamic Feature Selection** *(New in Phase 3.5)*:
-1. Train initial model with all 15 features
-2. Calculate feature importance scores
-3. Drop features with importance < 3%
-4. Retrain with only useful features
-5. Save selected feature list with model
-
-**Cross-Validation Metrics**:
-- RMSE: Root Mean Squared Error
-- MAE: Mean Absolute Error
-- R²: Coefficient of determination
-- Directional Accuracy: % of correct up/down predictions
-
-**Output Artifacts**:
-- `models/xgb_model.joblib`: Model + metadata (selected features)
-- `results/metrics.txt`: CV metrics across all folds
-- `results/feature_importance.png`: Feature importance with threshold line
-- `results/selected_features.txt`: Features used for inference
-
-#### **Predictor** (`src/models/predictor.py`)
-- **Input**: Raw OHLC DataFrame
-- **Output**: Expected next-day return (e.g., +1.2% or -0.5%)
-- **Process**:
-  1. Load model + selected features from metadata
-  2. Transform OHLC → Features via `generate_features()`
-  3. Extract only selected features for latest row
-  4. Predict with XGBoost regressor
-  5. Return expected return value
-
-**Trading Thresholds**:
-- BUY: Expected return > +0.5%
-- SELL: Expected return < -0.5%
-- HOLD: otherwise
-
----
-
-### 4. Risk Management ✨ *New in Phase 1*
-
-#### **Risk Manager** (`src/trading/risk_manager.py`)
-
-Professional-grade risk control system preventing catastrophic losses.
-
-**Risk Limits** (Configurable via `RiskLimits` dataclass):
-
-```python
-max_position_pct: 0.15      # Maximum 15% per position
-max_sector_pct: 0.40        # Maximum 40% in any sector
-min_cash_buffer: 100.0      # Minimum cash reserve
-max_daily_var_pct: 0.025    # Maximum 2.5% VaR
-volatility_lookback: 30     # Days for volatility calculation
-correlation_threshold: 0.7  # Reduce size if corr > 70%
-```
-
-**Position Sizing Algorithm**:
-
-1. **Volatility Adjustment**:
-   ```
-   volatility = std(returns) * sqrt(252)  # Annualized
-   vol_scalar = min(target_vol / volatility, 1.5)
-   adjusted_shares = base_shares * vol_scalar
-   ```
-   - Higher volatility → Smaller position
-   - Target volatility: 20% annualized
-
-2. **Constraint Checks**:
-   - Max position value: `portfolio_value × 0.15`
-   - Max sector value: `portfolio_value × 0.40 - current_sector_exposure`
-   - Available cash constraint
-
-3. **Correlation Penalty**:
-   - If same sector already > 25% of portfolio → Apply penalty (up to 50% reduction)
-
-4. **Final Position**:
-   ```
-   shares = min(
-       shares_by_cash,
-       shares_by_position_limit,
-       shares_by_volatility,
-       shares_by_sector_limit
-   ) × (1 - correlation_penalty)
-   ```
-
-**Value at Risk (VaR)**:
-- **Method**: Historical simulation
-- **Confidence**: 95%
-- **Horizon**: 1 day
-- **Calculation**:
-  1. Calculate daily returns for each holding over last 30 days
-  2. Weight returns by portfolio allocation
-  3. Compute aggregate portfolio returns
-  4. VaR = 5th percentile of return distribution × portfolio_value
-
-**Sector Classification**:
-| Sector        | Tickers |
-|---------------|---------|
-| Technology    | AAPL, MSFT, NVDA, GOOGL, AMZN, META, TSLA, AVGO, AMD, CRM, NFLX |
-| Financials    | JPM, V, MA, BAC, BRK-B |
-| Consumer      | HD, COST, WMT, PG, KO, PEP, DIS |
-| Healthcare    | UNH, JNJ, LLY, MRK |
-| Energy        | XOM, CVX |
-| Industrials   | BA, CAT |
-| Index         | SPY, QQQ, IWM, DIA |
-
-**Pre-Trade Validation**:
-```python
-is_valid, reason = risk_mgr.validate_trade(
-    ticker, action, shares, price,
-    current_holdings, current_prices,
-    cash_balance, portfolio_value
-)
-```
-
-Checks:
-- ✅ Sufficient cash (for BUY)
-- ✅ Position size within limits
-- ✅ Sector concentration within limits
-- ✅ Minimum cash buffer maintained
-- ✅ Sufficient shares owned (for SELL)
-
----
-
-### 5. Portfolio Management
-
-#### **Portfolio** (`src/trading/portfolio.py`)
-- **Ledger**: CSV-based transaction log (`ledger.csv`)
-- **State Tracking**: Cash balance, holdings by ticker
-- **Idempotency**: Prevents duplicate trades on same ticker/day
-
-**Key Methods**:
-- `get_holdings()`: Returns `{ticker: shares}` dictionary
-- `get_last_balance()`: Current cash balance
-- `get_portfolio_value(prices)`: Total value (cash + holdings)
-- `record_trade(ticker, action, price, shares)`: Executes and logs trade
-- `has_traded_today(ticker)`: Checks if already traded
-
----
-
-### 6. Backtesting Framework ✨ *New in Phase 2*
-
-The backtesting module (`src/backtesting/`) provides event-driven strategy validation with professional quant metrics.
-
-#### **Backtester** (`src/backtesting/backtester.py`)
-
-**Architecture**: Event-driven simulation engine that walks through historical data day-by-day, simulating trades with realistic costs and risk controls.
-
-```python
-from src.backtesting import Backtester, BacktestConfig
-
-config = BacktestConfig(
-    start_date="2017-01-01",
-    end_date="2024-12-31",
-    initial_cash=100000.0,
-    benchmark_ticker="SPY",
-    slippage_bps=5.0,           # 5 basis points slippage
-    max_position_pct=0.15,      # Max 15% per position
-    rebalance_frequency="daily" # daily, weekly, monthly
-)
-
-backtester = Backtester(config)
-metrics, trades_df, summary = backtester.run(
-    data_dict=data_dict,
-    signal_generator=my_strategy_function,
-    benchmark_data=spy_data
-)
-```
-
-#### **Performance Metrics** (`src/backtesting/performance.py`)
-
-**Professional Quant Metrics**:
-
-| Metric | Formula | Target |
-|--------|---------|--------|
-| **Sharpe Ratio** | `(Return - Rf) / Volatility` | > 1.0 |
-| **Sortino Ratio** | `(Return - Rf) / Downside Vol` | > 1.5 |
-| **Calmar Ratio** | `CAGR / Max Drawdown` | > 0.5 |
-| **Information Ratio** | `Active Return / Tracking Error` | > 0.5 |
-| **VaR (95%)** | 5th percentile of returns | < 2% daily |
-| **CVaR (Expected Shortfall)** | Average loss beyond VaR | < 3% daily |
-| **Alpha** | Excess return after beta adjustment | > 0% |
-| **Beta** | Market sensitivity | 0.5 - 1.5 |
-
-**Trade Quality Metrics**:
-- **Win Rate**: Percentage of profitable trades
-- **Profit Factor**: Gross profit / Gross loss
-- **Average Holding Period**: Days per position
-- **Turnover**: Annual portfolio turnover
-
-#### **Transaction Costs** (`src/backtesting/costs.py`)
-
-**Cost Components**:
-
-| Component | Default | Description |
-|-----------|---------|-------------|
-| **Slippage** | 5 bps | Bid-ask spread impact |
-| **Commission** | $0.00 | Per-share fee (zero for modern brokers) |
-| **Market Impact** | √(participation) × price | For orders > 0.5% of ADV |
-
-**Execution Price Calculation**:
-```python
-# BUY: Pay more than quoted price
-execution_price = price × (1 + slippage_bps/10000) + market_impact
-
-# SELL: Receive less than quoted price  
-execution_price = price × (1 - slippage_bps/10000) - market_impact
-```
-
-#### **Regime Classification**
-
-The backtester automatically classifies market regimes for stratified performance analysis:
-
-| Regime | Detection Criteria |
-|--------|-------------------|
-| **Bull** | SPY > SMA_200, Volatility < 1.5× average |
-| **Bear** | SPY < SMA_200 |
-| **Crisis** | Volatility > 2× average (e.g., COVID, 2008) |
-| **Sideways** | No clear trend |
-
-**Running a Backtest**:
-```bash
-# Full backtest (2017-2024)
-make backtest
-
-# Quick backtest (2023-2024)  
-make backtest-quick
-
-# CLI with custom dates
-python run_backtest.py --start 2020-01-01 --end 2023-12-31 --cash 50000
-```
-
-**Output Files**:
-- `results/backtest_summary.txt`: Human-readable performance summary
-- `results/backtest_metrics.json`: Machine-readable metrics
-- `results/backtest_trades.csv`: Complete trade log
-
----
-
-## 📊 Understanding the Metrics
-
-### **Model Performance Metrics** (`results/metrics.txt`) ✨ *Updated in Phase 3*
-
-**RMSE (Root Mean Squared Error)**:
-- Average prediction error in return terms
-- Example: RMSE = 0.0197 means ~2% average error
-- **Target**: < 0.025 (2.5%)
-
-**MAE (Mean Absolute Error)**:
-- Similar to RMSE but less sensitive to outliers
-- **Target**: < 0.015 (1.5%)
-
-**R² (Coefficient of Determination)**:
-- How much variance the model explains
-- R² = 0.0 means model = mean prediction
-- R² < 0 means model is worse than mean
-- **For daily returns**: Negative R² is common (markets are efficient)
-
-**Directional Accuracy**:
-- Percentage of correct up/down predictions
-- **Target**: > 52% (edge over random)
-- Example: 52.03% = slight but consistent edge
-
-### **Ranking Metrics** *(New in Phase 7)*
-
-> **Why Ranking Matters**: The model may have negative R² (bad at predicting exact returns) but still profit if it correctly *ranks* stocks (picks winners over losers).
-
-**Spearman Rank Correlation**:
-- Measures if predicted ranks match actual ranks
-- Range: -1 to +1 (0 = random)
-- **Target**: > 0.10 (weak but profitable correlation)
-
-**Top-10% Accuracy**:
-- Of stocks you'd buy (top 10% by prediction), how many are actually top 10%?
-- **Target**: > 15% (better than 10% random chance)
-
-**The R² Paradox Explained**:
-| Metric | Value | Meaning |
-|--------|-------|---------|
-| R² | -0.01 | Bad at magnitude prediction |
-| Spearman | 0.12 | Decent at ranking |
-| Win Rate | 37% | Low, but winners are 3x larger |
-| Result | +497% | Strategy still profits!
-
-### **Feature Importance** (`results/feature_importance.png`)
-
-Shows which features drive predictions:
-- Higher importance = more predictive power
-- Helps understand model behavior
-- Useful for feature engineering decisions
-
-### **Risk Metrics** (Displayed at runtime)
-
-**1-Day VaR (95%)**:
-- Expected maximum loss over 1 day with 95% confidence
-- Example: `VaR = $245.32 (2.45% of portfolio)` means there's a 5% chance of losing more than $245 tomorrow
-
-**Sector Exposure**:
-- Percentage of portfolio allocated to each sector
-- **Target**: No sector > 40%, diversification across 3+ sectors
-
-**Volatility Scalar**:
-- Adjustment factor for position sizing
-- `scalar > 1.0`: Low volatility → Increase position
-- `scalar < 1.0`: High volatility → Decrease position
-
----
-
-## 🛠 Operations (Makefile)
-
-The project uses `make` for standardized operations.
-
-### Available Commands
-
-#### **Setup Environment**
-```bash
-make setup
-```
-- Creates Conda environment from `environment.yml`
-- Installs all dependencies (pandas, yfinance, xgboost, pytest, etc.)
-
-#### **Run Trading Bot**
-```bash
-make trade
-```
-- Executes full trading workflow:
-  1. Fetch market data (3 years)
-  2. Validate data quality
-  3. Train/load XGBoost model
-  4. Generate predictions
-  5. Calculate risk-adjusted position sizes
-  6. Execute validated trades
-  7. Display portfolio summary and risk metrics
-
-#### **Force Model Retraining**
-```bash
-make train
-```
-- Trains model without executing trades
-- Useful for testing model performance
-- Saves new model to `models/xgb_model.joblib`
-
-#### **Run Test Suite**
-```bash
-make test
-```
-- Executes all 55 unit tests
-- Covers ML pipeline (12), backtesting (16), risk manager (14), validator (13)
-- Displays test results and coverage
-
-#### **Docker Deployment**
-```bash
-make docker-up    # Start containerized system
-make docker-down  # Stop containers
-```
-- Runs system in isolated Docker environment
-- Ensures reproducibility across platforms
-
-#### **Clean Build Artifacts**
-```bash
-make clean
-```
-- Removes `__pycache__` directories
-- Clears `results/` folder
-- Fresh start for debugging
-
----
-
-## 🧪 Testing Guide
-
-### Running Tests
-
-```bash
-# All tests
-pytest tests/ -v
-
-# Specific module
-pytest tests/test_risk_manager.py -v
-pytest tests/test_validator.py -v
-
-# With coverage report
-pytest tests/ --cov=src --cov-report=html
-open htmlcov/index.html  # View coverage
-```
-
-### Test Coverage
-
-**Risk Manager Tests** (`tests/test_risk_manager.py`):
-- Position sizing with volatility adjustment
-- Sector concentration limits
-- VaR calculation accuracy
-- Trade validation (BUY/SELL)
-- Correlation penalty logic
-- Edge cases (insufficient cash, oversized positions)
-
-**Data Validator Tests** (`tests/test_validator.py`):
-- Empty DataFrame detection
-- Missing column detection
-- Invalid OHLC relationships
-- Outlier detection (>10σ returns)
-- Stale data detection
-- Duplicate date handling
-
----
-
-## ⚙️ Configuration Guide
-
-### Main Configuration (`config/settings.yaml`)
-
-```yaml
-# Trading universe (30 tickers default)
-tickers:
-  - SPY    # S&P 500 Index
-  - AAPL   # Technology
-  - JPM    # Financials
-  # ... add more
-
-# Model settings
-model:
-  training_period: "3y"      # Data window: 1y, 2y, 3y, 5y, max
-  retrain_daily: true        # Retrain on each run? (true/false)
-  threshold_buy: 0.55        # Min probability to BUY (0.0-1.0)
-  threshold_sell: 0.45       # Max probability to SELL (0.0-1.0)
-
-# Portfolio settings
-portfolio:
-  initial_cash: 10000.0      # Starting capital ($)
-  min_cash_buffer: 100.0     # Reserve cash ($)
-```
-
-### Risk Configuration (`config/settings.yaml`) ✨ *Updated in Phase 7*
-
-```yaml
-portfolio:
-  initial_cash: 10000.0   # Starting capital ($)
-  min_cash_buffer: 200.0  # Reserve cash ($)
-
-risk:
-  # Position Safety (A/B Tested)
-  stop_loss_pct: 0.15     # 15% stop-loss (optimized via A/B testing)
-  max_position_pct: 0.15  # Max 15% per stock
-  max_sector_pct: 0.30    # Max 30% per sector
-
-  # Portfolio Safety (Drawdown Control)
-  drawdown_warning: 0.15  # At -15%: Reduce new sizes by 50%
-  drawdown_halt: 0.20     # At -20%: Stop new buys
-  drawdown_liquidate: 0.25 # At -25%: Liquidate to 50% cash
-```
-
----
-
-## 🛡️ Quant Risk Controls (Phase 7)
-
-### 1. Position Stop-Loss (15%)
-A/B tested on 75 random S&P 500 stocks (2018-2024) using walk-forward validation.
-
-**Finding**: 15% stop-loss outperforms no stop-loss.
-
-> **⚠️ Important Caveat**: Backtest returns may be inflated due to:
-> - **Survivorship bias**: Current S&P 500 excludes failed companies
-> - **Position concentration**: Large gains from few winning trades
-> - **Walk-forward limitations**: Model may overfit even with retraining
->
-> Live trading should expect **significantly lower** returns than backtests suggest.
-
-Run the comparison yourself:
-```bash
-python run_unbiased_comparison.py
-```
-
-### 2. Double-Layer Protection
-1. **Micro (Position)**: Hard stop-loss at **-15%**. Protects against tail risk while letting winners run.
-2. **Macro (Portfolio)**:
-   - **Warning (-15%)**: Cut position sizes in half.
-   - **Halt (-20%)**: Stop digging the hole. No new risk.
-   - **Liquidate (-25%)**: Emergency brake. Preserve capital.
-
-Edit `config/settings.yaml` to customize risk limits:
-
-```yaml
-risk:
-  stop_loss_pct: 0.15       # 15% position stop
-  max_position_pct: 0.15    # 15% max per position
-  max_sector_pct: 0.30      # 30% max per sector
-  drawdown_warning: 0.15    # Reduce at -15% drawdown
-  drawdown_halt: 0.20       # Stop buys at -20%
-  drawdown_liquidate: 0.25  # Emergency liquidation at -25%
-```
-
----
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-**1. Data Fetch Fails**
-```
-❌ Failed to fetch data.
-```
-**Solution**: Check internet connection, yfinance may be rate-limited. Wait 1-5 minutes and retry.
-
-**2. Invalid Tickers**
-```
-⚠️ Removing 2 invalid tickers: ['BRK-B', 'XYZ']
-```
-**Cause**: Ticker may be delisted, have insufficient data, or contain data errors.
-**Action**: Review validation summary, remove problematic tickers from `config/settings.yaml`.
-
-**3. Model Not Found**
-```
-Warning: No model found. Run training first.
-```
-**Solution**: Run `make train` to create `models/xgb_model.joblib`.
-
-**4. Trade Rejected**
-```
-⚠️ AAPL: Trade rejected - Position too large: 25.0% > 15.0% limit
-```
-**Cause**: Risk manager blocked trade exceeding constraints.
-**Action**: This is working as intended. Adjust `max_position_pct` if needed.
-
-**5. Test Failures**
-```
-FAILED tests/test_risk_manager.py::test_name
-```
-**Solution**: Ensure dependencies are installed (`make setup`). Check pytest output for specific error.
-
----
-
-## 📈 Interpreting Results
-
-### Good Model Performance
-- ✅ Accuracy: 0.52-0.58 (anything > 0.50 is better than random)
-- ✅ F1 Score: > 0.50
-- ✅ Balanced precision/recall (both > 0.48)
-
-### Poor Model Performance
-- ❌ Accuracy: ~0.50 (coin flip)
-- ❌ Extremely imbalanced confusion matrix (all predictions one class)
-- ❌ Very low precision or recall (< 0.40)
-
-### Healthy Portfolio Metrics
-- ✅ VaR < 3% of portfolio daily
-- ✅ Sector exposure: No sector > 45%
-- ✅ Largest position < 18% of portfolio
-- ✅ 5+ holdings across 3+ sectors
-
-### Risky Portfolio State
-- ❌ VaR > 5% of portfolio
-- ❌ Single sector > 60%
-- ❌ Single position > 25% of portfolio
-- ❌ < 3 holdings (under-diversified)
-
----
-
-## 🚀 Completed Phases
-
-### ✅ Phase 1: Risk Management & Data Validation
-- Volatility-adjusted position sizing
-- Portfolio constraints (15% max position, 40% max sector)
-- 10 data quality validation checks
-
-### ✅ Phase 2: Backtesting Framework
-- Event-driven backtesting engine
-- Transaction cost modeling (slippage, market impact)
-- Regime-based performance analysis
-
-### ✅ Phase 3: ML Improvements
-- TimeSeriesSplit cross-validation
-- Regression target (return prediction)
-- Anti-leakage feature pipeline
-
-### ✅ Phase 3.5: Enhanced Features
-- 15 technical indicators (volume, volatility, momentum, trend)
-- Dynamic feature selection (auto-filter <3% importance)
-
-### ✅ Phase 3.6: Regime Detection & Multi-Horizon *(New)*
-- **VIX-based regime detection**: NORMAL/ELEVATED/CRISIS
-- **Position multipliers**: 100% → 50% → 0% based on VIX
-- **Multi-horizon ensemble**: 1-day (50%), 5-day (30%), 20-day (20%)
-- **Blended signals**: More stable than single-horizon
-
-### ✅ Phase 4: Data Caching & Universe *(Complete)*
-- **SQLite cache**: 4.3M rows, 503 tickers
-- **Incremental fetching**: Only new bars after initial load
-- **S&P 500 universe**: Dynamic from Wikipedia
-- **GitHub Actions Cache**: Market data persists across workflow runs (~3s restore)
-
-### ✅ Phase 5: Walk-Forward Validation & Hyperopt *(Complete)*
-- **Walk-forward validation**: True out-of-sample testing
-- **Results**: 630% return vs SPY 234% (2015-2024)
-- **2010+ data filter**: 35/35 tickers now pass validation
-- **Hyperparameter optimization**: Current params already optimal
-- **Overfitting check**: Negative train/val gap = model generalizes well
-
-### ✅ Phase 6: Deployment & Reliability *(Complete)*
-- **GitHub Actions Cache**: `actions/cache@v4` for cross-run persistence
-- **Daily Cron Job**: 9 PM UTC / 1 PM PST (market close)
-- **T+1 Execution**: Signals at close, execute at next Open
-- **Automated Commits**: Ledger and model updates pushed to repo
-
----
-
-## 🎯 VIX Regime Detection *(Phase 3.6)*
-
-**File**: `src/trading/regime.py`
-
-**Thresholds**:
-| VIX Level | Regime | Position Multiplier |
-|-----------|--------|---------------------|
-| < 25 | NORMAL | 100% |
-| 25-35 | ELEVATED | 50% |
-| > 35 | CRISIS | 0% (hold cash) |
-
-**Usage**:
-```python
-from src.trading.regime import RegimeDetector
-
-detector = RegimeDetector()
-info = detector.get_regime_info(vix_value=22)
-# Returns: {'regime': 'NORMAL', 'multiplier': 1.0}
-```
-
----
-
-## 🎯 Multi-Horizon Ensemble *(Phase 3.6)*
-
-**File**: `src/models/predictor.py` → `EnsemblePredictor`
-
-**Horizons**:
-| Model | Weight | Purpose |
-|-------|--------|---------|
-| 1-day | 50% | Responsive to short-term moves |
-| 5-day | 30% | Weekly trend |
-| 20-day | 20% | Monthly direction |
-
-**Usage**:
-```python
-from src.models.predictor import EnsemblePredictor
-
-predictor = EnsemblePredictor()
-result = predictor.predict_with_regime(df, vix_value=22)
-# Returns: {'expected_return': 0.012, 'signal': 'BUY', 'regime': 'NORMAL'}
-```
-
----
-
-## 📦 SQLite Data Cache *(Phase 4)*
-
-**File**: `src/data/cache.py`
+#### Class: `DataCache`
 
 **Database**: `data/market.db`
 
-**Tables**:
-- `price_data`: OHLCV data (ticker, date, open, high, low, close, volume)
-- `macro_data`: VIX and other macro series
-- `cache_metadata`: Last update timestamps
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | `db_path: str = DB_PATH` | - | Initialize database connection |
+| `get_price_data` | `ticker, start_date=None, end_date=None` | DataFrame | Retrieve OHLCV data |
+| `update_price_data` | `ticker, df` | - | Store new price data (INSERT OR REPLACE) |
+| `get_last_date` | `ticker` | str or None | Get most recent cached date |
+| `get_first_date` | `ticker` | str or None | Get earliest cached date |
+| `get_cached_tickers` | - | List[str] | All tickers in cache |
+| `get_cache_stats` | - | DataFrame | Stats for all cached tickers |
+| `get_macro_data` | `series, start_date, end_date` | DataFrame | Fetch VIX, yields, etc. |
+| `update_macro_data` | `series, df` | - | Store macro data |
+| `clear_ticker` | `ticker` | - | Remove all data for a ticker |
+| `clear_all` | - | - | Clear entire cache |
+| `vacuum` | - | - | Optimize database file size |
 
-**Usage**:
+**Example Usage**:
 ```python
-from src.data.cache import DataCache
+from src.data.cache import DataCache, get_cache
 
-cache = DataCache()
-df = cache.get_price_data('AAPL', '2020-01-01', '2024-12-01')
-stats = cache.get_cache_stats()  # Shows rows per ticker
+cache = get_cache()
+
+# Get data
+df = cache.get_price_data('AAPL', '2024-01-01', '2025-01-01')
+
+# Check freshness
+last_date = cache.get_last_date('AAPL')  # '2025-12-19'
+
+# Store new data  
+cache.update_price_data('AAPL', new_df)
+```
+
+#### `get_cache()`
+**Purpose**: Singleton accessor for default cache instance.
+**Returns**: `DataCache` instance
+
+---
+
+### Module: `src/data/loader.py`
+
+Smart data loading with cache-first strategy.
+
+#### `fetch_data(tickers, period, interval, use_cache)`
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `tickers` | List[str] | - | Stock symbols |
+| `period` | str | "2y" | Historical period for initial fetch |
+| `interval` | str | "1d" | Data granularity |
+| `use_cache` | bool | True | Whether to use SQLite cache |
+
+**Returns**: `Dict[str, pd.DataFrame]`
+
+**Logic**:
+1. Check SQLite cache first
+2. If cached: fetch only new bars (incremental)
+3. If not cached: fetch full history, then cache
+4. Handle rate limits with exponential backoff
+
+#### `fetch_from_cache_only(tickers, start_date, end_date)`
+
+**Purpose**: Load data exclusively from cache (no API calls).  
+**Use Case**: Backtesting without hitting rate limits.
+
+**Returns**: `Dict[str, pd.DataFrame]`
+
+#### `update_cache(tickers, period)`
+
+**Purpose**: Refresh cache for all tickers.  
+**Prints**: Cache statistics after update.
+
+---
+
+### Module: `src/data/validator.py`
+
+#### Class: `DataValidator`
+
+**Purpose**: Ensures data quality before model training.
+
+| Validation Check | Threshold | Action on Fail |
+|-----------------|-----------|----------------|
+| Empty DataFrame | N/A | Critical Error |
+| Missing OHLC Columns | Required | Critical Error |
+| Data Freshness | < 48 hours | Warning |
+| Missing Values | < 5% | Error if exceeded |
+| Zero/Negative Prices | 0 allowed | Error |
+| Duplicate Dates | 0 allowed | Error |
+| Sufficient History | ≥ 200 days | Warning |
+
+---
+
+## Feature Engineering
+
+### Module: `src/features/indicators.py`
+
+Technical indicator computation with **15 features** across 4 categories.
+
+#### Indicator Functions
+
+**Momentum Indicators (4 features)**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `compute_rsi` | `series, period=14` | Series | Relative Strength Index (0-100) |
+| `compute_macd` | `series, fast=12, slow=26, signal=9` | Tuple(macd, signal) | MACD and signal line |
+
+**Volume Indicators (3 features)**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `compute_obv` | `close, volume` | Series | On-Balance Volume |
+| `compute_obv_momentum` | `close, volume, period=10` | Series | OBV rate of change |
+| `compute_volume_ratio` | `volume, short=5, long=20` | Series | Short/long volume ratio |
+| `compute_vwap_deviation` | `close, volume, period=20` | Series | Price deviation from VWAP |
+
+**Volatility Indicators (4 features)**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `compute_atr` | `high, low, close, period=14` | Series | Average True Range |
+| `compute_bollinger_bands` | `series, window=20, num_std=2` | Tuple(upper, lower) | BB bands |
+| `compute_bollinger_pctb` | `close, window=20, num_std=2` | Series | Position in BB (0-1) |
+| `compute_volatility_ratio` | `close, short=10, long=60` | Series | Vol expansion/contraction |
+
+#### `generate_features(df, include_target=False)`
+
+**Purpose**: Generate all 15 technical indicators from OHLCV data.
+
+**Parameters**:
+- `df`: DataFrame with Open, High, Low, Close, Volume columns
+- `include_target`: If True, also create target column (training only)
+
+**Returns**: DataFrame with feature columns added, NaN rows dropped.
+
+**Features Generated**:
+```python
+FEATURE_COLUMNS = [
+    # Momentum (4)
+    'RSI', 'MACD', 'MACD_signal', 'MACD_hist',
+    # Trend (4)
+    'BB_Width', 'Dist_SMA50', 'Dist_SMA200', 'Return_1d', 'Return_5d',
+    # Volume (3)
+    'OBV_Momentum', 'Volume_Ratio', 'VWAP_Dev',
+    # Volatility (4)
+    'ATR_Pct', 'BB_PctB', 'Vol_Ratio'
+]
+```
+
+#### `create_target(df, target_type, horizon)`
+
+**Purpose**: Create target variable for ML training.
+
+> ⚠️ **IMPORTANT**: Only call in training pipeline AFTER train/test split to prevent look-ahead bias.
+
+**Parameters**:
+- `target_type`: 'regression' (return %) or 'classification' (up/down)
+- `horizon`: Days ahead to predict (default: 1)
+
+---
+
+## Machine Learning Pipeline
+
+### Module: `src/models/trainer.py`
+
+XGBoost training with time-series cross-validation.
+
+#### `select_features_better_than_noise(X, y, feature_names, n_noise=5)`
+
+**Purpose**: Automatic feature selection using random noise baseline.
+
+**Method**:
+1. Add N random noise features to data
+2. Train quick XGBoost model
+3. Rank all features by importance
+4. Keep only features with importance > max(noise importance)
+
+**Returns**: List of selected feature names
+
+#### `train_model(data_dict, n_splits=5, save_model=True)`
+
+**Purpose**: Train single-horizon XGBoost regressor.
+
+**Anti-Leakage Measures**:
+1. Features generated WITHOUT target (no look-ahead)
+2. Target added AFTER feature generation
+3. TimeSeriesSplit for walk-forward validation
+
+**Saves**:
+- `models/xgb_model.joblib` - Trained model
+- `models/model_metadata.json` - Feature list and metrics
+
+#### `train_ensemble(data_dict, n_splits=5, save_model=True)`
+
+**Purpose**: Train multi-horizon ensemble model.
+
+**Horizons**:
+| Horizon | Weight | Purpose |
+|---------|--------|---------|
+| 1 day | 50% | Short-term responsiveness |
+| 5 days | 30% | Weekly trend |
+| 20 days | 20% | Monthly trend |
+
+**Saves**: `models/xgb_ensemble.joblib`
+
+#### `evaluate_model(model, test_df)`
+
+**Purpose**: Evaluate model on held-out test data.
+
+**Returns**: Dict with RMSE, MAE, R², directional accuracy
+
+---
+
+## Prediction & Signals
+
+### Module: `src/models/predictor.py`
+
+#### Class: `Predictor`
+
+Single-horizon prediction using trained XGBoost model.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | - | - | Load model from disk |
+| `predict` | `df` | float | Expected next-day return |
+| `predict_with_signal` | `df, buy_threshold=0.005, sell_threshold=-0.005` | Tuple(signal, return, confidence) | Signal generation |
+| `predict_batch` | `data_dict` | Dict[str, float] | Batch prediction |
+
+**Signal Thresholds**:
+- **BUY**: Expected return > +0.5%
+- **SELL**: Expected return < -0.5%
+- **HOLD**: In between
+
+#### Class: `EnsemblePredictor`
+
+Multi-horizon ensemble for more stable predictions.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | - | - | Load ensemble from disk |
+| `predict` | `df` | float | Weighted average return |
+| `predict_with_regime` | `df, vix_value` | Dict | Prediction with regime adjustments |
+| `predict_batch` | `data_dict, vix_value` | Dict[str, Dict] | Batch with regime awareness |
+
+**Ensemble Blending**:
+```python
+prediction = (0.5 * pred_1d) + (0.3 * pred_5d/5) + (0.2 * pred_20d/20)
 ```
 
 ---
 
-## 🌐 S&P 500 Universe *(Phase 4)*
+## Portfolio Management
 
-**File**: `src/data/universe.py`
+### Module: `src/trading/portfolio.py`
 
-**Configuration** (`config/settings.yaml`):
-```yaml
-universe:
-  type: "sp500"   # or "config" for manual tickers
+#### Class: `Portfolio`
+
+Manages trade recording and portfolio state.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | `portfolio_id="default", start_cash=100000` | - | Initialize with ledger file |
+| `get_last_balance` | - | float | Current cash balance |
+| `get_holdings` | - | Dict[str, int] | Current positions |
+| `get_entry_prices` | - | Dict[str, float] | Average entry price per holding |
+| `get_portfolio_value` | `current_prices` | float | Total value (cash + holdings) |
+| `get_positions` | - | Dict | Detailed position info |
+| `check_stop_losses` | `current_prices, stop_loss_pct=0.08` | List[Tuple] | Positions breaching stop-loss |
+| `has_traded_today` | `ticker, date=None` | bool | Idempotency check |
+| `record_trade` | `ticker, action, price, shares, strategy, momentum_score` | bool | Log trade to CSV |
+
+**Ledger Files**:
+- `ledger_momentum.csv` - Momentum strategy trades
+- `ledger_ml.csv` - ML strategy trades
+
+**CSV Schema**:
+```
+date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentum_score
 ```
 
-**Functions**:
-- `fetch_sp500_tickers()`: Gets ~503 tickers from Wikipedia
-- `get_mega_caps()`: Returns top 50 mega-cap stocks (fallback)
-- `filter_by_liquidity()`: Filters by average daily volume
+**Special Rows**:
+- `PORTFOLIO,VALUE` - Daily portfolio snapshot for charting
 
 ---
 
-## 🚀 Walk-Forward Validation *(Phase 5 - NEW)*
+## Risk Management
 
-**File**: `run_walkforward.py`
+### Module: `src/trading/risk_manager.py`
 
-**Purpose**: True out-of-sample testing to eliminate look-ahead bias
+#### `@dataclass RiskLimits`
 
-**Process**:
+Configuration for risk constraints.
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `max_position_pct` | 0.15 | Max 15% per position |
+| `max_sector_pct` | 0.30 | Max 30% per sector |
+| `min_cash_buffer` | $200 | Minimum cash reserve |
+| `max_daily_var_pct` | 0.025 | Max 2.5% daily VaR |
+| `volatility_lookback` | 30 | Days for vol calculation |
+| `drawdown_warning` | 0.15 | 15% drawdown warning |
+| `drawdown_halt` | 0.20 | 20% drawdown halt |
+| `drawdown_liquidate` | 0.25 | 25% forced liquidation |
+
+#### Class: `DrawdownController`
+
+Monitors portfolio drawdown and adjusts position sizing.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | `warning=0.15, halt=0.20, liquidate=0.25` | - | Set thresholds |
+| `update` | `current_value` | - | Update peak and drawdown |
+| `get_position_multiplier` | - | float | 1.0/0.5/0.0 based on drawdown |
+| `should_liquidate` | - | bool | True if > 25% drawdown |
+| `get_status` | - | str | "NORMAL", "WARNING", "HALT" |
+
+**Drawdown Actions**:
+| Drawdown | Action |
+|----------|--------|
+| < 15% | Normal trading |
+| 15-20% | Reduce new positions by 50% |
+| 20-25% | Halt all new buys |
+| > 25% | Force liquidate 50% |
+
+#### Class: `RiskManager`
+
+Portfolio-level risk management.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | `risk_limits` | - | Initialize with limits |
+| `calculate_position_size` | `ticker, price, cash, portfolio_value, ...` | Tuple(shares, reason) | Optimal position size |
+| `calculate_portfolio_var` | `holdings, prices, historical_data, confidence` | float | Value at Risk |
+| `validate_trade` | `ticker, action, shares, price, ...` | Tuple(bool, reason) | Pre-trade validation |
+
+**Position Sizing Formula**:
+```python
+shares = min(
+    shares_by_cash,
+    shares_by_position_limit,  # Max 15% of portfolio
+    shares_by_volatility,      # Target 20% annualized vol
+    shares_by_sector_limit,    # Max 30% per sector
+    shares_corrected_for_correlation  # Diversification penalty
+)
 ```
-Year 1: Train on 2010-2014 → Test on 2015
-Year 2: Train on 2010-2015 → Test on 2016
-...
-Year 10: Train on 2010-2023 → Test on 2024
+
+---
+
+## Transaction Costs
+
+### Module: `src/backtesting/costs.py`
+
+Realistic trading cost simulation with **5 basis points (bps) slippage**.
+
+#### `@dataclass CostConfig`
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `commission_per_share` | $0.00 | Per-share commission |
+| `min_commission` | $0.00 | Minimum commission |
+| `slippage_bps` | 5.0 | Bid-ask slippage (5 bps) |
+| `market_impact_enabled` | True | Enable market impact |
+| `market_impact_coefficient` | 0.1 | Impact multiplier |
+| `avg_daily_volume_threshold` | 0.005 | ADV threshold |
+
+#### Class: `TransactionCostModel`
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `__init__` | `config=None` | - | Initialize with defaults |
+| `calculate_execution_price` | `action, price, shares, adv` | Tuple(exec_price, cost) | Apply slippage |
+| `calculate_trade_costs` | `trade_value, shares, adv` | Dict | Cost breakdown |
+
+**Execution Price Calculation**:
+```python
+# BUY: Pay more than quoted (slippage hurts)
+execution_price = price * (1 + slippage_bps/10000)
+
+# SELL: Receive less than quoted (slippage hurts)
+execution_price = price * (1 - slippage_bps/10000)
 ```
 
-**Results (vs SPY Buy-and-Hold)**:
-| Metric | WALK-FORWARD | SPY | Winner |
-|--------|--------------|-----|--------|
-| Total Return | 630% | 234% | 🏆 MODEL |
-| CAGR | 22.0% | 12.8% | 🏆 MODEL |
-| Sharpe Ratio | 0.73 | 0.49 | 🏆 MODEL |
-| Max Drawdown | -35% | -34% | SPY |
+**Example**:
+- Stock price: $100.00
+- Slippage: 5 bps = 0.05%
+- BUY execution: $100.05
+- SELL execution: $99.95
 
-**Run it**:
+#### Class: `CostTracker`
+
+Tracks cumulative costs during backtesting.
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `record_trade` | `date, ticker, action, shares, price, adv` | Dict | Record and calculate costs |
+| `get_summary` | - | Dict | Total costs summary |
+| `get_cost_dataframe` | - | DataFrame | Full cost history |
+| `reset` | - | - | Clear tracked costs |
+
+---
+
+## Backtesting Framework
+
+### Module: `src/backtesting/backtester.py`
+
+#### Class: `Backtester`
+
+Full walk-forward backtesting with transaction costs.
+
+**Configuration**:
+```python
+config = BacktestConfig(
+    start_date="2020-01-01",
+    end_date="2025-12-01",
+    initial_capital=100000,
+    benchmark_ticker="SPY",
+    slippage_bps=5.0,
+    max_position_pct=0.15,
+    rebalance_frequency="daily"
+)
+
+backtester = Backtester(config)
+metrics, trades_df, summary = backtester.run(data_dict, signal_generator)
+```
+
+### Module: `src/backtesting/performance.py`
+
+Performance metrics calculation.
+
+| Metric | Formula | Interpretation |
+|--------|---------|----------------|
+| **Total Return** | (Final - Initial) / Initial | Overall performance |
+| **CAGR** | (Final/Initial)^(1/years) - 1 | Annualized return |
+| **Sharpe Ratio** | (Return - RiskFree) / StdDev | Risk-adjusted return |
+| **Max Drawdown** | Max peak-to-trough decline | Worst loss from peak |
+| **Win Rate** | Winning trades / Total trades | Trade success rate |
+| **Sortino Ratio** | Return / Downside StdDev | Downside risk-adjusted |
+
+---
+
+## Dashboard
+
+### Module: `dashboard/app.py`
+
+Streamlit-based live dashboard.
+
+**URL**: [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
+
+**Features**:
+- Portfolio Overview cards (Momentum, ML, SPY)
+- Performance chart with all 3 strategies
+- Current Holdings tables
+- Recent Trades display
+- Detailed Metrics table
+
+**Data Sources**:
+- `data/portfolio_snapshot.json` - Summary metrics
+- `ledger_momentum.csv` - Trade history
+- `ledger_ml.csv` - Trade history
+- `data/spy_benchmark.json` - SPY comparison
+
+---
+
+## CLI Reference
+
+### Trading Commands
+
 ```bash
-python run_walkforward.py --start 2015 --end 2024
+# Momentum Strategy (monthly rebalance)
+python main.py --strategy momentum --portfolio momentum
+
+# ML Strategy (daily rebalance)
+python main.py --strategy ml --portfolio ml
+
+# Training only
+python main.py --mode train --strategy ml
+
+# Backtest
+python main.py --mode backtest --strategy momentum
+```
+
+### Utility Scripts
+
+```bash
+# Update market data cache
+python -c "from src.data.loader import update_cache; update_cache(['AAPL','TSLA'])"
+
+# Compute portfolio snapshot
+python scripts/utils/compute_portfolio_snapshot.py
+
+# Run PIT backtest
+python scripts/validation/pit_backtest_oct_dec.py
+python scripts/validation/pit_momentum_oct_dec.py
+```
+
+### Make Commands
+
+```bash
+make train      # Train ML model
+make trade      # Execute trades
+make backtest   # Run backtest
+make docker-up  # Start Docker container
+make clean      # Clean artifacts
 ```
 
 ---
 
-## 🔧 Hyperparameter Optimization *(Phase 5)*
+## Current Performance (Dec 2025)
 
-**File**: `run_hyperopt.py`
+### With 5 bps Transaction Costs (Oct 1 - Dec 19, 2025)
 
-**Purpose**: Ensure model isn't overfitting
+| Metric | Momentum | ML | SPY |
+|--------|----------|-----|-----|
+| **Final Value** | $10,720 | $10,158 | $10,310 |
+| **Return** | +7.20% | +1.58% | +3.10% |
+| **Excess Return** | +4.10% | -1.52% | — |
+| **Total Trades** | 50 | 526 | — |
 
-**Safeguards**:
-- TimeSeriesSplit (not random split)
-- Early stopping on validation set
-- Overfitting check (train/val gap)
+**Key Insight**: Momentum outperforms with transaction costs due to lower turnover (50 vs 526 trades).
 
-**Results**: Current params already optimal (+0.03% improvement only)
+---
 
-**Optimal Parameters**:
-```python
-n_estimators: 50
-max_depth: 4
-learning_rate: 0.05
-min_child_weight: 5
-subsample: 0.8
-reg_lambda: 1
+## File Structure
+
+```
+paper-trader/
+├── main.py                              # Core orchestrator
+├── config/
+│   └── trading.yaml                     # Strategy configuration
+├── data/
+│   ├── market.db                        # SQLite cache (4M+ rows)
+│   ├── portfolio_snapshot.json          # Dashboard data
+│   └── sp500_tickers.txt                # Universe
+├── src/
+│   ├── data/
+│   │   ├── cache.py                     # DataCache class
+│   │   ├── loader.py                    # fetch_data, update_cache
+│   │   └── validator.py                 # DataValidator
+│   ├── features/
+│   │   └── indicators.py                # 15 technical indicators
+│   ├── models/
+│   │   ├── trainer.py                   # train_model, train_ensemble
+│   │   └── predictor.py                 # Predictor, EnsemblePredictor
+│   ├── trading/
+│   │   ├── portfolio.py                 # Portfolio class
+│   │   ├── risk_manager.py              # RiskManager, DrawdownController
+│   │   └── regime.py                    # Market regime detection
+│   └── backtesting/
+│       ├── costs.py                     # TransactionCostModel
+│       ├── backtester.py                # Backtester class
+│       └── performance.py               # Metrics calculation
+├── scripts/
+│   ├── backtests/                       # Backtest scripts
+│   ├── validation/                      # PIT validation
+│   └── utils/                           # Utility scripts
+├── dashboard/
+│   └── app.py                           # Streamlit dashboard
+├── ledger_ml.csv                        # ML trade history
+└── ledger_momentum.csv                  # Momentum trade history
 ```
 
 ---
 
-## 📚 Additional Resources
-
-- **XGBoost Documentation**: https://xgboost.readthedocs.io/
-- **yfinance GitHub**: https://github.com/ranaroussi/yfinance
-- **Technical Analysis Library**: https://technical-analysis-library-in-python.readthedocs.io/
-- **Quantitative Finance**: "Advances in Financial Machine Learning" by Marcos Lopez de Prado
-
----
-
-**Last Updated**: December 2025 (ML Alignment Complete + Momentum Backtest Validated)
-
+*Built by Prabuddha Tamhane • 2025*
