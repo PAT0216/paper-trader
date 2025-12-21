@@ -171,43 +171,53 @@ def run_backtest():
     else:
         all_trading_days = []
     
-    # Track which holdings were active on each day
-    # Momentum: holdings change on rebalance dates
-    period_holdings = {}  # {date_range: holdings}
-    period_cash = {}
+    # Build holdings snapshots at each rebalance date
+    # Before Oct 1: no holdings, $10k cash
+    # Oct 1 (after rebalance): Oct holdings + remaining cash
+    # Nov 1 (after rebalance): Nov holdings + remaining cash  
+    # Dec 1 (after rebalance): Dec holdings + remaining cash
     
-    # Oct 1 - Oct 31: First set of holdings (from Oct 1 buys)
-    # Nov 1 - Nov 30: Second set of holdings (from Nov 1 buys)  
-    # Dec 1 - Dec 19: Third set of holdings (from Dec 1 buys)
+    rebalance_holdings = {}  # date -> {ticker: shares}
+    rebalance_cash = {}      # date -> cash after rebalance
     
-    from datetime import datetime as dt
+    # Parse the actual trades to get holdings snapshots
+    temp_holdings = {}
+    temp_cash = INITIAL_CAPITAL
     
-    current_holdings = {}
-    current_cash = INITIAL_CAPITAL
-    
-    # Replay trades to get holdings at each date
-    trades_by_date = {}
     for trade in all_trades:
-        d = trade['date']
-        if d not in trades_by_date:
-            trades_by_date[d] = []
-        trades_by_date[d].append(trade)
-    
-    for trading_day in all_trading_days:
-        # Apply any trades on this day
-        if trading_day in trades_by_date:
-            for trade in trades_by_date[trading_day]:
-                if trade['action'] == 'SELL':
-                    if trade['ticker'] in current_holdings:
-                        del current_holdings[trade['ticker']]
-                    current_cash += trade['shares'] * trade['price']
-                else:  # BUY
-                    current_holdings[trade['ticker']] = trade['shares']
-                    current_cash -= trade['shares'] * trade['price']
+        rebalance_date = trade['date']
+        if trade['action'] == 'SELL':
+            if trade['ticker'] in temp_holdings:
+                del temp_holdings[trade['ticker']]
+            temp_cash += trade['shares'] * trade['price']
+        else:  # BUY
+            temp_holdings[trade['ticker']] = trade['shares']
+            temp_cash -= trade['shares'] * trade['price']
         
-        # Calculate portfolio value on this day
-        day_value = current_cash
-        for ticker, shares in current_holdings.items():
+        # Snapshot after each rebalance date's trades complete
+        rebalance_holdings[rebalance_date] = temp_holdings.copy()
+        rebalance_cash[rebalance_date] = temp_cash
+    
+    # For each trading day, determine which holdings were active
+    for trading_day in all_trading_days:
+        # Find the most recent rebalance date on or before this day
+        active_rebalance = None
+        for rd in ['2025-12-01', '2025-11-01', '2025-10-01']:
+            if trading_day >= rd:
+                active_rebalance = rd
+                break
+        
+        if active_rebalance and active_rebalance in rebalance_holdings:
+            day_holdings = rebalance_holdings[active_rebalance]
+            day_cash = rebalance_cash[active_rebalance]
+        else:
+            # Before first rebalance
+            day_holdings = {}
+            day_cash = INITIAL_CAPITAL
+        
+        # Calculate portfolio value on this day using current market prices
+        day_value = day_cash
+        for ticker, shares in day_holdings.items():
             df = cache.get_price_data(ticker, trading_day, trading_day)
             if not df.empty:
                 price_col = 'Adj_Close' if 'Adj_Close' in df.columns else 'Close'
