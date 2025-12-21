@@ -32,10 +32,12 @@ def _get_strategies() -> Dict[str, Type[BaseStrategy]]:
     """Lazy load strategy classes."""
     from src.strategies.momentum_strategy import MomentumStrategy
     from src.strategies.ml_strategy import MLStrategy
+    from src.strategies.lstm_strategy import LSTMStrategy
     
     return {
         "momentum": MomentumStrategy,
         "ml": MLStrategy,
+        "lstm": LSTMStrategy,
     }
 
 
