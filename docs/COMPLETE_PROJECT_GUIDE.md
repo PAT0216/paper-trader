@@ -7,7 +7,7 @@
 
 ---
 
-## 🏗️ System Overview
+##  System Overview
 
 Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 - Runs **two independent strategies** (Momentum + ML) in parallel
@@ -17,11 +17,11 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 - Displays results on a **Streamlit dashboard**
 
 ### Live Dashboard
-🌐 [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
+ [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
 
 ---
 
-## 📈 Strategy 1: Momentum (Primary)
+##  Strategy 1: Momentum (Primary)
 
 ### Theory
 - Based on **Jegadeesh & Titman (1993)** academic research
@@ -51,7 +51,7 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 
 ---
 
-## 🤖 Strategy 2: ML Ensemble
+##  Strategy 2: ML Ensemble
 
 ### Theory
 - XGBoost regression predicting next-day returns
@@ -90,7 +90,7 @@ Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
 
 ---
 
-## 💰 Transaction Costs
+##  Transaction Costs
 
 ### Cost Model
 All trades include **5 basis points (0.05%) slippage**:
@@ -113,7 +113,7 @@ execution_price = quote_price × 0.9995
 
 ---
 
-## 🛡️ Risk Management
+##  Risk Management
 
 ### Portfolio-Level Controls
 
@@ -134,7 +134,7 @@ execution_price = quote_price × 0.9995
 
 ---
 
-## 📦 Data Infrastructure
+##  Data Infrastructure
 
 ### SQLite Cache
 
@@ -159,7 +159,7 @@ data = fetch_from_cache_only(['AAPL'], '2024-01-01', '2025-01-01')
 
 ---
 
-## 📊 Streamlit Dashboard
+##  Streamlit Dashboard
 
 ### Features
 - **Portfolio Overview**: Momentum vs ML vs SPY cards
@@ -175,7 +175,7 @@ GitHub Actions → main.py → ledger_*.csv → dashboard/app.py
 
 ---
 
-## 📁 File Structure
+##  File Structure
 
 ```
 paper-trader/
@@ -211,7 +211,7 @@ paper-trader/
 
 ---
 
-## 🎯 CLI Reference
+##  CLI Reference
 
 ```bash
 # Momentum strategy (isolated portfolio)
@@ -229,7 +229,7 @@ python main.py --mode backtest --strategy momentum
 
 ---
 
-## 🔧 Make Commands
+##  Make Commands
 
 ```bash
 make train      # Train ML model
@@ -241,7 +241,7 @@ make clean      # Clean artifacts
 
 ---
 
-## ⚙️ GitHub Actions
+##  GitHub Actions
 
 ### Scheduled Workflows
 
@@ -256,7 +256,7 @@ make clean      # Clean artifacts
 
 ---
 
-## 📝 Assumptions & Limitations
+##  Assumptions & Limitations
 
 1. **Paper trading only** - No real broker integration
 2. **End-of-day data** - Trades execute at next open
@@ -266,7 +266,7 @@ make clean      # Clean artifacts
 
 ---
 
-## 🔮 Future Improvements
+##  Future Improvements
 
 - [ ] Real broker integration (Alpaca, IBKR)
 - [ ] Intraday trading capability

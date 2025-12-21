@@ -304,7 +304,7 @@ FEATURE_COLUMNS = [
 
 **Purpose**: Create target variable for ML training.
 
-> ⚠️ **IMPORTANT**: Only call in training pipeline AFTER train/test split to prevent look-ahead bias.
+>  **IMPORTANT**: Only call in training pipeline AFTER train/test split to prevent look-ahead bias.
 
 **Parameters**:
 - `target_type`: 'regression' (return %) or 'classification' (up/down)

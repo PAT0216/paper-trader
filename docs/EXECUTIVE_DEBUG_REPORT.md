@@ -3,7 +3,7 @@
 
 **Report Date:** December 17, 2024  
 **Investigation Period:** Single debugging session  
-**Status:** ✅ ALL 8 EXPERIMENTS COMPLETE  
+**Status:**  ALL 8 EXPERIMENTS COMPLETE  
 **Primary Finding:** Model features misaligned with strategy objective  
 **Winner:** Experiment 7 (Pure Momentum ML) → +49.3% CAGR, Sharpe 1.34
 
@@ -46,9 +46,9 @@ The ML ensemble strategy was generating **-79% returns** over 2017-2022 while SP
 | 4_ML+Momentum_Hybrid | -21.6%/yr | -0.44 | -50.9% | -47% | ML + momentum filter |
 | 5_With_StopLoss | -6.0%/yr | -0.14 | -32.5% | -31% | Baseline + 8% stop-loss |
 | 6_Combined_Improvements | +20.1%/yr | +0.71 | -19.9% | -5% | Invert + filter + stop-loss |
-| 7_Pure_Momentum_ML | **+49.3%/yr** | **+1.34** | **-15.1%** | **+24%** | **🏆 WINNER** |
+| 7_Pure_Momentum_ML | **+49.3%/yr** | **+1.34** | **-15.1%** | **+24%** | ** WINNER** |
 
-### 🏆 Primary Recommendation
+###  Primary Recommendation
 **Implement Experiment 7 (Pure Momentum ML)** - XGBoost with momentum features + 10% stop-loss.
 
 | Metric | Baseline | Winner (Exp 7) | Improvement |
@@ -308,7 +308,7 @@ Week 93 (Dec 2025):
 
 ## 6. Experiment Results
 
-### ✅ ALL 8 EXPERIMENTS COMPLETE
+###  ALL 8 EXPERIMENTS COMPLETE
 
 | # | Experiment | Description | Total Return | CAGR | Sharpe | Max DD | Win Rate |
 |---|------------|-------------|--------------|------|--------|--------|----------|
@@ -323,16 +323,16 @@ Week 93 (Dec 2025):
 
 **Benchmark:** SPY returned +47.2% total (+25.5% CAGR) over same period.
 
-### 🏆 FINAL LEADERBOARD
+###  FINAL LEADERBOARD
 
 | Rank | Experiment | CAGR | Sharpe | Beat SPY By |
 |------|------------|------|--------|-------------|
-| 🥇 | **7_Pure_Momentum_ML** | **+49.3%/yr** | **+1.34** | **+23.8%** |
-| 🥈 | 2_Momentum_Features | +37.1%/yr | +1.00 | +11.6% |
-| 🥉 | 6_Combined_Improvements | +20.1%/yr | +0.71 | -5.4% |
+|  | **7_Pure_Momentum_ML** | **+49.3%/yr** | **+1.34** | **+23.8%** |
+|  | 2_Momentum_Features | +37.1%/yr | +1.00 | +11.6% |
+|  | 6_Combined_Improvements | +20.1%/yr | +0.71 | -5.4% |
 | 4 | 1_Signal_Inversion | +19.2%/yr | +0.65 | -6.3% |
 
-### ⚠️ IMPORTANT: Winning Experiments Still Use ML (XGBoost)
+### ️ IMPORTANT: Winning Experiments Still Use ML (XGBoost)
 
 **Both Experiment 2 and 7 use Machine Learning (XGBoost).**
 
@@ -368,7 +368,7 @@ This proves the **features were the problem**, not the ML approach itself. Addin
    - Sharpe improved from -0.63 to +1.00
    - **Still uses XGBoost ML**, just with better features
 
-3. **Pure Momentum ML is Best (+145% swing) 🏆**
+3. **Pure Momentum ML is Best (+145% swing) **
    - Baseline: -42% → Pure Momentum ML: +103%
    - +49% CAGR with Sharpe 1.34
    - Max drawdown only -15% (best of all experiments!)

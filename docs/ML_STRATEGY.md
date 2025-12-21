@@ -8,7 +8,7 @@ Based on quantitative finance research combining technical analysis with machine
 
 ---
 
-## 📊 Performance (Updated Dec 2025)
+##  Performance (Updated Dec 2025)
 
 ### Point-in-Time Backtest (Oct 1 - Dec 17, 2025)
 
@@ -41,7 +41,7 @@ Full 8-year walk-forward backtest with monthly retraining and weekly rebalancing
 
 ---
 
-## 🧠 How It Works
+##  How It Works
 
 ### 1. Multi-Horizon Ensemble Architecture
 
@@ -101,7 +101,7 @@ target = close.pct_change(horizon).shift(-horizon)
 
 ---
 
-## 📉 Daily Trading Flow
+##  Daily Trading Flow
 
 ```mermaid
 sequenceDiagram
@@ -133,7 +133,7 @@ sequenceDiagram
 
 ---
 
-## ⚙️ Model Parameters
+##  Model Parameters
 
 ### XGBoost Configuration
 
@@ -171,7 +171,7 @@ xgb_params = {
 
 ---
 
-## 🛡️ Risk Management
+##  Risk Management
 
 | Control | Setting |
 |---------|---------|
@@ -184,7 +184,7 @@ xgb_params = {
 
 ---
 
-## 📁 Files
+##  Files
 
 | File | Purpose |
 |------|---------|
@@ -197,7 +197,7 @@ xgb_params = {
 
 ---
 
-## 🔧 Configuration
+##  Configuration
 
 Edit `config/settings.yaml`:
 
@@ -216,7 +216,7 @@ risk:
 
 ---
 
-## 📈 Usage
+##  Usage
 
 ### Command Line
 ```bash
@@ -237,7 +237,7 @@ python scripts/backtests/ml_walkforward.py
 
 ---
 
-## 🕐 Workflow Schedule
+##  Workflow Schedule
 
 | Workflow | Schedule | Action |
 |----------|----------|--------|
@@ -253,7 +253,7 @@ The workflow:
 
 ---
 
-## 🐛 Bug Fixes (Dec 2025)
+##  Bug Fixes (Dec 2025)
 
 ### 1. Target Calculation Bug
 **Problem**: `pct_change().shift(-horizon)` calculated 1-day returns shifted, not N-day returns.
@@ -272,7 +272,7 @@ The workflow:
 
 ---
 
-## 📊 Comparison with Momentum
+##  Comparison with Momentum
 
 | Metric | ML Ensemble | Momentum |
 |--------|-------------|----------|
@@ -285,7 +285,7 @@ The workflow:
 
 ---
 
-## 🔗 Data Flow
+##  Data Flow
 
 ```mermaid
 flowchart LR
@@ -303,7 +303,7 @@ flowchart LR
 
 ---
 
-## 📚 Theory
+##  Theory
 
 ### Why Multi-Horizon?
 Different trading signals have different time scales:

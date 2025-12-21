@@ -8,7 +8,7 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 
 ---
 
-## 📊 Performance (Updated Dec 2025)
+##  Performance (Updated Dec 2025)
 
 ### Full Backtest (2015-2025, Monthly Rebalancing)
 
@@ -45,11 +45,11 @@ Based on academic research by Jegadeesh & Titman (1993) and Fama-French factor i
 | Sharpe | **0.98** | 0.01 |
 | Max DD | **-27%** | -28% |
 
-> ⚠️ Weekly rebalancing fails due to stop-losses triggering on short-term volatility.
+>  Weekly rebalancing fails due to stop-losses triggering on short-term volatility.
 
 ---
 
-## 🔝 Top Holdings Over Time
+##  Top Holdings Over Time
 
 The strategy naturally concentrates in high-momentum stocks:
 

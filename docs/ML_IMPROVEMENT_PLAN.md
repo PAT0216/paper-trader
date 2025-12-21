@@ -351,8 +351,8 @@ Experiment                       Return    vs SPY   Sharpe    MaxDD   WinRate
 2_Momentum_Features              +22.0%     -3.0%    +0.75    20.0%    55.0%  ← Best!
 ...
 --------------------------------------------------------------------------------
-🏆 Best Sharpe: 2_Momentum_Features
-🏆 Best Return: 2_Momentum_Features
+ Best Sharpe: 2_Momentum_Features
+ Best Return: 2_Momentum_Features
 ```
 
 ---
