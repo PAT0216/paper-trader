@@ -27,10 +27,10 @@ def train_lstm(
     verbose: int = 1
 ) -> dict:
     """
-    Train LSTM model with proper train/test split.
+    Train threshold classification model.
     
-    Uses non-overlapping windows to prevent data leakage.
-    Time-based split ensures no future information in training.
+    Uses LSTM if TensorFlow available, otherwise XGBoost fallback.
+    Non-overlapping windows prevent data leakage.
     
     Args:
         data_dict: Dictionary of {ticker: OHLCV DataFrame}
@@ -38,8 +38,8 @@ def train_lstm(
         window_step: Step between windows (same as sequence_length for non-overlapping)
         horizon: Forward return horizon
         sigma_multiplier: Threshold for target classification
-        epochs: Maximum training epochs
-        batch_size: Training batch size
+        epochs: Maximum training epochs (LSTM only)
+        batch_size: Training batch size (LSTM only)
         validation_split: Fraction for validation
         save_path: Where to save trained model
         verbose: Verbosity level
@@ -47,14 +47,17 @@ def train_lstm(
     Returns:
         Training history and metrics
     """
-    from src.models.lstm.model import build_lstm_model, get_callbacks
+    from src.models.lstm.model import is_tensorflow_available, build_lstm_model, get_callbacks, build_xgb_threshold_model
     
-    print(f"Building LSTM training dataset...")
+    use_lstm = is_tensorflow_available()
+    
+    print(f"Building training dataset...")
+    print(f"  Model: {'LSTM' if use_lstm else 'XGBoost (TF fallback)'}")
     print(f"  Sequence length: {sequence_length} days")
     print(f"  Window step: {window_step} (non-overlapping: {window_step >= sequence_length})")
     print(f"  Threshold: mean + {sigma_multiplier}*sigma")
     
-    X_all, y_all, dates_all = [], [], []
+    X_all, y_all = [], []
     
     for ticker, df in data_dict.items():
         try:
@@ -103,51 +106,75 @@ def train_lstm(
     print(f"  Train: {len(X_train)} samples")
     print(f"  Val: {len(X_val)} samples")
     
-    # Build model
-    model = build_lstm_model(
-        sequence_length=sequence_length,
-        n_features=len(LSTM_FEATURES)
-    )
+    if use_lstm:
+        # LSTM training
+        model = build_lstm_model(
+            sequence_length=sequence_length,
+            n_features=len(LSTM_FEATURES)
+        )
+        
+        if verbose:
+            model.summary()
+        
+        pos_weight = len(y_train) / (2 * y_train.sum() + 1)
+        neg_weight = len(y_train) / (2 * (len(y_train) - y_train.sum()) + 1)
+        class_weight = {0: neg_weight, 1: pos_weight}
+        
+        print(f"\nTraining LSTM for up to {epochs} epochs...")
+        history = model.fit(
+            X_train, y_train,
+            validation_data=(X_val, y_val),
+            epochs=epochs,
+            batch_size=batch_size,
+            callbacks=get_callbacks(patience=15),
+            class_weight=class_weight,
+            verbose=verbose
+        )
+        
+        model.save(save_path)
+        val_loss, val_acc = model.evaluate(X_val, y_val, verbose=0)
+        
+    else:
+        # XGBoost fallback - flatten sequences for tabular model
+        X_train_flat = X_train.reshape(X_train.shape[0], -1)
+        X_val_flat = X_val.reshape(X_val.shape[0], -1)
+        
+        print(f"\nTraining XGBoost threshold classifier...")
+        model = build_xgb_threshold_model()
+        model.fit(
+            X_train_flat, y_train,
+            eval_set=[(X_val_flat, y_val)],
+            verbose=verbose > 0
+        )
+        
+        # Save model
+        import joblib
+        xgb_save_path = save_path.replace('.h5', '_xgb.joblib')
+        os.makedirs(os.path.dirname(xgb_save_path) or '.', exist_ok=True)
+        joblib.dump(model, xgb_save_path)
+        save_path = xgb_save_path
+        
+        # Evaluate
+        from sklearn.metrics import accuracy_score, log_loss
+        y_pred = model.predict(X_val_flat)
+        y_prob = model.predict_proba(X_val_flat)[:, 1]
+        val_acc = accuracy_score(y_val, y_pred)
+        val_loss = log_loss(y_val, y_prob)
+        history = {'loss': [], 'val_loss': [val_loss]}
     
-    if verbose:
-        model.summary()
-    
-    # Class weights to handle imbalance
-    pos_weight = len(y_train) / (2 * y_train.sum() + 1)
-    neg_weight = len(y_train) / (2 * (len(y_train) - y_train.sum()) + 1)
-    class_weight = {0: neg_weight, 1: pos_weight}
-    print(f"\nClass weights: {class_weight}")
-    
-    # Train
-    print(f"\nTraining LSTM for up to {epochs} epochs...")
-    history = model.fit(
-        X_train, y_train,
-        validation_data=(X_val, y_val),
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=get_callbacks(patience=15),
-        class_weight=class_weight,
-        verbose=verbose
-    )
-    
-    # Save model
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    model.save(save_path)
     print(f"\nModel saved to {save_path}")
-    
-    # Final metrics
-    val_loss, val_acc = model.evaluate(X_val, y_val, verbose=0)
     print(f"\nFinal Validation:")
     print(f"  Loss: {val_loss:.4f}")
     print(f"  Accuracy: {val_acc:.4f}")
     
     return {
-        'history': history.history,
+        'history': history if use_lstm else {'val_loss': [val_loss]},
         'val_loss': val_loss,
         'val_accuracy': val_acc,
         'train_samples': len(X_train),
         'val_samples': len(X_val),
-        'model_path': save_path
+        'model_path': save_path,
+        'model_type': 'lstm' if use_lstm else 'xgboost'
     }
 
 

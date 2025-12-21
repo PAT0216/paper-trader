@@ -28,7 +28,7 @@ class LSTMStrategy(BaseStrategy):
     def __init__(
         self, 
         n_mc_samples: int = 50, 
-        confidence_threshold: float = 0.5,
+        confidence_threshold: float = 0.0,  # Include all predictions in ranking
         sequence_length: int = 60
     ):
         """

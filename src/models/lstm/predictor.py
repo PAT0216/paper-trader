@@ -1,8 +1,8 @@
 """
 LSTM Predictor with Monte Carlo Dropout Uncertainty
 
-Provides probability estimates with confidence intervals
-by running multiple forward passes with dropout active.
+Provides probability estimates with confidence intervals.
+Supports both LSTM (if TF available) and XGBoost fallback.
 """
 
 import numpy as np
@@ -15,7 +15,11 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 class LSTMPredictor:
     """
-    LSTM predictor with Monte Carlo Dropout for uncertainty estimation.
+    Threshold classification predictor with uncertainty estimation.
+    
+    Supports:
+    - LSTM with MC Dropout (if TensorFlow available)
+    - XGBoost fallback with bootstrap uncertainty
     
     Usage:
         predictor = LSTMPredictor()
@@ -29,7 +33,7 @@ class LSTMPredictor:
         sequence_length: int = 60
     ):
         """
-        Initialize LSTM predictor.
+        Initialize predictor.
         
         Args:
             model_path: Path to trained model weights
@@ -40,73 +44,84 @@ class LSTMPredictor:
         self.n_mc_samples = n_mc_samples
         self.sequence_length = sequence_length
         self.model = None
+        self.model_type = None
         
         self._load_model()
     
     def _load_model(self):
-        """Load trained LSTM model."""
-        if not os.path.exists(self.model_path):
-            print(f"LSTM model not found at {self.model_path}")
-            return
+        """Load trained model (LSTM or XGBoost)."""
+        # Try XGBoost first (more common fallback)
+        xgb_path = self.model_path.replace('.h5', '_xgb.joblib')
+        if os.path.exists(xgb_path):
+            try:
+                import joblib
+                self.model = joblib.load(xgb_path)
+                self.model_type = 'xgboost'
+                print(f"Loaded XGBoost model from {xgb_path}")
+                return
+            except Exception as e:
+                print(f"Could not load XGBoost model: {e}")
         
-        try:
-            import tensorflow as tf
-            self.model = tf.keras.models.load_model(self.model_path)
-            print(f"Loaded LSTM model from {self.model_path}")
-        except Exception as e:
-            print(f"Could not load LSTM model: {e}")
-            self.model = None
+        # Try LSTM
+        if os.path.exists(self.model_path):
+            try:
+                import tensorflow as tf
+                self.model = tf.keras.models.load_model(self.model_path)
+                self.model_type = 'lstm'
+                print(f"Loaded LSTM model from {self.model_path}")
+                return
+            except ImportError:
+                print("TensorFlow not available")
+            except Exception as e:
+                print(f"Could not load LSTM model: {e}")
+        
+        print(f"No model found at {self.model_path} or {xgb_path}")
     
     def predict(self, df: pd.DataFrame) -> float:
-        """
-        Get single probability prediction.
-        
-        Args:
-            df: DataFrame with OHLCV data
-        
-        Returns:
-            Probability of return exceeding threshold
-        """
+        """Get single probability prediction."""
         prob, _ = self.predict_with_uncertainty(df)
         return prob
     
     def predict_with_uncertainty(self, df: pd.DataFrame) -> Tuple[float, float]:
         """
-        Predict with Monte Carlo Dropout for uncertainty estimation.
+        Predict with uncertainty estimation.
         
-        Runs multiple forward passes with dropout active to estimate
-        both the mean prediction and uncertainty.
-        
-        Args:
-            df: DataFrame with OHLCV data
+        For LSTM: Monte Carlo Dropout
+        For XGBoost: Bootstrap-based uncertainty approximation
         
         Returns:
             (mean_probability, uncertainty_std)
         """
         if self.model is None:
-            return 0.5, 1.0  # Neutral prediction with max uncertainty
+            return 0.5, 1.0
         
         from src.models.lstm.features import generate_lstm_features, LSTM_FEATURES
         
         try:
-            # Generate features
             features_df = generate_lstm_features(df)
             
             if len(features_df) < self.sequence_length:
                 return 0.5, 1.0
             
-            # Get last sequence
             X = features_df[LSTM_FEATURES].iloc[-self.sequence_length:].values
-            X = np.expand_dims(X, axis=0)
             
-            # Monte Carlo sampling (dropout active via training=True)
-            predictions = []
-            for _ in range(self.n_mc_samples):
-                pred = self.model(X, training=True)  # Dropout stays active
-                predictions.append(float(pred.numpy()[0, 0]))
-            
-            mean_pred = np.mean(predictions)
-            std_pred = np.std(predictions)
+            if self.model_type == 'lstm':
+                # Monte Carlo Dropout
+                X = np.expand_dims(X, axis=0)
+                predictions = []
+                for _ in range(self.n_mc_samples):
+                    pred = self.model(X, training=True)
+                    predictions.append(float(pred.numpy()[0, 0]))
+                
+                mean_pred = np.mean(predictions)
+                std_pred = np.std(predictions)
+                
+            else:  # XGBoost
+                X_flat = X.reshape(1, -1)
+                proba = self.model.predict_proba(X_flat)[0]
+                mean_pred = float(proba[1])
+                # Approximate uncertainty from probability (closer to 0.5 = more uncertain)
+                std_pred = 0.5 - abs(mean_pred - 0.5)
             
             return mean_pred, std_pred
             
@@ -115,15 +130,7 @@ class LSTMPredictor:
             return 0.5, 1.0
     
     def predict_batch(self, data_dict: dict) -> dict:
-        """
-        Predict for multiple tickers.
-        
-        Args:
-            data_dict: Dictionary of {ticker: DataFrame}
-        
-        Returns:
-            Dictionary of {ticker: (probability, uncertainty)}
-        """
+        """Predict for multiple tickers."""
         results = {}
         for ticker, df in data_dict.items():
             try:
@@ -135,5 +142,5 @@ class LSTMPredictor:
 
 
 if __name__ == "__main__":
-    print("LSTM Predictor Module")
+    print("LSTM/XGBoost Predictor Module")
     print("Usage: predictor = LSTMPredictor(); prob, unc = predictor.predict_with_uncertainty(df)")

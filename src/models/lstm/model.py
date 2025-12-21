@@ -83,3 +83,33 @@ def get_callbacks(patience: int = 15):
             verbose=1
         )
     ]
+
+
+# ==================== XGBoost Fallback Model ====================
+# Used when TensorFlow is not available
+
+def build_xgb_threshold_model():
+    """
+    Build XGBoost classifier for threshold prediction.
+    
+    Fallback for environments without TensorFlow.
+    Uses same threshold classification approach but with GBT instead of LSTM.
+    """
+    from xgboost import XGBClassifier
+    
+    return XGBClassifier(
+        n_estimators=100,
+        max_depth=5,
+        learning_rate=0.1,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        scale_pos_weight=3,  # Handle class imbalance
+        random_state=42,
+        n_jobs=-1,
+        eval_metric='logloss'
+    )
+
+
+def is_tensorflow_available() -> bool:
+    """Check if TensorFlow is available."""
+    return TF_AVAILABLE
