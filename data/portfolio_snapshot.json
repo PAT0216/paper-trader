@@ -1,23 +1,23 @@
 {
-  "timestamp": "2025-12-21T06:18:08.223133Z",
+  "timestamp": "2025-12-21T06:23:15.816873Z",
   "price_date": "2025-12-19",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10720.1,
-      "return_pct": 7.2,
-      "cash": 1155.98,
+      "value": 14169.59,
+      "return_pct": 41.7,
+      "cash": 4605.47,
       "holdings": {
-        "NEM": 10,
-        "WBD": 41,
-        "WDC": 6,
-        "STX": 3,
-        "AVGO": 2,
-        "MU": 4,
-        "LRCX": 6,
-        "HOOD": 8,
         "PLTR": 5,
-        "APP": 1
+        "WDC": 6,
+        "NEM": 10,
+        "AVGO": 2,
+        "LRCX": 6,
+        "WBD": 41,
+        "HOOD": 8,
+        "APP": 1,
+        "STX": 3,
+        "MU": 4
       },
       "positions": 10
     },

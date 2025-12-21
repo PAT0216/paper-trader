@@ -159,6 +159,64 @@ def run_backtest():
         ret = (portfolio_value / INITIAL_CAPITAL - 1) * 100
         print(f"   Portfolio: ${portfolio_value:,.2f} ({ret:+.2f}%)")
     
+    # Compute DAILY portfolio values for charting
+    print(f"\n📊 Computing daily portfolio values...")
+    daily_values = []
+    
+    # Get all trading days in range
+    sample_ticker = list(holdings.keys())[0] if holdings else 'SPY'
+    all_days_df = cache.get_price_data(sample_ticker, START_DATE, END_DATE)
+    if not all_days_df.empty:
+        all_trading_days = sorted(all_days_df.index.strftime('%Y-%m-%d').tolist())
+    else:
+        all_trading_days = []
+    
+    # Track which holdings were active on each day
+    # Momentum: holdings change on rebalance dates
+    period_holdings = {}  # {date_range: holdings}
+    period_cash = {}
+    
+    # Oct 1 - Oct 31: First set of holdings (from Oct 1 buys)
+    # Nov 1 - Nov 30: Second set of holdings (from Nov 1 buys)  
+    # Dec 1 - Dec 19: Third set of holdings (from Dec 1 buys)
+    
+    from datetime import datetime as dt
+    
+    current_holdings = {}
+    current_cash = INITIAL_CAPITAL
+    
+    # Replay trades to get holdings at each date
+    trades_by_date = {}
+    for trade in all_trades:
+        d = trade['date']
+        if d not in trades_by_date:
+            trades_by_date[d] = []
+        trades_by_date[d].append(trade)
+    
+    for trading_day in all_trading_days:
+        # Apply any trades on this day
+        if trading_day in trades_by_date:
+            for trade in trades_by_date[trading_day]:
+                if trade['action'] == 'SELL':
+                    if trade['ticker'] in current_holdings:
+                        del current_holdings[trade['ticker']]
+                    current_cash += trade['shares'] * trade['price']
+                else:  # BUY
+                    current_holdings[trade['ticker']] = trade['shares']
+                    current_cash -= trade['shares'] * trade['price']
+        
+        # Calculate portfolio value on this day
+        day_value = current_cash
+        for ticker, shares in current_holdings.items():
+            df = cache.get_price_data(ticker, trading_day, trading_day)
+            if not df.empty:
+                price_col = 'Adj_Close' if 'Adj_Close' in df.columns else 'Close'
+                day_value += shares * df[price_col].iloc[-1]
+        
+        daily_values.append((trading_day, round(day_value, 2)))
+    
+    print(f"   Computed {len(daily_values)} daily values")
+    
     # Final value on END_DATE
     final_prices = {}
     for ticker in holdings:
@@ -174,7 +232,8 @@ def run_backtest():
         if ticker in final_prices:
             final_value += shares * final_prices[ticker]
     
-    portfolio_history.append((END_DATE, final_value))
+    # Use daily_values for portfolio_history (for charting)
+    portfolio_history = daily_values if daily_values else portfolio_history
     
     # Results
     total_return = (final_value / INITIAL_CAPITAL - 1) * 100
@@ -236,8 +295,27 @@ def run_backtest():
         })
     
     ledger_df = pd.DataFrame(ledger_rows)
+    
+    # Add daily PORTFOLIO VALUE entries for charting
+    for date_str, value in daily_values:
+        ledger_rows.append({
+            'date': date_str,
+            'ticker': 'PORTFOLIO',
+            'action': 'VALUE',
+            'price': 1.0,
+            'shares': 0,
+            'amount': 0.0,
+            'cash_balance': 0.0,
+            'total_value': value,
+            'strategy': 'momentum',
+            'momentum_score': ''
+        })
+    
+    # Sort by date and save
+    ledger_df = pd.DataFrame(ledger_rows)
+    ledger_df = ledger_df.sort_values('date')
     ledger_df.to_csv('ledger_momentum.csv', index=False)
-    print(f"💾 Ledger saved to ledger_momentum.csv ({len(all_trades)} trades)")
+    print(f"💾 Ledger saved to ledger_momentum.csv ({len(all_trades)} trades + {len(daily_values)} daily values)")
 
 
 if __name__ == "__main__":
