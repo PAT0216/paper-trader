@@ -175,23 +175,9 @@ def main():
         
         spy_df = None
         
-        # Try database first
-        if first_date and os.path.exists(DB_PATH):
-            con = sqlite3.connect(DB_PATH)
-            spy_df = pd.read_sql_query("""
-                SELECT date, COALESCE(adj_close, close) AS price
-                FROM price_data
-                WHERE ticker = 'SPY'
-                  AND date >= ?
-                ORDER BY date ASC
-            """, con, params=(first_date,))
-            con.close()
-            if spy_df.empty:
-                spy_df = None
-                print("  Database has no SPY data, trying yfinance...")
-        
-        # Fallback to yfinance
-        if spy_df is None and first_date:
+        # ALWAYS fetch SPY fresh from yfinance for accurate benchmark
+        # This ensures SPY chart stays current regardless of cache state
+        if first_date:
             try:
                 import yfinance as yf
                 ticker = yf.Ticker('SPY')
@@ -202,9 +188,28 @@ def main():
                         'date': hist['Date'].astype(str).str[:10],
                         'price': hist['Close']
                     })
-                    print(f"  Fetched {len(spy_df)} days from yfinance")
-            except Exception as yf_err:
-                print(f"  yfinance fallback failed: {yf_err}")
+                    print(f"  Fetched {len(spy_df)} days of SPY from yfinance (fresh)")
+            except Exception as e:
+                print(f"  yfinance fetch failed: {e}, trying database cache...")
+        
+        # Fallback to database cache if yfinance fails
+        if spy_df is None and first_date and os.path.exists(DB_PATH):
+            try:
+                con = sqlite3.connect(DB_PATH)
+                spy_df = pd.read_sql_query("""
+                    SELECT date, COALESCE(adj_close, close) AS price
+                    FROM price_data
+                    WHERE ticker = 'SPY'
+                      AND date >= ?
+                    ORDER BY date ASC
+                """, con, params=(first_date,))
+                con.close()
+                if not spy_df.empty:
+                    print(f"  Using cached SPY data ({len(spy_df)} days)")
+                else:
+                    spy_df = None
+            except Exception as db_err:
+                print(f"  Database fallback failed: {db_err}")
         
         if spy_df is not None and not spy_df.empty:
             spy_start = spy_df['price'].iloc[0]
