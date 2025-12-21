@@ -88,6 +88,60 @@ momentum = (price_12_months_ago / price_1_month_ago) - 1
 
 ---
 
+## Strategy Architecture (NEW)
+
+The project uses a **modular strategy pattern** allowing easy addition of new strategies.
+
+### Class: `BaseStrategy` (`src/strategies/base.py`)
+
+Abstract base class that all strategies must implement:
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `get_name()` | str | Strategy identifier (e.g., 'momentum') |
+| `get_display_name()` | str | Human-readable name |
+| `needs_training()` | bool | Whether ML training required |
+| `rank_universe(data_dict)` | Dict[str, float] | Score all tickers |
+| `generate_signals(data_dict)` | Dict[str, str] | Generate BUY/SELL/HOLD |
+| `get_ledger_filename()` | str | Ledger file path |
+
+### Registry: `src/strategies/registry.py`
+
+Factory pattern for dynamic strategy loading:
+
+```python
+from src.strategies import get_strategy, list_strategies
+
+# List available strategies
+list_strategies()  # ['momentum', 'ml']
+
+# Load strategy by name
+strategy = get_strategy("momentum")
+signals = strategy.generate_signals(data_dict)
+```
+
+### Adding a New Strategy
+
+```python
+# 1. Create src/strategies/my_strategy.py
+class MyStrategy(BaseStrategy):
+    def get_name(self): return "my_strategy"
+    def needs_training(self): return False
+    def rank_universe(self, data_dict): ...
+    def generate_signals(self, data_dict): ...
+
+# 2. Register in src/strategies/registry.py
+from .my_strategy import MyStrategy
+STRATEGIES["my_strategy"] = MyStrategy
+
+# 3. Create workflow (optional)
+# .github/workflows/my_strategy.yml
+
+# Done! No main.py changes needed.
+```
+
+---
+
 ## Data Pipeline
 
 ### Module: `src/data/cache.py`

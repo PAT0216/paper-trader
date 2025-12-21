@@ -9,14 +9,19 @@ from src.data.validator import DataValidator
 from src.trading import portfolio
 from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
 from src.backtesting.costs import TransactionCostModel
+from src.strategies import get_strategy, list_strategies
 import numpy as np
 
 def main():
+    # Use registry for dynamic strategy choices
+    available_strategies = list_strategies()
+    
     parser = argparse.ArgumentParser(description="AI Paper Trader")
     parser.add_argument("--mode", choices=["trade", "train", "backtest"], default="trade", help="Mode of operation")
-    parser.add_argument("--strategy", choices=["ml", "momentum"], default="momentum", help="Strategy: momentum (recommended) or ml (XGBoost)")
+    parser.add_argument("--strategy", choices=available_strategies, default="momentum", help=f"Strategy: {', '.join(available_strategies)}")
     parser.add_argument("--portfolio", default="default", help="Portfolio ID (e.g., 'momentum', 'ml') for isolated ledgers")
     args = parser.parse_args()
+
     
     # 1. Load Configuration
     try:
@@ -107,13 +112,16 @@ def main():
     current_prices = {t: df['Close'].iloc[-1] for t, df in data_dict.items()}
 
     # 3. Operations based on Mode
+    # Load strategy instance for training check
+    strategy = get_strategy(args.strategy)
+    
     if args.mode == "train" or (args.mode == "trade" and config['model']['retrain_daily']):
-        if args.strategy == "momentum":
-            print("📈 Momentum strategy - no training required")
-        else:
-            print("🧠 Training Model...")
+        if strategy.needs_training():
+            print(f"🧠 Training {strategy.get_display_name()} Model...")
             from src.models import trainer
             trainer.train_model(data_dict)
+        else:
+            print(f"📈 {strategy.get_display_name()} - no training required")
         
     if args.mode == "trade":
         print(f"\n--- 🔮 Generating Signals (Strategy: {args.strategy.upper()}) ---")

@@ -16,6 +16,8 @@ from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from datetime import datetime
 
+from src.strategies.base import BaseStrategy
+
 
 @dataclass
 class RebalanceOrder:
@@ -27,7 +29,7 @@ class RebalanceOrder:
     reason: str
 
 
-class MomentumStrategy:
+class MomentumStrategy(BaseStrategy):
     """
     Long-only momentum strategy.
     
@@ -35,6 +37,8 @@ class MomentumStrategy:
     Designed for monthly rebalancing on first trading day.
     
     Default: 12-month lookback, 15% daily stop-loss
+    
+    Inherits from BaseStrategy for consistent interface.
     """
     
     DEFAULT_CONFIG_PATH = 'config/momentum_config.yaml'
@@ -374,6 +378,33 @@ class MomentumStrategy:
         """
         # First trading day is typically 1st-3rd of month
         return date.day <= 3
+    
+    # ==================== BaseStrategy Implementation ====================
+    
+    def get_name(self) -> str:
+        """Return strategy identifier."""
+        return "momentum"
+    
+    def get_display_name(self) -> str:
+        """Return human-readable name."""
+        return "Momentum 12-1"
+    
+    def needs_training(self) -> bool:
+        """Momentum strategy does not require model training."""
+        return False
+    
+    def validate_data(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
+        """
+        Validate data for momentum strategy.
+        
+        Requires 252+ days for 12-month lookback.
+        """
+        min_days = 252
+        return {
+            ticker: df 
+            for ticker, df in data_dict.items() 
+            if len(df) >= min_days
+        }
 
 
 def load_tickers_from_file(path: str = 'data/sp500_tickers.txt') -> List[str]:
