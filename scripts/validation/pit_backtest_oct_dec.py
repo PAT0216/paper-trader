@@ -31,7 +31,7 @@ from src.backtesting.costs import TransactionCostModel
 # =============================================================================
 
 START_DATE = '2025-10-01'
-END_DATE = '2025-12-17'  # Today
+END_DATE = '2025-12-19'  # Latest available data
 INITIAL_CASH = 10000
 TOP_N = 10  # Top 10% of ~500 = ~50, but we cap at 10
 HORIZON_WEIGHTS = {1: 0.5, 5: 0.3, 20: 0.2}

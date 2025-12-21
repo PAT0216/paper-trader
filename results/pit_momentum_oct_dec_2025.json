@@ -1,0 +1,44 @@
+{
+  "strategy": "momentum",
+  "start_date": "2025-10-01",
+  "end_date": "2025-12-19",
+  "initial_value": 10000,
+  "final_value": 10720.1,
+  "total_return": 7.2,
+  "transaction_costs": "5 bps slippage",
+  "portfolio_history": [
+    [
+      "2025-10-01",
+      10000
+    ],
+    [
+      "2025-10-01",
+      9995.893260581972
+    ],
+    [
+      "2025-11-01",
+      9920.681838592533
+    ],
+    [
+      "2025-12-01",
+      9951.872234143259
+    ],
+    [
+      "2025-12-19",
+      10720.09707812214
+    ]
+  ],
+  "total_trades": 50,
+  "final_holdings": {
+    "HOOD": 8,
+    "PLTR": 5,
+    "WDC": 6,
+    "STX": 3,
+    "AVGO": 2,
+    "MU": 4,
+    "LRCX": 6,
+    "WBD": 41,
+    "NEM": 10,
+    "APP": 1
+  }
+}

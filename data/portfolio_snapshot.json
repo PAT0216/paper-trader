@@ -1,42 +1,43 @@
 {
-  "timestamp": "2025-12-20T10:28:18.010314Z",
+  "timestamp": "2025-12-21T06:18:08.223133Z",
   "price_date": "2025-12-19",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10396.37,
-      "return_pct": 3.96,
-      "cash": 2329.49,
+      "value": 10720.1,
+      "return_pct": 7.2,
+      "cash": 1155.98,
       "holdings": {
-        "NEM": 8,
-        "WBD": 34,
-        "PLTR": 4,
+        "NEM": 10,
+        "WBD": 41,
+        "WDC": 6,
         "STX": 3,
-        "WDC": 5,
         "AVGO": 2,
-        "MU": 3,
-        "LRCX": 5,
-        "HOOD": 6,
-        "APH": 5
+        "MU": 4,
+        "LRCX": 6,
+        "HOOD": 8,
+        "PLTR": 5,
+        "APP": 1
       },
       "positions": 10
     },
     "ml": {
-      "value": 9789.9,
-      "return_pct": -2.1,
-      "cash": 675.65,
+      "value": 10158.14,
+      "return_pct": 1.58,
+      "cash": 928.57,
       "holdings": {
-        "INTC": 26,
-        "HOOD": 7,
-        "MOH": 6,
-        "CMG": 31,
-        "BAX": 58,
-        "ARE": 23,
-        "FISV": 15,
-        "AMD": 2,
-        "NFLX": 16
+        "INTC": 25,
+        "COIN": 3,
+        "AVGO": 2,
+        "HOOD": 8,
+        "GLW": 11,
+        "PSKY": 76,
+        "MCHP": 15,
+        "GNRC": 7,
+        "SMCI": 33,
+        "LYB": 23
       },
-      "positions": 9
+      "positions": 10
     }
   },
   "benchmark": {

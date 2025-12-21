@@ -12,6 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.data.cache import DataCache
+from src.backtesting.costs import TransactionCostModel
 
 # Configuration
 START_DATE = "2020-01-01"
@@ -88,6 +89,7 @@ def run_backtest():
     holdings = {}  # ticker -> shares
     portfolio_history = []  # List of (date, value)
     trades = []
+    cost_model = TransactionCostModel()  # 5 bps slippage
     
     for i, rebalance_date in enumerate(rebalance_dates):
         try:
@@ -131,18 +133,20 @@ def run_backtest():
                 ret = (portfolio_value / INITIAL_CAPITAL - 1) * 100
                 print(f"{rebalance_date}: ${portfolio_value:,.0f} ({ret:+.1f}%)")
             
-            # Sell all holdings
+            # Sell all holdings (with slippage)
             for ticker, shares in list(holdings.items()):
                 if ticker in latest_prices and shares > 0:
-                    price = latest_prices[ticker]
-                    amount = shares * price
+                    raw_price = latest_prices[ticker]
+                    # Apply 5 bps slippage on sells
+                    exec_price, _ = cost_model.calculate_execution_price('SELL', raw_price, shares)
+                    amount = shares * exec_price
                     cash += amount
                     trades.append({
                         'date': rebalance_date,
                         'ticker': ticker,
                         'action': 'SELL',
                         'shares': shares,
-                        'price': price,
+                        'price': exec_price,
                         'amount': amount
                     })
             
@@ -155,14 +159,16 @@ def run_backtest():
                 if ticker not in latest_prices:
                     continue
                     
-                price = latest_prices[ticker]
-                if price <= 0:
+                raw_price = latest_prices[ticker]
+                if raw_price <= 0:
                     continue
-                    
-                shares = int(position_size / price)
                 
-                if shares > 0 and cash >= shares * price:
-                    amount = shares * price
+                # Apply 5 bps slippage on buys
+                exec_price, _ = cost_model.calculate_execution_price('BUY', raw_price, 1)
+                shares = int(position_size / exec_price)
+                
+                if shares > 0 and cash >= shares * exec_price:
+                    amount = shares * exec_price
                     cash -= amount
                     holdings[ticker] = shares
                     trades.append({
@@ -170,7 +176,7 @@ def run_backtest():
                         'ticker': ticker,
                         'action': 'BUY',
                         'shares': shares,
-                        'price': price,
+                        'price': exec_price,
                         'amount': amount,
                         'momentum': score
                     })
