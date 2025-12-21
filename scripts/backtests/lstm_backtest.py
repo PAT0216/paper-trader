@@ -30,19 +30,23 @@ TOP_N = 10  # Number of stocks to hold
 REBALANCE_FREQ = 'weekly'  # 'daily' or 'weekly'
 SLIPPAGE_BPS = 5
 
-# ==================== Load Data ====================
+# ==================== Load Data from Cache Only ====================
 print(f"\n{'='*60}")
 print(f"LSTM V4 Backtest: {START_DATE} to {END_DATE}")
 print(f"{'='*60}")
 
-# Get tickers from cache
+# Load data directly from cache (no API calls)
 cache = get_cache()
 tickers = cache.get_cached_tickers()
 print(f"\nUniverse: {len(tickers)} tickers")
 
-# Load data
-print("Loading data from cache...")
-data_dict = fetch_data(tickers, period='2y', use_cache=True)
+print("Loading data from cache (no API calls)...")
+data_dict = {}
+for ticker in tickers:
+    df = cache.get_price_data(ticker)
+    if df is not None and len(df) >= 60:
+        data_dict[ticker] = df
+
 print(f"Loaded: {len(data_dict)} tickers")
 
 # Filter to backtest period
@@ -61,7 +65,9 @@ print(f"Filtered to period: {len(backtest_data)} tickers")
 
 # ==================== Initialize ====================
 strategy = get_strategy('lstm')
-cost_model = TransactionCostModel(slippage_bps=SLIPPAGE_BPS)
+from src.backtesting.costs import CostConfig
+cost_config = CostConfig(slippage_bps=SLIPPAGE_BPS)
+cost_model = TransactionCostModel(config=cost_config)
 
 # Get trading days
 sample_df = list(backtest_data.values())[0]
@@ -118,7 +124,7 @@ for i, date in enumerate(trading_days):
             for ticker in list(holdings.keys()):
                 if ticker not in target_tickers and ticker in prices:
                     shares = holdings[ticker]
-                    sell_price = cost_model.calculate_execution_price('SELL', prices[ticker])
+                    sell_price, _ = cost_model.calculate_execution_price('SELL', prices[ticker], shares)
                     proceeds = shares * sell_price
                     cash += proceeds
                     trades.append({
@@ -137,11 +143,14 @@ for i, date in enumerate(trading_days):
                 
                 for ticker in target_tickers:
                     if ticker not in holdings and ticker in prices:
-                        buy_price = cost_model.calculate_execution_price('BUY', prices[ticker])
-                        shares = int(allocation / buy_price)
-                        if shares > 0:
-                            cost = shares * buy_price
-                            cash -= cost
+                        # Estimate shares first, then get execution price
+                        est_shares = int(allocation / prices[ticker])
+                        if est_shares > 0:
+                            buy_price, _ = cost_model.calculate_execution_price('BUY', prices[ticker], est_shares)
+                            shares = int(allocation / buy_price)
+                            if shares > 0:
+                                cost = shares * buy_price
+                                cash -= cost
                             holdings[ticker] = shares
                             trades.append({
                                 'date': date_str,
