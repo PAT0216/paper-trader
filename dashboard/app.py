@@ -469,18 +469,20 @@ with st.sidebar:
     st.markdown("##### 🎯 Strategy")
     strategy = st.radio(
         "Select strategy:",
-        options=["Compare", "Momentum", "ML"],
+        options=["Compare", "Momentum", "ML", "LSTM"],
         index=0,
         horizontal=True,
         label_visibility="collapsed"
     )
     
     if strategy == "Compare":
-        portfolios = ["momentum", "ml"]
+        portfolios = ["momentum", "ml", "lstm"]
     elif strategy == "Momentum":
         portfolios = ["momentum"]
-    else:
+    elif strategy == "ML":
         portfolios = ["ml"]
+    else:
+        portfolios = ["lstm"]
     
     st.markdown("---")
     
@@ -492,9 +494,13 @@ with st.sidebar:
             <strong style="color: #10b981;">Momentum</strong><br>
             <span style="color: #94a3b8;">12-1 month factor • Monthly rebalance • 15% stop-loss</span>
         </div>
-        <div>
+        <div style="margin-bottom: 12px;">
             <strong style="color: #3b82f6;">ML Ensemble</strong><br>
             <span style="color: #94a3b8;">XGBoost • 15 features • VIX regime detection</span>
+        </div>
+        <div>
+            <strong style="color: #f59e0b;">LSTM</strong><br>
+            <span style="color: #94a3b8;">TensorFlow • Threshold classifier • Daily rebalance</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
