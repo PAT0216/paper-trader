@@ -496,7 +496,7 @@ with st.sidebar:
         </div>
         <div style="margin-bottom: 12px;">
             <strong style="color: #3b82f6;">ML Ensemble</strong><br>
-            <span style="color: #94a3b8;">XGBoost • 15 features • VIX regime detection</span>
+            <span style="color: #94a3b8;">XGBoost • 15 features • Daily rebalance</span>
         </div>
         <div>
             <strong style="color: #f59e0b;">LSTM</strong><br>
