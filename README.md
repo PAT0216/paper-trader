@@ -95,48 +95,18 @@ cd dashboard && streamlit run app.py
 
 ## System Architecture
 
-```mermaid
-flowchart LR
-    subgraph Input["Data Sources"]
-        A1[(SQLite<br/>Cache)]
-        A2[yfinance]
-        A3[FRED API]
-    end
-
-    subgraph Process["Processing"]
-        B[Feature<br/>Engineering]
-    end
-
-    subgraph Models["Strategies"]
-        C1[Momentum]
-        C2[XGBoost]
-        C3[LSTM]
-    end
-
-    subgraph Trade["Execution"]
-        D[Trading<br/>Engine]
-    end
-
-    subgraph Output["Output"]
-        E1[Ledger]
-        E2[Dashboard]
-    end
-
-    Input --> Process
-    Process --> Models
-    Models --> Trade
-    Trade --> Output
-```
+![Paper Trader AI - MLOps System Architecture](docs/architecture.png)
 
 ### Pipeline Overview
 
 | Stage | Components | Description |
 |-------|------------|-------------|
-| **Data Sources** | SQLite cache, yfinance, FRED | Market data collection and storage |
-| **Processing** | Technical indicators, momentum factors | Feature engineering for models |
-| **Strategies** | Momentum, XGBoost, LSTM | Three independent trading strategies |
-| **Execution** | Risk management, position sizing, costs | Trade execution with 5 bps slippage |
-| **Output** | CSV ledgers, Streamlit dashboard | Trade history and live monitoring |
+| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (4.3M+ rows) |
+| **2. Feature Engineering** | Technical indicators, momentum factors, LSTM sequences | Transform raw data for model consumption |
+| **3. Model Layer** | Momentum, XGBoost Ensemble, LSTM Neural Network | Three independent trading strategies |
+| **4. Trading Engine** | Risk management, position sizing, transaction costs | Trade execution with 5 bps slippage |
+| **5. Deployment** | GitHub Actions, Docker, CSV Ledgers | Automated daily operations |
+| **6. Monitoring** | Streamlit Dashboard, SPY Benchmark | Live performance tracking |
 
 ## Strategy Architecture
 
