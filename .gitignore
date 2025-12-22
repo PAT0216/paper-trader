@@ -40,3 +40,4 @@ data/universe_cache.csv
 # Research papers (not needed for trading)
 *.pdf
 ML_stock_strategy_research_paper*.md
+docs/SENTINULL_PLAN.md
