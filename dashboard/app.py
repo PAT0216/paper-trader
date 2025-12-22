@@ -578,8 +578,8 @@ for i, (pid, df) in enumerate(data.items()):
         color_class = "positive" if pnl >= 0 else "negative"
         arrow = "↑" if pnl >= 0 else "↓"
         
-        strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble"
-        strategy_emoji = "🚀" if pid == "momentum" else "🤖"
+        strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble" if pid == "ml" else "LSTM"
+        strategy_emoji = "🚀" if pid == "momentum" else "🤖" if pid == "ml" else "🧠"
         
         st.markdown(f"""
         <div class="metric-card">
@@ -808,7 +808,7 @@ with tab1:
     cols = st.columns(len(data))
     for i, (pid, df) in enumerate(data.items()):
         with cols[i]:
-            strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble"
+            strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble" if pid == "ml" else "LSTM"
             st.markdown(f"**{strategy_name}**")
             
             # First try to get holdings from ledger
@@ -839,7 +839,7 @@ with tab2:
         selected = st.radio(
             "Select portfolio:",
             options=list(data.keys()),
-            format_func=lambda x: "Momentum" if x == "momentum" else "ML Ensemble",
+            format_func=lambda x: "Momentum" if x == "momentum" else "ML Ensemble" if x == "ml" else "LSTM",
             horizontal=True,
             label_visibility="collapsed"
         )
