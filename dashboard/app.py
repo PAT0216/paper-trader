@@ -445,12 +445,23 @@ def load_benchmark_series(
 
 # ============ SIDEBAR ============
 with st.sidebar:
-    # Logo & Title
     st.markdown("""
         <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 2.5rem; margin-bottom: 8px;">📈</div>
-            <h2 style="margin: 0; font-size: 1.5rem; color: #f8fafc;">Paper Trader AI</h2>
-            <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #64748b;">Algorithmic Trading System</p>
+            <div style="font-size: 3rem; margin-bottom: 8px; 
+                        background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #8b5cf6 100%);
+                        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                        filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.3));">
+                ⚡
+            </div>
+            <h2 style="margin: 0; font-size: 1.6rem; 
+                       background: linear-gradient(90deg, #f8fafc, #94a3b8);
+                       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                       font-weight: 700; letter-spacing: -0.5px;">
+                Paper Trader AI
+            </h2>
+            <p style="margin: 8px 0 0 0; font-size: 0.75rem; color: #64748b; letter-spacing: 2px; text-transform: uppercase;">
+                Algorithmic Trading
+            </p>
         </div>
     """, unsafe_allow_html=True)
     
