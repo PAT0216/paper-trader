@@ -25,30 +25,64 @@
 
 ## System Architecture
 
+```mermaid
+flowchart TB
+    subgraph DATA["DATA PIPELINE"]
+        direction TB
+        A1[("SQLite Cache<br/>4.3M+ rows")]
+        A2["yfinance API"]
+        A3["FRED API"]
+    end
+
+    subgraph MODELS["MODEL LAYER"]
+        direction LR
+        C1["Momentum<br/>Fama-French"]
+        C2["XGBoost<br/>Multi-horizon"]
+        C3["LSTM<br/>TensorFlow"]
+    end
+
+    subgraph TRADING["TRADING ENGINE"]
+        direction TB
+        D1["Signal Generation"]
+        D2["Risk Management"]
+        D3["Transaction Costs<br/>5 bps"]
+    end
+
+    subgraph DEPLOY["DEPLOYMENT"]
+        E1["GitHub Actions"]
+        E2["Ledger CSV"]
+        E3["Streamlit Dashboard"]
+    end
+
+    DATA --> MODELS
+    MODELS --> TRADING
+    TRADING --> DEPLOY
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         PAPER TRADER AI                             │
-│                    Dual-Portfolio Trading System                    │
-└─────────────────────────────────────────────────────────────────────┘
-                                  │
-        ┌─────────────────────────┴─────────────────────────┐
-        ▼                                                   ▼
-┌───────────────────┐                           ┌───────────────────┐
-│  MOMENTUM STRATEGY │                           │   ML STRATEGY     │
-│  • 12-1 Momentum   │                           │  • XGBoost Ensemble│
-│  • Monthly Rebal   │                           │  • Daily Rebalance │
-│  • 10 Positions    │                           │  • 10 Positions    │
-│  ledger_momentum.csv│                           │  ledger_ml.csv     │
-└───────────────────┘                           └───────────────────┘
-                                  │
-                                  ▼
-                    ┌─────────────────────────┐
-                    │   SHARED INFRASTRUCTURE  │
-                    │  • SQLite Cache (market.db)│
-                    │  • Risk Manager           │
-                    │  • Transaction Cost Model │
-                    │  • Streamlit Dashboard    │
-                    └─────────────────────────┘
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           PAPER TRADER AI                                    │
+│                     Triple-Portfolio Trading System                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+        ┌─────────────────────────────┼─────────────────────────────┐
+        ▼                             ▼                             ▼
+┌───────────────────┐     ┌───────────────────┐     ┌───────────────────┐
+│ MOMENTUM STRATEGY │     │   ML STRATEGY     │     │  LSTM STRATEGY    │
+│ • 12-1 Momentum   │     │ • XGBoost Ensemble│     │ • TensorFlow NN   │
+│ • Monthly Rebal   │     │ • Daily Rebalance │     │ • Daily Rebalance │
+│ • 10 Positions    │     │ • 10 Positions    │     │ • 10 Positions    │
+│ ledger_momentum   │     │ ledger_ml.csv     │     │ ledger_lstm.csv   │
+└───────────────────┘     └───────────────────┘     └───────────────────┘
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │   SHARED INFRASTRUCTURE  │
+                        │  • SQLite Cache (market.db)│
+                        │  • Risk Manager           │
+                        │  • Transaction Cost Model │
+                        │  • Streamlit Dashboard    │
+                        └─────────────────────────┘
 ```
 
 ### Core Entry Point: `main.py`
@@ -624,6 +658,9 @@ python main.py --strategy momentum --portfolio momentum
 
 # ML Strategy (daily rebalance)
 python main.py --strategy ml --portfolio ml
+
+# LSTM Strategy (daily rebalance)
+python main.py --strategy lstm --portfolio lstm
 
 # Training only
 python main.py --mode train --strategy ml

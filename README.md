@@ -3,32 +3,33 @@
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
-![Strategy](https://img.shields.io/badge/strategy-dual--portfolio-orange)
+![Strategy](https://img.shields.io/badge/strategy-triple--portfolio-orange)
 
-**Paper Trader AI** is a production-grade algorithmic trading system featuring a **Dual Portfolio Architecture** that runs two independent strategies simultaneously for performance comparison.
+**Paper Trader AI** is a production-grade algorithmic trading system featuring a **Triple Portfolio Architecture** that runs three independent strategies simultaneously for performance comparison.
 
 ### [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
 > Real-time portfolio values, performance charts with SPY benchmark, and trade history updated daily.
 
 ---
 
-## Dual Portfolio System
+## Triple Portfolio System
 
 | Portfolio | Strategy | Schedule | Ledger |
 |-----------|----------|----------|--------|
 | **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
+| **LSTM** | TensorFlow neural network | Daily (weekdays) | `ledger_lstm.csv` |
 
 ### Performance With Transaction Costs (Oct 1 - Dec 19, 2025)
 
-| Metric | Momentum | ML Ensemble | SPY |
-|--------|----------|-------------|-----|
-| **Return** | +7.20% | +1.58% | +3.10% |
-| **Excess vs SPY** | +4.10% | -1.52% | — |
-| **Total Trades** | 50 | 526 | — |
-| **Slippage** | 5 bps | 5 bps | — |
+| Metric | Momentum | ML Ensemble | LSTM | SPY |
+|--------|----------|-------------|------|-----|
+| **Return** | +7.20% | +1.58% | +1.59% | +2.12% |
+| **Excess vs SPY** | +5.08% | -0.54% | -0.53% | — |
+| **Total Trades** | 50 | 526 | 134 | — |
+| **Slippage** | 5 bps | 5 bps | 5 bps | — |
 
-> Both strategies include realistic transaction costs (5 basis points slippage on all trades).
+> All strategies include realistic transaction costs (5 basis points slippage on all trades).
 
 ---
 
@@ -91,6 +92,74 @@ cd dashboard && streamlit run app.py
 - **Point-in-time Universe**: Monthly S&P 500 sync
 
 ---
+
+## System Architecture
+
+```mermaid
+flowchart TB
+    subgraph DATA["DATA PIPELINE"]
+        direction TB
+        A1[("SQLite Cache<br/>4.3M+ rows")]
+        A2["yfinance API"]
+        A3["FRED API<br/>(Macro Data)"]
+        A4["S&P 500<br/>Universe Sync"]
+    end
+
+    subgraph FEATURES["FEATURE ENGINEERING"]
+        direction TB
+        B1["Technical Indicators<br/>RSI, MACD, Bollinger"]
+        B2["Momentum Factors<br/>12-month returns"]
+        B3["LSTM Sequences<br/>60-day windows"]
+    end
+
+    subgraph MODELS["MODEL LAYER"]
+        direction LR
+        C1["Momentum<br/>Fama-French"]
+        C2["XGBoost<br/>Multi-horizon"]
+        C3["LSTM<br/>TensorFlow"]
+    end
+
+    subgraph TRADING["TRADING ENGINE"]
+        direction TB
+        D1["Signal Generation"]
+        D2["Risk Management<br/>15% stop-loss"]
+        D3["Position Sizing<br/>Max 15%/stock"]
+        D4["Transaction Costs<br/>5 bps slippage"]
+    end
+
+    subgraph DEPLOY["DEPLOYMENT"]
+        direction TB
+        E1["GitHub Actions<br/>Cron Scheduler"]
+        E2["Docker<br/>Container"]
+        E3["Ledger CSV<br/>Trade History"]
+    end
+
+    subgraph MONITOR["MONITORING"]
+        direction TB
+        F1["Streamlit<br/>Dashboard"]
+        F2["SPY Benchmark<br/>Comparison"]
+        F3["Portfolio<br/>Snapshot"]
+    end
+
+    DATA --> FEATURES
+    FEATURES --> MODELS
+    MODELS --> TRADING
+    TRADING --> DEPLOY
+    DEPLOY --> MONITOR
+    MONITOR -.->|"Performance<br/>Feedback"| MODELS
+    DEPLOY -.->|"Trade Logs"| DATA
+```
+
+### Component Details
+
+| Phase | Components | Purpose |
+|-------|------------|---------|
+| **Data Pipeline** | SQLite cache, yfinance, FRED | Collect & store market data |
+| **Feature Engineering** | Technical indicators, momentum factors | Transform raw data for models |
+| **Model Layer** | Momentum, XGBoost, LSTM | Generate trading signals |
+| **Trading Engine** | Risk mgmt, position sizing, costs | Execute trades safely |
+| **Deployment** | GitHub Actions, Docker | Automate daily operations |
+| **Monitoring** | Streamlit dashboard | Track performance vs benchmark |
 
 ## Strategy Architecture
 
