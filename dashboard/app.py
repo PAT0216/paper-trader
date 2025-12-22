@@ -599,7 +599,16 @@ with cols[-1]:
     if benchmark:
         bench_value = benchmark['value']
         bench_ret = benchmark['return_pct']
-        period_label = f"{benchmark.get('start_date', '')} → {benchmark.get('end_date', '')}"
+        # Shorten dates: 2025-10-01 → Oct 1
+        from datetime import datetime
+        start_str = benchmark.get('start_date', '')
+        end_str = benchmark.get('end_date', '')
+        try:
+            start_short = datetime.strptime(start_str, '%Y-%m-%d').strftime('%b %d')
+            end_short = datetime.strptime(end_str, '%Y-%m-%d').strftime('%b %d')
+            period_label = f"{start_short} → {end_short}"
+        except:
+            period_label = f"{start_str} → {end_str}"
         bench_arrow = "↑" if bench_ret >= 0 else "↓"
         bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
         
