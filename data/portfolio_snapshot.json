@@ -42,10 +42,10 @@
   },
   "benchmark": {
     "ticker": "SPY",
-    "start_price": 668.45,
-    "end_price": 689.17,
-    "return_pct": 3.1,
-    "value": 10309.97,
+    "start_price": 666.48,
+    "end_price": 680.59,
+    "return_pct": 2.12,
+    "value": 10211.7,
     "start_date": "2025-10-01",
     "end_date": "2025-12-19"
   }
