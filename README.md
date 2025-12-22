@@ -96,70 +96,47 @@ cd dashboard && streamlit run app.py
 ## System Architecture
 
 ```mermaid
-flowchart TB
-    subgraph DATA["DATA PIPELINE"]
-        direction TB
-        A1[("SQLite Cache<br/>4.3M+ rows")]
-        A2["yfinance API"]
-        A3["FRED API<br/>(Macro Data)"]
-        A4["S&P 500<br/>Universe Sync"]
+flowchart LR
+    subgraph Input["Data Sources"]
+        A1[(SQLite<br/>Cache)]
+        A2[yfinance]
+        A3[FRED API]
     end
 
-    subgraph FEATURES["FEATURE ENGINEERING"]
-        direction TB
-        B1["Technical Indicators<br/>RSI, MACD, Bollinger"]
-        B2["Momentum Factors<br/>12-month returns"]
-        B3["LSTM Sequences<br/>60-day windows"]
+    subgraph Process["Processing"]
+        B[Feature<br/>Engineering]
     end
 
-    subgraph MODELS["MODEL LAYER"]
-        direction LR
-        C1["Momentum<br/>Fama-French"]
-        C2["XGBoost<br/>Multi-horizon"]
-        C3["LSTM<br/>TensorFlow"]
+    subgraph Models["Strategies"]
+        C1[Momentum]
+        C2[XGBoost]
+        C3[LSTM]
     end
 
-    subgraph TRADING["TRADING ENGINE"]
-        direction TB
-        D1["Signal Generation"]
-        D2["Risk Management<br/>15% stop-loss"]
-        D3["Position Sizing<br/>Max 15%/stock"]
-        D4["Transaction Costs<br/>5 bps slippage"]
+    subgraph Trade["Execution"]
+        D[Trading<br/>Engine]
     end
 
-    subgraph DEPLOY["DEPLOYMENT"]
-        direction TB
-        E1["GitHub Actions<br/>Cron Scheduler"]
-        E2["Docker<br/>Container"]
-        E3["Ledger CSV<br/>Trade History"]
+    subgraph Output["Output"]
+        E1[Ledger]
+        E2[Dashboard]
     end
 
-    subgraph MONITOR["MONITORING"]
-        direction TB
-        F1["Streamlit<br/>Dashboard"]
-        F2["SPY Benchmark<br/>Comparison"]
-        F3["Portfolio<br/>Snapshot"]
-    end
-
-    DATA --> FEATURES
-    FEATURES --> MODELS
-    MODELS --> TRADING
-    TRADING --> DEPLOY
-    DEPLOY --> MONITOR
-    MONITOR -.->|"Performance<br/>Feedback"| MODELS
-    DEPLOY -.->|"Trade Logs"| DATA
+    Input --> Process
+    Process --> Models
+    Models --> Trade
+    Trade --> Output
 ```
 
-### Component Details
+### Pipeline Overview
 
-| Phase | Components | Purpose |
-|-------|------------|---------|
-| **Data Pipeline** | SQLite cache, yfinance, FRED | Collect & store market data |
-| **Feature Engineering** | Technical indicators, momentum factors | Transform raw data for models |
-| **Model Layer** | Momentum, XGBoost, LSTM | Generate trading signals |
-| **Trading Engine** | Risk mgmt, position sizing, costs | Execute trades safely |
-| **Deployment** | GitHub Actions, Docker | Automate daily operations |
-| **Monitoring** | Streamlit dashboard | Track performance vs benchmark |
+| Stage | Components | Description |
+|-------|------------|-------------|
+| **Data Sources** | SQLite cache, yfinance, FRED | Market data collection and storage |
+| **Processing** | Technical indicators, momentum factors | Feature engineering for models |
+| **Strategies** | Momentum, XGBoost, LSTM | Three independent trading strategies |
+| **Execution** | Risk management, position sizing, costs | Trade execution with 5 bps slippage |
+| **Output** | CSV ledgers, Streamlit dashboard | Trade history and live monitoring |
 
 ## Strategy Architecture
 
