@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-22T21:16:48.325306Z",
+  "timestamp": "2025-12-22T21:40:58.652127Z",
   "price_date": "2025-12-22",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,30 +22,29 @@
       "positions": 10
     },
     "ml": {
-      "value": 11242.88,
-      "return_pct": 12.43,
-      "cash": 1919.45,
+      "value": 9322.05,
+      "return_pct": -6.78,
+      "cash": 773.54,
       "holdings": {
         "INTC": 25,
-        "COIN": 3,
-        "AVGO": 2,
+        "AVGO": 3,
         "HOOD": 8,
-        "PSKY": 76,
-        "GLW": 11,
         "LYB": 23,
+        "GLW": 11,
         "GNRC": 7,
+        "PSKY": 76,
         "MCHP": 15,
-        "SMCI": 33
+        "NFLX": 7
       },
-      "positions": 10
+      "positions": 9
     }
   },
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 684.72,
-    "return_pct": 2.74,
-    "value": 10273.67,
+    "end_price": 684.83,
+    "return_pct": 2.75,
+    "value": 10275.32,
     "start_date": "2025-10-01",
     "end_date": "2025-12-22"
   }
