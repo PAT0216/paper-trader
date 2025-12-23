@@ -1,6 +1,9 @@
 """
 Compute current portfolio values from ledger holdings and latest prices.
 Outputs a JSON snapshot for the dashboard to read.
+
+IMPORTANT: Portfolio values come from the ledger's PORTFOLIO,VALUE rows
+(the authoritative source), NOT from recalculating holdings × prices.
 """
 
 import pandas as pd
@@ -15,9 +18,43 @@ OUTPUT_PATH = 'data/portfolio_snapshot.json'
 INITIAL_CAPITAL = 10000
 
 
+def get_ledger_portfolio_value(ledger_path: str) -> tuple[float, str]:
+    """
+    Get the latest PORTFOLIO,VALUE entry from the ledger.
+    This is the authoritative source of truth for portfolio value.
+    Returns: (portfolio_value, date_str)
+    """
+    if not os.path.exists(ledger_path):
+        return 0, ""
+    
+    df = pd.read_csv(ledger_path)
+    if df.empty:
+        return 0, ""
+    
+    # Filter to PORTFOLIO,VALUE rows only
+    value_rows = df[(df['ticker'] == 'PORTFOLIO') & (df['action'] == 'VALUE')]
+    
+    if value_rows.empty:
+        return 0, ""
+    
+    # Get the latest entry
+    value_rows = value_rows.sort_values('date')
+    latest = value_rows.iloc[-1]
+    
+    # The value is stored in 'total_value' or 'cash_balance' column
+    value = latest.get('total_value', latest.get('cash_balance', 0))
+    date_str = str(latest['date'])[:10]
+    
+    return float(value), date_str
+
+
 def get_current_holdings(ledger_path: str) -> tuple[dict, float]:
     """
     Parse ledger to get current holdings and cash balance.
+    
+    IMPORTANT: Cash is calculated from transaction amounts, NOT from the
+    cash_balance column (which may be incorrect in some ledgers).
+    
     Returns: (holdings_dict, cash_balance)
     """
     if not os.path.exists(ledger_path):
@@ -33,31 +70,27 @@ def get_current_holdings(ledger_path: str) -> tuple[dict, float]:
     # Sort by date and process in order
     df = df.sort_values('date')
     
-    # Group by date and sort actions within each day
-    action_order = {'DEPOSIT': 0, 'SELL': 1, 'BUY': 2}
-    
-    for date_str, day_group in df.groupby(df['date'].astype(str).str[:10], sort=False):
-        day_sorted = day_group.copy()
-        day_sorted['_order'] = day_sorted['action'].map(action_order).fillna(3)
-        day_sorted = day_sorted.sort_values('_order')
+    for _, row in df.iterrows():
+        action = row.get('action', '')
+        ticker = row.get('ticker', '')
+        amount = row.get('amount', 0)
+        shares = row.get('shares', 0)
         
-        for _, row in day_sorted.iterrows():
-            action = row.get('action', '')
-            ticker = row.get('ticker', '')
-            
-            if action == 'DEPOSIT':
-                cash = row.get('cash_balance', 0)
-            elif action == 'BUY':
-                shares = row.get('shares', 0)
-                holdings[ticker] = holdings.get(ticker, 0) + shares
-                cash = row.get('cash_balance', 0)
-            elif action == 'SELL':
-                shares_sold = row.get('shares', 0)
-                if ticker in holdings:
-                    holdings[ticker] -= shares_sold
-                    if holdings[ticker] <= 0:
-                        del holdings[ticker]
-                cash = row.get('cash_balance', 0)
+        if action == 'DEPOSIT':
+            # Deposit adds to cash
+            cash += amount if amount > 0 else row.get('cash_balance', 0)
+        elif action == 'BUY':
+            # BUY: subtract amount from cash, add shares to holdings
+            cash -= amount
+            holdings[ticker] = holdings.get(ticker, 0) + shares
+        elif action == 'SELL':
+            # SELL: add amount to cash, subtract shares from holdings
+            cash += amount
+            if ticker in holdings:
+                holdings[ticker] -= shares
+                if holdings[ticker] <= 0:
+                    del holdings[ticker]
+        # Skip PORTFOLIO,VALUE rows (they don't affect holdings/cash)
     
     return holdings, cash
 
