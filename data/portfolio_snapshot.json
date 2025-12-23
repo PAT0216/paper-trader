@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-23T08:42:59.558561Z",
+  "timestamp": "2025-12-23T08:45:14.233404Z",
   "price_date": "2025-12-22",
   "initial_capital": 10000,
   "portfolios": {
@@ -37,6 +37,24 @@
         "NFLX": 7
       },
       "positions": 9
+    },
+    "lstm": {
+      "value": 10229.74,
+      "return_pct": 2.3,
+      "cash": 204.94,
+      "holdings": {
+        "LIN": 2,
+        "POOL": 4,
+        "MSI": 3,
+        "CPRT": 31,
+        "VICI": 42,
+        "SO": 9,
+        "PPL": 27,
+        "DUK": 8,
+        "WEC": 10,
+        "IRM": 13
+      },
+      "positions": 10
     }
   },
   "benchmark": {

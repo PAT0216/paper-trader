@@ -155,7 +155,8 @@ def main():
     # Process each ledger
     ledgers = {
         'momentum': 'ledger_momentum.csv',
-        'ml': 'ledger_ml.csv'
+        'ml': 'ledger_ml.csv',
+        'lstm': 'ledger_lstm.csv'
     }
     
     all_tickers = set()
