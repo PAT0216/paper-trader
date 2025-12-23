@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-23T21:15:23.917736Z",
+  "timestamp": "2025-12-23T21:41:11.685023Z",
   "price_date": "2025-12-22",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,19 +22,19 @@
       "positions": 10
     },
     "ml": {
-      "value": 10250.62,
-      "return_pct": 2.51,
-      "cash": 1702.11,
+      "value": 10250.36,
+      "return_pct": 2.5,
+      "cash": 1173.91,
       "holdings": {
         "INTC": 25,
-        "AVGO": 3,
+        "AVGO": 4,
         "HOOD": 8,
-        "LYB": 23,
         "GLW": 11,
         "PSKY": 76,
+        "LYB": 23,
         "MCHP": 15,
         "GNRC": 7,
-        "NFLX": 7
+        "NFLX": 9
       },
       "positions": 9
     },
