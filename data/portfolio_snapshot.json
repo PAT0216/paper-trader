@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-12-23T08:36:12.255133Z",
-  "price_date": "2025-12-19",
+  "timestamp": "2025-12-23T08:42:59.558561Z",
+  "price_date": "2025-12-22",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10720.1,
-      "return_pct": 7.2,
+      "value": 10815.92,
+      "return_pct": 8.16,
       "cash": 1155.98,
       "holdings": {
         "AVGO": 2,
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 10170.78,
-      "return_pct": 1.71,
+      "value": 10182.21,
+      "return_pct": 1.82,
       "cash": 1702.11,
       "holdings": {
         "INTC": 25,
