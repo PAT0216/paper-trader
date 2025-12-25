@@ -29,7 +29,7 @@
     "BB_PctB",
     "Vol_Ratio"
   ],
-  "training_date": "2025-12-24T21:44:49.258668",
+  "training_date": "2025-12-25T21:40:38.968554",
   "training_samples": 1867472,
   "xgboost_version": "2.0.3",
   "prediction_stats": {
@@ -45,6 +45,6 @@
   "cv_metrics": {
     "avg_rmse": 0.019591125272582114,
     "avg_dir_accuracy": 0.5218840463300614,
-    "avg_spearman": 0.02382649025041212
+    "avg_spearman": 0.023826490250412117
   }
 }
