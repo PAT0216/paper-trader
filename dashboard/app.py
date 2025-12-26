@@ -652,24 +652,32 @@ colors = {
     'lstm': '#a855f7'        # Purple
 }
 
+# Collect all portfolio dates for SPY alignment
+all_portfolio_dates = set()
+portfolio_histories = {}
+
 for pid, df in data.items():
     history = get_portfolio_history(df)
     if not history.empty:
-        color = colors.get(pid, '#22c55e')
-        # Convert hex to RGB for fill
-        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-        
-        fig.add_trace(go.Scatter(
-            x=history['date'],
-            y=history['total_value'],
-            name=pid.upper(),
-            line=dict(color=color, width=2),
-            fill='tozeroy',
-            fillcolor=f'rgba({r}, {g}, {b}, 0.08)',
-            hovertemplate='%{y:$,.0f}<extra></extra>'
-        ))
+        portfolio_histories[pid] = history
+        all_portfolio_dates.update(history['date'].tolist())
 
-# Add SPY benchmark line
+# Add portfolio traces
+for pid, history in portfolio_histories.items():
+    color = colors.get(pid, '#22c55e')
+    r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+    
+    fig.add_trace(go.Scatter(
+        x=history['date'],
+        y=history['total_value'],
+        name=pid.upper(),
+        line=dict(color=color, width=2),
+        fill='tozeroy',
+        fillcolor=f'rgba({r}, {g}, {b}, 0.08)',
+        hovertemplate='%{y:$,.0f}<extra></extra>'
+    ))
+
+# Add SPY benchmark line - aligned to portfolio dates for consistent hover
 min_d, max_d = get_ledger_date_range(data)
 spy_chart_data = None
 
@@ -688,6 +696,23 @@ if spy_chart_data is None or spy_chart_data.empty:
     spy_chart_data = load_spy_benchmark()
 
 if spy_chart_data is not None and not spy_chart_data.empty:
+    # Align SPY data to portfolio dates so hover shows SPY on all dates
+    if all_portfolio_dates:
+        spy_chart_data = spy_chart_data.copy()
+        spy_chart_data['date'] = pd.to_datetime(spy_chart_data['date'])
+        spy_chart_data = spy_chart_data.set_index('date').sort_index()
+        
+        # Create date range covering all portfolio dates
+        all_dates = pd.to_datetime(list(all_portfolio_dates))
+        date_range = pd.date_range(start=all_dates.min(), end=all_dates.max(), freq='D')
+        
+        # Reindex and forward-fill to cover all dates
+        spy_chart_data = spy_chart_data.reindex(date_range).ffill().bfill()
+        spy_chart_data = spy_chart_data.reset_index().rename(columns={'index': 'date'})
+        
+        # Filter to only portfolio dates
+        spy_chart_data = spy_chart_data[spy_chart_data['date'].isin(all_dates)]
+    
     fig.add_trace(go.Scatter(
         x=spy_chart_data['date'],
         y=spy_chart_data['value'],
