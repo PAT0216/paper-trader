@@ -23,279 +23,255 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ============ PROFESSIONAL THEME ============
+# ============ REFINED THEME ============
 st.markdown("""
 <style>
-    /* Import Google Font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    /* Import Google Font - Geist for modern feel */
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
-    /* Main background - deep slate with subtle gradient */
+    /* Main background - pure dark with subtle texture */
     .stApp {
-        background: linear-gradient(135deg, #0a0f1a 0%, #111827 50%, #0f172a 100%);
-        font-family: 'Inter', -apple-system, sans-serif;
+        background: #09090b;
+        font-family: 'Space Grotesk', -apple-system, sans-serif;
     }
     
-    /* Keep Streamlit header/toolbar visible (it contains the mobile sidebar hamburger). */
+    /* Header transparent */
     header[data-testid="stHeader"] {
         background: transparent !important;
     }
-
-    /* Footer only (toolbar/header is allowed and should stay visible) */
     footer {visibility: hidden !important;}
     
-    /* Sidebar styling */
+    /* Sidebar - minimal */
     section[data-testid="stSidebar"] {
-        background: #0f172a !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        background: #09090b !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
-    
     section[data-testid="stSidebar"] > div {
-        background: #0f172a !important;
-        padding-top: 1rem;
+        background: #09090b !important;
+        padding-top: 1.5rem;
     }
-    
-    /* Sidebar collapse button */
     button[data-testid="baseButton-header"] {
-        color: #94a3b8 !important;
+        color: #71717a !important;
     }
     
-    /* Typography */
+    /* Typography - clean hierarchy */
     h1 {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 2.25rem !important;
-        font-weight: 700 !important;
-        color: #f8fafc !important;
-        letter-spacing: -0.02em !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 2rem !important;
+        font-weight: 600 !important;
+        color: #fafafa !important;
+        letter-spacing: -0.03em !important;
     }
-    
     h2 {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-        color: #f1f5f9 !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 1.25rem !important;
+        font-weight: 500 !important;
+        color: #fafafa !important;
     }
-    
     h3 {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
-        color: #e2e8f0 !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        color: #71717a !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
+        letter-spacing: 0.1em !important;
     }
-    
-    /* IMPORTANT:
-       Do NOT force fonts on all spans — Streamlit uses Material icon fonts that are spans.
-       If we override them, icons render as text like `keyboard_double_arrow_right`. */
     p, label, li {
-        font-family: 'Inter', sans-serif !important;
-        color: #94a3b8;
+        font-family: 'Space Grotesk', sans-serif !important;
+        color: #a1a1aa;
     }
-
-    /* Body text containers */
     .stMarkdown, .stText, .stCaption, .stAlert, .stRadio, .stSelectbox, .stMultiSelect, .stCheckbox, .stDataFrame {
-        font-family: 'Inter', sans-serif !important;
-        color: #94a3b8;
+        font-family: 'Space Grotesk', sans-serif !important;
+        color: #a1a1aa;
     }
     
-    /* Metric Cards */
-    .metric-card {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 24px;
-        margin: 8px 0;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Hero Metric Cards - big & bold */
+    .hero-metric {
+        background: linear-gradient(135deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding: 28px 24px;
+        margin: 0;
+        position: relative;
+        overflow: hidden;
     }
-    
-    .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    .hero-metric::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
     }
-    
+    .hero-metric.momentum::before {
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.6), transparent);
+    }
+    .hero-metric.ml::before {
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent);
+    }
+    .hero-metric.lstm::before {
+        background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.6), transparent);
+    }
+    .hero-metric.benchmark::before {
+        background: linear-gradient(90deg, transparent, rgba(113, 113, 122, 0.4), transparent);
+    }
     .metric-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 500;
-        color: #64748b;
+        color: #52525b;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-bottom: 8px;
+        letter-spacing: 0.12em;
+        margin-bottom: 12px;
     }
-    
     .metric-value {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 600;
-        color: #f8fafc;
-        line-height: 1.2;
+        color: #fafafa;
+        line-height: 1;
+        letter-spacing: -0.02em;
     }
-    
     .metric-delta {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 0.95rem;
-        font-weight: 500;
-        margin-top: 8px;
-    }
-    
-    .positive { color: #10b981 !important; }
-    .negative { color: #ef4444 !important; }
-    
-    /* Section dividers */
-    .section-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 32px 0 16px 0;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    
-    .section-icon {
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         font-size: 1rem;
+        font-weight: 500;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .positive { color: #22c55e !important; }
+    .negative { color: #ef4444 !important; }
+    .neutral { color: #71717a !important; }
+    
+    /* Section headers - minimal */
+    .section-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #52525b;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 48px 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
     
-    /* DataFrames */
+    /* DataFrames - cleaner */
     .stDataFrame {
         border-radius: 12px !important;
         overflow: hidden !important;
     }
-    
     .stDataFrame [data-testid="stDataFrameResizable"] {
-        background: rgba(30, 41, 59, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(24, 24, 27, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
         border-radius: 12px !important;
     }
     
-    /* Radio buttons - pill style */
+    /* Radio buttons - subtle pills */
     .stRadio > div {
-        gap: 8px !important;
+        gap: 6px !important;
     }
-    
     .stRadio > div > label {
-        background: rgba(30, 41, 59, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 20px !important;
-        padding: 8px 20px !important;
-        color: #94a3b8 !important;
+        background: rgba(24, 24, 27, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 8px !important;
+        padding: 10px 18px !important;
+        color: #71717a !important;
         font-weight: 500 !important;
-        transition: all 0.2s ease !important;
+        font-size: 0.85rem !important;
+        transition: all 0.15s ease !important;
     }
-    
     .stRadio > div > label:hover {
-        border-color: #10b981 !important;
-        color: #f1f5f9 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #a1a1aa !important;
     }
-    
     .stRadio > div > label[data-checked="true"] {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-        border-color: #10b981 !important;
-        color: #ffffff !important;
+        background: rgba(22, 163, 74, 0.15) !important;
+        border-color: rgba(22, 163, 74, 0.3) !important;
+        color: #22c55e !important;
     }
     
-    /* Tabs */
+    /* Tabs - minimal */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 4px;
         background: transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        padding-bottom: 0;
     }
-    
     .stTabs [data-baseweb="tab"] {
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 12px 24px;
-        color: #94a3b8;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        padding: 12px 20px;
+        color: #52525b;
         font-weight: 500;
+        font-size: 0.9rem;
     }
-    
     .stTabs [data-baseweb="tab"]:hover {
-        border-color: rgba(16, 185, 129, 0.5);
-        color: #f1f5f9;
+        color: #a1a1aa;
     }
-    
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%) !important;
-        border-color: #10b981 !important;
-        color: #10b981 !important;
+        background: transparent !important;
+        border-bottom: 2px solid #22c55e !important;
+        color: #fafafa !important;
     }
     
-    /* Status badges */
+    /* Status badge - subtle */
     .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
+        background: rgba(22, 163, 74, 0.1);
+        color: #22c55e;
+        border: 1px solid rgba(22, 163, 74, 0.2);
     }
-    
-    .status-live {
-        background: rgba(16, 185, 129, 0.15);
-        color: #10b981;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-    
     .status-pulse {
-        width: 8px;
-        height: 8px;
-        background: #10b981;
+        width: 6px;
+        height: 6px;
+        background: #22c55e;
         border-radius: 50%;
         animation: pulse 2s infinite;
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
     }
-    
     @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.2); }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
     }
     
-    /* Hide default hr */
+    /* HR - subtle */
     hr {
-        border-color: rgba(255, 255, 255, 0.06) !important;
-        margin: 24px 0 !important;
+        border-color: rgba(255, 255, 255, 0.04) !important;
+        margin: 20px 0 !important;
     }
     
     /* Custom scrollbar */
-    ::-webkit-scrollbar {
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(113, 113, 122, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(113, 113, 122, 0.5); }
+    
+    [data-testid="collapsedControl"] { color: #a1a1aa !important; }
+    
+    /* Strategy indicator dots */
+    .strategy-dot {
         width: 8px;
         height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
     }
-    
-    ::-webkit-scrollbar-track {
-        background: rgba(15, 23, 42, 0.5);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: rgba(100, 116, 139, 0.4);
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(100, 116, 139, 0.6);
-    }
-    
-    /* Sidebar toggle button - make visible */
-    [data-testid="collapsedControl"] {
-        color: #f1f5f9 !important;
-    }
-    
-    /* Charts container */
-    .chart-container {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 16px;
-        padding: 16px;
-        margin: 8px 0;
-    }
+    .dot-momentum { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+    .dot-ml { background: #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+    .dot-lstm { background: #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -446,38 +422,27 @@ def load_benchmark_series(
 # ============ SIDEBAR ============
 with st.sidebar:
     st.markdown("""
-        <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 3rem; margin-bottom: 8px; 
-                        background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #8b5cf6 100%);
-                        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                        filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.3));">
-                
-            </div>
-            <h2 style="margin: 0; font-size: 1.6rem; 
-                       background: linear-gradient(90deg, #f8fafc, #94a3b8);
-                       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                       font-weight: 700; letter-spacing: -0.5px;">
-                Paper Trader AI
+        <div style="padding: 8px 0 24px 0;">
+            <h2 style="margin: 0; font-size: 1.1rem; color: #fafafa; font-weight: 600; letter-spacing: -0.02em;">
+                Paper Trader
             </h2>
-            <p style="margin: 8px 0 0 0; font-size: 0.75rem; color: #64748b; letter-spacing: 2px; text-transform: uppercase;">
-                Algorithmic Trading
+            <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: #52525b; letter-spacing: 0.05em;">
+                Algorithmic Trading System
             </p>
         </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
-        <div style="text-align: center; margin-bottom: 20px;">
-            <span class="status-badge status-live">
+        <div style="margin-bottom: 24px;">
+            <span class="status-badge">
                 <span class="status-pulse"></span>
-                Paper Trading
+                Live
             </span>
         </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("---")
-    
     # Strategy selection
-    st.markdown("##### Strategy")
+    st.markdown("<p style='font-size: 0.7rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;'>View</p>", unsafe_allow_html=True)
     strategy = st.radio(
         "Select strategy:",
         options=["Compare", "Momentum", "ML", "LSTM"],
@@ -495,46 +460,60 @@ with st.sidebar:
     else:
         portfolios = ["lstm"]
     
-    st.markdown("---")
+    st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
     
-    # Strategy Info
-    st.markdown("##### Strategies")
+    # Strategy Info - minimal
+    st.markdown("<p style='font-size: 0.7rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;'>Strategies</p>", unsafe_allow_html=True)
     st.markdown("""
-    <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; font-size: 0.85rem;">
-        <div style="margin-bottom: 12px;">
-            <strong style="color: #10b981;">Momentum</strong><br>
-            <span style="color: #94a3b8;">12-1 month factor • Monthly rebalance • 15% stop-loss</span>
+    <div style="font-size: 0.8rem; line-height: 1.8;">
+        <div style="margin-bottom: 10px;">
+            <span class="strategy-dot dot-momentum"></span>
+            <span style="color: #a1a1aa;">Momentum</span>
+            <span style="color: #52525b; font-size: 0.75rem;"> · Monthly</span>
         </div>
-        <div style="margin-bottom: 12px;">
-            <strong style="color: #3b82f6;">ML Ensemble</strong><br>
-            <span style="color: #94a3b8;">XGBoost • 15 features • Daily rebalance</span>
+        <div style="margin-bottom: 10px;">
+            <span class="strategy-dot dot-ml"></span>
+            <span style="color: #a1a1aa;">XGBoost</span>
+            <span style="color: #52525b; font-size: 0.75rem;"> · Daily</span>
         </div>
         <div>
-            <strong style="color: #f59e0b;">LSTM</strong><br>
-            <span style="color: #94a3b8;">TensorFlow • Threshold classifier • Daily rebalance</span>
+            <span class="strategy-dot dot-lstm"></span>
+            <span style="color: #a1a1aa;">LSTM</span>
+            <span style="color: #52525b; font-size: 0.75rem;"> · Daily</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    # Spacer to push links to bottom
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # Links
+    # Links - minimal
     st.markdown("""
-        <div style="text-align: center; padding: 10px 0;">
+        <div style="padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.04);">
             <a href="https://github.com/PAT0216/paper-trader" target="_blank" 
-               style="color: #64748b; text-decoration: none; font-size: 0.85rem;">
-                <span style="margin-right: 6px;">⭐</span> View on GitHub
+               style="color: #52525b; text-decoration: none; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                Source Code
+            </a>
+            <a href="https://pat0216.github.io" target="_blank" 
+               style="color: #52525b; text-decoration: none; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                About Me
             </a>
         </div>
     """, unsafe_allow_html=True)
 
 
 # ============ MAIN CONTENT ============
-# Header
-col1, col2 = st.columns([3, 1])
-with col1:
-    st.markdown("# Dashboard")
-    st.markdown(f"<p style='color: #64748b; margin-top: -10px;'>Last updated: {datetime.now().strftime('%B %d, %Y')}</p>", unsafe_allow_html=True)
+# Header - minimal
+st.markdown(f"""
+    <div style="margin-bottom: 32px;">
+        <h1 style="margin: 0 0 4px 0;">Dashboard</h1>
+        <p style="color: #52525b; font-size: 0.8rem; margin: 0;">
+            Updated {datetime.now().strftime('%b %d, %Y')} · Paper trading since Oct 2024
+        </p>
+    </div>
+""", unsafe_allow_html=True)
 
 # Load data
 data = {}
@@ -545,29 +524,21 @@ for pid in portfolios:
 
 if not data:
     st.markdown("""
-        <div style="text-align: center; padding: 60px 20px;">
-            <div style="font-size: 3rem; margin-bottom: 16px;"></div>
-            <h3 style="color: #f1f5f9; margin-bottom: 8px;">No Trading Data Yet</h3>
-            <p style="color: #64748b;">Run the trading workflows to see portfolio performance.</p>
+        <div style="text-align: center; padding: 80px 20px;">
+            <p style="font-size: 0.9rem; color: #52525b; margin: 0;">No trading data yet</p>
+            <p style="font-size: 0.8rem; color: #3f3f46; margin: 8px 0 0 0;">Run the trading workflows to begin</p>
         </div>
     """, unsafe_allow_html=True)
     st.stop()
 
 
 # ============ KEY METRICS ============
-st.markdown("""
-    <div class="section-header">
-        <div class="section-icon"></div>
-        <h3 style="margin: 0;">Portfolio Overview</h3>
-    </div>
-""", unsafe_allow_html=True)
-
 # Load snapshot for live values
 snapshot = load_portfolio_snapshot()
 snapshot_portfolios = snapshot.get('portfolios', {})
 price_date = snapshot.get('price_date', '')
 
-# Metrics cards
+# Hero metrics - big and bold
 cols = st.columns(len(data) + 1)  # +1 for benchmark comparison
 
 for i, (pid, df) in enumerate(data.items()):
@@ -587,17 +558,16 @@ for i, (pid, df) in enumerate(data.items()):
             pnl_pct = (pnl / start) * 100 if start > 0 else 0
         
         color_class = "positive" if pnl >= 0 else "negative"
-        arrow = "↑" if pnl >= 0 else "↓"
+        arrow = "+" if pnl >= 0 else ""
         
-        strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble" if pid == "ml" else "LSTM"
-        strategy_emoji = ""
+        strategy_name = "Momentum" if pid == "momentum" else "XGBoost" if pid == "ml" else "LSTM"
         
         st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">{strategy_emoji} {strategy_name}</div>
+        <div class="hero-metric {pid}">
+            <div class="metric-label"><span class="strategy-dot dot-{pid}"></span>{strategy_name}</div>
             <div class="metric-value">${value:,.0f}</div>
             <div class="metric-delta {color_class}">
-                {arrow} ${abs(pnl):,.0f} ({pnl_pct:+.2f}%)
+                {arrow}{pnl_pct:.2f}%
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -610,25 +580,15 @@ with cols[-1]:
     if benchmark:
         bench_value = benchmark['value']
         bench_ret = benchmark['return_pct']
-        # Shorten dates: 2025-10-01 → Oct 1
-        from datetime import datetime
-        start_str = benchmark.get('start_date', '')
-        end_str = benchmark.get('end_date', '')
-        try:
-            start_short = datetime.strptime(start_str, '%Y-%m-%d').strftime('%b %d')
-            end_short = datetime.strptime(end_str, '%Y-%m-%d').strftime('%b %d')
-            period_label = f"{start_short} → {end_short}"
-        except:
-            period_label = f"{start_str} → {end_str}"
-        bench_arrow = "↑" if bench_ret >= 0 else "↓"
-        bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
+        bench_arrow = "+" if bench_ret >= 0 else ""
+        bench_color = "positive" if bench_ret >= 0 else "negative"
         
         st.markdown(f"""
-        <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-            <div class="metric-label">S&P 500 (SPY)</div>
-            <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
-            <div class="metric-delta" style="color: {bench_color};">
-                {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
+        <div class="hero-metric benchmark">
+            <div class="metric-label">SPY Benchmark</div>
+            <div class="metric-value" style="color: #71717a;">${bench_value:,.0f}</div>
+            <div class="metric-delta {bench_color}">
+                {bench_arrow}{bench_ret:.2f}%
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -645,12 +605,10 @@ with cols[-1]:
 
         if spy.empty:
             st.markdown(f"""
-            <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-                <div class="metric-label">S&P 500 (Benchmark)</div>
-                <div class="metric-value" style="color: #94a3b8;">N/A</div>
-                <div class="metric-delta" style="color: #64748b;">
-                    Missing SPY data for {min_d.strftime('%Y-%m-%d') if min_d else '—'} → {max_d.strftime('%Y-%m-%d') if max_d else '—'}
-                </div>
+            <div class="hero-metric benchmark">
+                <div class="metric-label">SPY Benchmark</div>
+                <div class="metric-value" style="color: #71717a;">—</div>
+                <div class="metric-delta neutral">No data</div>
             </div>
             """, unsafe_allow_html=True)
         else:
@@ -658,48 +616,47 @@ with cols[-1]:
             end_px = float(spy.iloc[-1]["px"])
             bench_value = base_start * (end_px / start_px) if start_px > 0 else base_start
             bench_ret = ((end_px / start_px) - 1) * 100 if start_px > 0 else 0.0
-            bench_arrow = "↑" if bench_ret >= 0 else "↓"
-            bench_color = "#10b981" if bench_ret >= 0 else "#ef4444"
-            period_label = f"{min_d.strftime('%b %d, %Y')} → {max_d.strftime('%b %d, %Y')}" if min_d and max_d else "Ledger period"
+            bench_arrow = "+" if bench_ret >= 0 else ""
+            bench_color = "positive" if bench_ret >= 0 else "negative"
 
             st.markdown(f"""
-            <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-                <div class="metric-label">S&P 500 (SPY)</div>
-                <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
-                <div class="metric-delta" style="color: {bench_color};">
-                    {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
+            <div class="hero-metric benchmark">
+                <div class="metric-label">SPY Benchmark</div>
+                <div class="metric-value" style="color: #71717a;">${bench_value:,.0f}</div>
+                <div class="metric-delta {bench_color}">
+                    {bench_arrow}{bench_ret:.2f}%
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
 
 # ============ PERFORMANCE CHART ============
-st.markdown("""
-    <div class="section-header">
-        <div class="section-icon"></div>
-        <h3 style="margin: 0;">Performance</h3>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="section-title">Performance</div>', unsafe_allow_html=True)
 
-# Create performance chart
+# Create performance chart - cleaner design
 fig = go.Figure()
 
 colors = {
-    'momentum': '#10b981',  # Green
+    'momentum': '#22c55e',  # Green
     'ml': '#3b82f6',         # Blue
-    'lstm': '#a855f7'        # Purple - distinct from momentum
+    'lstm': '#a855f7'        # Purple
 }
 
 for pid, df in data.items():
     history = get_portfolio_history(df)
     if not history.empty:
+        color = colors.get(pid, '#22c55e')
+        # Convert hex to RGB for fill
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+        
         fig.add_trace(go.Scatter(
             x=history['date'],
             y=history['total_value'],
             name=pid.upper(),
-            line=dict(color=colors.get(pid, '#10b981'), width=2.5),
+            line=dict(color=color, width=2),
             fill='tozeroy',
-            fillcolor=f"rgba({int(colors.get(pid, '#10b981')[1:3], 16)}, {int(colors.get(pid, '#10b981')[3:5], 16)}, {int(colors.get(pid, '#10b981')[5:7], 16)}, 0.1)"
+            fillcolor=f'rgba({r}, {g}, {b}, 0.08)',
+            hovertemplate='%{y:$,.0f}<extra></extra>'
         ))
 
 # Add SPY benchmark line
@@ -725,42 +682,47 @@ if spy_chart_data is not None and not spy_chart_data.empty:
         x=spy_chart_data['date'],
         y=spy_chart_data['value'],
         name='SPY',
-        line=dict(color='#64748b', width=2, dash='dash'),
-        opacity=0.8
+        line=dict(color='#52525b', width=1.5, dash='dot'),
+        hovertemplate='SPY: %{y:$,.0f}<extra></extra>'
     ))
 
 fig.update_layout(
     template='plotly_dark',
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family='Inter, sans-serif', color='#94a3b8'),
+    font=dict(family='Space Grotesk, sans-serif', color='#71717a', size=11),
     legend=dict(
         orientation='h',
         yanchor='bottom',
         y=1.02,
         xanchor='right',
         x=1,
-        bgcolor='rgba(0,0,0,0)'
+        bgcolor='rgba(0,0,0,0)',
+        font=dict(size=11)
     ),
-    margin=dict(l=0, r=0, t=40, b=0),
+    margin=dict(l=0, r=0, t=30, b=0),
     xaxis=dict(
-        showgrid=True,
-        gridcolor='rgba(255,255,255,0.05)',
-        linecolor='rgba(255,255,255,0.1)'
+        showgrid=False,
+        showline=False,
+        zeroline=False,
+        tickfont=dict(size=10)
     ),
     yaxis=dict(
         showgrid=True,
-        gridcolor='rgba(255,255,255,0.05)',
-        linecolor='rgba(255,255,255,0.1)',
+        gridcolor='rgba(255,255,255,0.03)',
+        showline=False,
+        zeroline=False,
         tickprefix='$',
-        tickformat=','
+        tickformat=',',
+        tickfont=dict(size=10)
     ),
     hovermode='x unified',
     hoverlabel=dict(
-        bgcolor='#1e293b',
-        bordercolor='#334155',
-        font=dict(color='#f1f5f9')
-    )
+        bgcolor='#18181b',
+        bordercolor='#27272a',
+        font=dict(color='#fafafa', family='JetBrains Mono', size=12)
+    ),
+    height=350
 )
 
 st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
@@ -768,12 +730,7 @@ st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
 
 # ============ DETAILED METRICS ============
-st.markdown("""
-    <div class="section-header">
-        <div class="section-icon"></div>
-        <h3 style="margin: 0;">Detailed Metrics</h3>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="section-title">Metrics</div>', unsafe_allow_html=True)
 
 # Create comparison table
 comparison_data = []
@@ -846,7 +803,7 @@ with tab1:
                         ])
             
             if holdings.empty:
-                st.markdown("<p style='color: #64748b; font-style: italic;'>No current positions</p>", unsafe_allow_html=True)
+                st.markdown("<p style='color: #52525b; font-size: 0.85rem;'>No positions</p>", unsafe_allow_html=True)
             else:
                 st.dataframe(
                     holdings,
@@ -872,7 +829,7 @@ with tab2:
         actual_trades = data[selected][(data[selected]['ticker'] != 'CASH') & (data[selected]['action'] != 'VALUE')]
         trades_df = actual_trades.tail(15)
         if trades_df.empty:
-            st.markdown("<p style='color: #64748b; font-style: italic;'>No trades recorded yet (ML uses simulated backtest values)</p>", unsafe_allow_html=True)
+            st.markdown("<p style='color: #52525b; font-size: 0.85rem;'>No trades yet</p>", unsafe_allow_html=True)
         else:
             display_df = trades_df[['date', 'ticker', 'action', 'price', 'shares']].copy()
             display_df['date'] = pd.to_datetime(display_df['date']).dt.strftime('%Y-%m-%d')
@@ -893,15 +850,12 @@ with tab2:
 
 
 # ============ FOOTER ============
-st.markdown("---")
 st.markdown("""
-    <div style="text-align: center; padding: 20px 0; color: #475569;">
-        <p style="margin: 0; font-size: 0.8rem;">
-            Paper Trader AI • Built by 
-            <a href="https://pat0216.github.io" target="_blank" style="color: #10b981; text-decoration: none;">Prabuddha Tamhane</a>
-        </p>
-        <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: #334155;">
-            Backtested results. Not financial advice.
+    <div style="text-align: center; padding: 40px 0 20px 0; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.04);">
+        <p style="margin: 0; font-size: 0.75rem; color: #3f3f46;">
+            Built by <a href="https://pat0216.github.io" target="_blank" style="color: #52525b; text-decoration: none;">Prabuddha Tamhane</a>
+            <span style="margin: 0 8px;">·</span>
+            Paper trading only
         </p>
     </div>
 """, unsafe_allow_html=True)
