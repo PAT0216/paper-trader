@@ -140,6 +140,56 @@ def compute_portfolio_value(holdings: dict, prices: dict, cash: float) -> float:
     return total
 
 
+def append_portfolio_value_to_ledger(ledger_path: str, value: float, date_str: str, strategy: str) -> bool:
+    """
+    Append a PORTFOLIO,VALUE row to the ledger for the given date.
+    
+    This ensures the ledger has a daily record of portfolio value,
+    which is used by the dashboard chart. Only appends if no entry
+    exists for this date yet.
+    
+    Returns: True if appended, False if already exists or error
+    """
+    if not os.path.exists(ledger_path):
+        return False
+    
+    try:
+        df = pd.read_csv(ledger_path)
+        
+        # Check if we already have an entry for this date
+        existing = df[(df['ticker'] == 'PORTFOLIO') & 
+                      (df['action'] == 'VALUE') & 
+                      (df['date'].astype(str).str[:10] == date_str)]
+        
+        if not existing.empty:
+            print(f"  {strategy}: Already has entry for {date_str}")
+            return False
+        
+        # Create new row matching ledger format
+        new_row = pd.DataFrame([{
+            'date': date_str,
+            'ticker': 'PORTFOLIO',
+            'action': 'VALUE',
+            'price': 1.0,
+            'shares': 0,
+            'amount': 0.0,
+            'cash_balance': 0.0,
+            'total_value': round(value, 2),
+            'strategy': strategy,
+            'momentum_score' if 'momentum' in strategy else 'confidence': ''
+        }])
+        
+        # Append to ledger
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.to_csv(ledger_path, index=False)
+        print(f"  {strategy}: Appended value ${value:,.2f} for {date_str}")
+        return True
+        
+    except Exception as e:
+        print(f"  {strategy}: Error appending value - {e}")
+        return False
+
+
 def main():
     print("=" * 50)
     print("COMPUTING PORTFOLIO SNAPSHOT")
@@ -194,6 +244,14 @@ def main():
         print(f"\n{name.upper()} RESULT:")
         print(f"  Value: ${value:,.2f}")
         print(f"  Return: {return_pct:+.2f}%")
+    
+    # Append daily PORTFOLIO,VALUE entries to ledgers
+    # This ensures the chart has continuous daily data
+    price_date = get_latest_date(DB_PATH)
+    print(f"\n📊 Updating ledgers with daily values for {price_date}...")
+    for name, path in ledgers.items():
+        value = snapshot['portfolios'][name]['value']
+        append_portfolio_value_to_ledger(path, value, price_date, name)
     
     # Add SPY benchmark
     print("\n📈 Computing SPY benchmark...")
