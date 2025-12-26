@@ -431,13 +431,14 @@ def load_benchmark_series(
 
 # ============ SIDEBAR ============
 with st.sidebar:
+    # Logo with different font (JetBrains Mono for terminal feel)
     st.markdown("""
-        <div style="padding: 8px 0 24px 0;">
-            <h2 style="margin: 0; font-size: 1.1rem; color: #fafafa; font-weight: 600; letter-spacing: -0.02em;">
-                Paper Trader
-            </h2>
-            <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: #52525b; letter-spacing: 0.05em;">
-                Algorithmic Trading System
+        <div style="padding: 0 0 20px 0;">
+            <h1 style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: #fafafa; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap;">
+                Paper<span style="color: #22c55e;">Trader</span>
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.6rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.08em;">
+                AI Trading
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -821,7 +822,7 @@ with tab1:
     cols = st.columns(len(data))
     for i, (pid, df) in enumerate(data.items()):
         with cols[i]:
-            strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble" if pid == "ml" else "LSTM"
+            strategy_name = "Momentum" if pid == "momentum" else "XGBoost" if pid == "ml" else "LSTM"
             st.markdown(f"**{strategy_name}**")
             
             # First try to get holdings from ledger
@@ -849,13 +850,17 @@ with tab1:
 
 with tab2:
     if len(data) > 1:
-        selected = st.radio(
+        # Pill buttons for strategy selection (no typing)
+        options = list(data.keys())
+        selected = st.pills(
             "Select portfolio:",
-            options=list(data.keys()),
-            format_func=lambda x: "Momentum" if x == "momentum" else "ML Ensemble" if x == "ml" else "LSTM",
-            horizontal=True,
-            label_visibility="collapsed"
+            options=options,
+            format_func=lambda x: "Momentum" if x == "momentum" else "XGBoost" if x == "ml" else "LSTM",
+            label_visibility="collapsed",
+            default=options[0]
         )
+        if selected is None:
+            selected = options[0]
     else:
         selected = list(data.keys())[0]
     
@@ -887,10 +892,11 @@ with tab2:
 # ============ FOOTER ============
 st.markdown("""
     <div style="text-align: center; padding: 40px 0 20px 0; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.04);">
-        <p style="margin: 0; font-size: 0.75rem; color: #3f3f46;">
-            Built by <a href="https://pat0216.github.io" target="_blank" style="color: #52525b; text-decoration: none;">Prabuddha Tamhane</a>
-            <span style="margin: 0 8px;">·</span>
-            Paper trading only
+        <p style="margin: 0 0 8px 0; font-size: 0.8rem; color: #52525b;">
+            Built by <a href="https://pat0216.github.io" target="_blank" style="color: #22c55e; text-decoration: none; font-weight: 500;">Prabuddha Tamhane</a>
+        </p>
+        <p style="margin: 0; font-size: 0.65rem; color: #3f3f46;">
+            Paper trading only · Not financial advice
         </p>
     </div>
 """, unsafe_allow_html=True)
