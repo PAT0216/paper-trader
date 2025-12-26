@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-26T21:15:56.897691Z",
+  "timestamp": "2025-12-26T21:40:14.551275Z",
   "price_date": "2025-12-26",
   "initial_capital": 10000,
   "portfolios": {
@@ -15,9 +15,9 @@
         "NEM": 10,
         "HOOD": 8,
         "STX": 3,
-        "MU": 4,
         "WDC": 6,
-        "PLTR": 5
+        "PLTR": 5,
+        "MU": 4
       },
       "positions": 10
     },
