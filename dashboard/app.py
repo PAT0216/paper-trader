@@ -169,27 +169,28 @@ st.markdown("""
         border-radius: 12px !important;
     }
     
-    /* Radio buttons - subtle pills */
+    /* Radio buttons - compact list style */
     .stRadio > div {
-        gap: 6px !important;
+        gap: 4px !important;
+        flex-direction: column !important;
     }
     .stRadio > div > label {
-        background: rgba(24, 24, 27, 0.8) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
-        border-radius: 8px !important;
-        padding: 10px 18px !important;
-        color: #71717a !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        color: #52525b !important;
         font-weight: 500 !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         transition: all 0.15s ease !important;
+        margin: 0 !important;
     }
     .stRadio > div > label:hover {
-        border-color: rgba(255, 255, 255, 0.1) !important;
+        background: rgba(255, 255, 255, 0.03) !important;
         color: #a1a1aa !important;
     }
     .stRadio > div > label[data-checked="true"] {
-        background: rgba(22, 163, 74, 0.15) !important;
-        border-color: rgba(22, 163, 74, 0.3) !important;
+        background: rgba(22, 163, 74, 0.1) !important;
         color: #22c55e !important;
     }
     
@@ -356,12 +357,21 @@ def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_portfolio_history(df: pd.DataFrame) -> pd.DataFrame:
-    """Get portfolio value over time."""
+    """Get portfolio value over time - prefer PORTFOLIO VALUE rows."""
     if df.empty or 'date' not in df.columns:
         return pd.DataFrame()
     
-    # Get unique dates with their total values
+    # Prefer PORTFOLIO VALUE rows (end-of-day snapshots) if they exist
+    if 'action' in df.columns:
+        value_rows = df[df['action'] == 'VALUE']
+        if not value_rows.empty:
+            history = value_rows.groupby('date').last().reset_index()[['date', 'total_value']]
+            history = history.sort_values('date').reset_index(drop=True)
+            return history
+    
+    # Fallback: use last entry per date, sorted
     history = df.groupby('date').last().reset_index()[['date', 'total_value']]
+    history = history.sort_values('date').reset_index(drop=True)
     return history
 
 
@@ -441,17 +451,17 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
     
-    # Strategy selection
+    # Strategy selection - vertical for sidebar
     st.markdown("<p style='font-size: 0.7rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;'>View</p>", unsafe_allow_html=True)
     strategy = st.radio(
         "Select strategy:",
-        options=["Compare", "Momentum", "ML", "LSTM"],
+        options=["All", "Momentum", "ML", "LSTM"],
         index=0,
-        horizontal=True,
+        horizontal=False,
         label_visibility="collapsed"
     )
     
-    if strategy == "Compare":
+    if strategy == "All":
         portfolios = ["momentum", "ml", "lstm"]
     elif strategy == "Momentum":
         portfolios = ["momentum"]
@@ -510,7 +520,7 @@ st.markdown(f"""
     <div style="margin-bottom: 32px;">
         <h1 style="margin: 0 0 4px 0;">Dashboard</h1>
         <p style="color: #52525b; font-size: 0.8rem; margin: 0;">
-            Updated {datetime.now().strftime('%b %d, %Y')} · Paper trading since Oct 2024
+            Updated {datetime.now().strftime('%b %d, %Y')} · Live since Oct 2025
         </p>
     </div>
 """, unsafe_allow_html=True)
