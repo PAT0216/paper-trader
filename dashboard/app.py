@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 st.set_page_config(
     page_title="Paper Trader AI",
-    page_icon="📈",
+    page_icon="◉",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -451,7 +451,7 @@ with st.sidebar:
                         background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #8b5cf6 100%);
                         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                         filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.3));">
-                ⚡
+                
             </div>
             <h2 style="margin: 0; font-size: 1.6rem; 
                        background: linear-gradient(90deg, #f8fafc, #94a3b8);
@@ -477,7 +477,7 @@ with st.sidebar:
     st.markdown("---")
     
     # Strategy selection
-    st.markdown("##### 🎯 Strategy")
+    st.markdown("##### Strategy")
     strategy = st.radio(
         "Select strategy:",
         options=["Compare", "Momentum", "ML", "LSTM"],
@@ -498,7 +498,7 @@ with st.sidebar:
     st.markdown("---")
     
     # Strategy Info
-    st.markdown("##### 📚 Strategies")
+    st.markdown("##### Strategies")
     st.markdown("""
     <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; font-size: 0.85rem;">
         <div style="margin-bottom: 12px;">
@@ -546,7 +546,7 @@ for pid in portfolios:
 if not data:
     st.markdown("""
         <div style="text-align: center; padding: 60px 20px;">
-            <div style="font-size: 3rem; margin-bottom: 16px;">📊</div>
+            <div style="font-size: 3rem; margin-bottom: 16px;"></div>
             <h3 style="color: #f1f5f9; margin-bottom: 8px;">No Trading Data Yet</h3>
             <p style="color: #64748b;">Run the trading workflows to see portfolio performance.</p>
         </div>
@@ -557,7 +557,7 @@ if not data:
 # ============ KEY METRICS ============
 st.markdown("""
     <div class="section-header">
-        <div class="section-icon">💰</div>
+        <div class="section-icon"></div>
         <h3 style="margin: 0;">Portfolio Overview</h3>
     </div>
 """, unsafe_allow_html=True)
@@ -590,7 +590,7 @@ for i, (pid, df) in enumerate(data.items()):
         arrow = "↑" if pnl >= 0 else "↓"
         
         strategy_name = "Momentum" if pid == "momentum" else "ML Ensemble" if pid == "ml" else "LSTM"
-        strategy_emoji = "🚀" if pid == "momentum" else "🤖" if pid == "ml" else "🧠"
+        strategy_emoji = ""
         
         st.markdown(f"""
         <div class="metric-card">
@@ -625,7 +625,7 @@ with cols[-1]:
         
         st.markdown(f"""
         <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-            <div class="metric-label">📊 S&P 500 (SPY)</div>
+            <div class="metric-label">S&P 500 (SPY)</div>
             <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
             <div class="metric-delta" style="color: {bench_color};">
                 {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
@@ -646,7 +646,7 @@ with cols[-1]:
         if spy.empty:
             st.markdown(f"""
             <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-                <div class="metric-label">📊 S&P 500 (Benchmark)</div>
+                <div class="metric-label">S&P 500 (Benchmark)</div>
                 <div class="metric-value" style="color: #94a3b8;">N/A</div>
                 <div class="metric-delta" style="color: #64748b;">
                     Missing SPY data for {min_d.strftime('%Y-%m-%d') if min_d else '—'} → {max_d.strftime('%Y-%m-%d') if max_d else '—'}
@@ -664,7 +664,7 @@ with cols[-1]:
 
             st.markdown(f"""
             <div class="metric-card" style="border-color: rgba(100, 116, 139, 0.3);">
-                <div class="metric-label">📊 S&P 500 (SPY)</div>
+                <div class="metric-label">S&P 500 (SPY)</div>
                 <div class="metric-value" style="color: #94a3b8;">${bench_value:,.0f}</div>
                 <div class="metric-delta" style="color: {bench_color};">
                     {bench_arrow} {bench_ret:+.2f}% <span style="color:#64748b; font-family: 'Inter', sans-serif;">({period_label})</span>
@@ -676,7 +676,7 @@ with cols[-1]:
 # ============ PERFORMANCE CHART ============
 st.markdown("""
     <div class="section-header">
-        <div class="section-icon">📈</div>
+        <div class="section-icon"></div>
         <h3 style="margin: 0;">Performance</h3>
     </div>
 """, unsafe_allow_html=True)
@@ -685,8 +685,9 @@ st.markdown("""
 fig = go.Figure()
 
 colors = {
-    'momentum': '#10b981',
-    'ml': '#3b82f6'
+    'momentum': '#10b981',  # Green
+    'ml': '#3b82f6',         # Blue
+    'lstm': '#a855f7'        # Purple - distinct from momentum
 }
 
 for pid, df in data.items():
@@ -769,7 +770,7 @@ st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 # ============ DETAILED METRICS ============
 st.markdown("""
     <div class="section-header">
-        <div class="section-icon">📊</div>
+        <div class="section-icon"></div>
         <h3 style="margin: 0;">Detailed Metrics</h3>
     </div>
 """, unsafe_allow_html=True)
@@ -822,7 +823,7 @@ st.dataframe(
 
 
 # ============ HOLDINGS & TRADES ============
-tab1, tab2 = st.tabs(["📦 Current Holdings", "📜 Recent Trades"])
+tab1, tab2 = st.tabs(["Current Holdings", "Recent Trades"])
 
 with tab1:
     cols = st.columns(len(data))
@@ -900,7 +901,7 @@ st.markdown("""
             <a href="https://pat0216.github.io" target="_blank" style="color: #10b981; text-decoration: none;">Prabuddha Tamhane</a>
         </p>
         <p style="margin: 4px 0 0 0; font-size: 0.7rem; color: #334155;">
-            ⚠️ Backtested results. Not financial advice.
+            Backtested results. Not financial advice.
         </p>
     </div>
 """, unsafe_allow_html=True)
