@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-31T21:16:20.009785Z",
+  "timestamp": "2025-12-31T21:43:50.892859Z",
   "price_date": "2025-12-31",
   "initial_capital": 10000,
   "portfolios": {
@@ -29,10 +29,10 @@
         "INTC": 25,
         "AVGO": 4,
         "HOOD": 8,
-        "LYB": 23,
         "GLW": 11,
         "PSKY": 76,
         "MCHP": 15,
+        "LYB": 23,
         "GNRC": 7,
         "NFLX": 9
       },
@@ -60,9 +60,9 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 681.86,
-    "return_pct": 2.31,
-    "value": 10230.75,
+    "end_price": 681.92,
+    "return_pct": 2.32,
+    "value": 10231.65,
     "start_date": "2025-10-01",
     "end_date": "2025-12-31"
   }
