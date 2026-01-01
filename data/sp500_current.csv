@@ -116,6 +116,7 @@ CTSH,Cognizant,Information Technology,IT Consulting & Other Services,"Teaneck, N
 COIN,Coinbase,Financials,Financial Exchanges & Data,"New York City, New York",2025-05-19,1679788,2012
 CL,Colgate-Palmolive,Consumer Staples,Household Products,"New York City, New York",1957-03-04,21665,1806
 CMCSA,Comcast,Communication Services,Cable & Satellite,"Philadelphia, Pennsylvania",2002-11-19,1166691,1963
+FIX,Comfort Systems USA,Industrials,Construction & Engineering,"Houston, Texas",-,1035983,-
 CAG,Conagra Brands,Consumer Staples,Packaged Foods & Meats,"Chicago, Illinois",1983-08-31,23217,1919
 COP,ConocoPhillips,Energy,Oil & Gas Exploration & Production,"Houston, Texas",1957-03-04,1163165,2002
 ED,Consolidated Edison,Utilities,Multi-Utilities,"New York City, New York",1957-03-04,1047862,1823
@@ -287,7 +288,6 @@ LII,Lennox International,Industrials,Building Products,"Richardson, Texas",2024-
 LLY,Lilly (Eli),Health Care,Pharmaceuticals,"Indianapolis, Indiana",1970-12-31,59478,1876
 LIN,Linde plc,Materials,Industrial Gases,"Guildford, United Kingdom",1992-07-01,1707925,1879
 LYV,Live Nation Entertainment,Communication Services,Movies & Entertainment,"Beverly Hills, California",2019-12-23,1335258,2010
-LKQ,LKQ Corporation,Consumer Discretionary,Distributors,"Nashville, Tennessee",2016-05-23,1065696,1998
 LMT,Lockheed Martin,Industrials,Aerospace & Defense,"Bethesda, Maryland",1957-03-04,936468,1995
 L,Loews Corporation,Financials,Multi-line Insurance,"New York City, New York",1995-05-31,60086,1959
 LOW,Lowe's,Consumer Discretionary,Home Improvement Retail,"Mooresville, North Carolina",1984-02-29,60667,1904/1946/1959
@@ -315,7 +315,6 @@ MU,Micron Technology,Information Technology,Semiconductors,"Boise, Idaho",1994-0
 MSFT,Microsoft,Information Technology,Systems Software,"Redmond, Washington",1994-06-01,789019,1975
 MAA,Mid-America Apartment Communities,Real Estate,Multi-Family Residential REITs,"Memphis, Tennessee",2016-12-02,912595,1977
 MRNA,Moderna,Health Care,Biotechnology,"Cambridge, Massachusetts",2021-07-21,1682852,2010
-MHK,Mohawk Industries,Consumer Discretionary,Home Furnishings,"Calhoun, Georgia",2013-12-23,851968,1878
 MOH,Molina Healthcare,Health Care,Managed Health Care,"Long Beach, California",2022-03-02,1179929,1980
 TAP,Molson Coors Beverage Company,Consumer Staples,Brewers,"Chicago, Illinois",1976-06-30,24545,"2005 (Molson 1786, Coors 1873)"
 MDLZ,Mondelez International,Consumer Staples,Packaged Foods & Meats,"Chicago, Illinois",2012-10-02,1103982,2012
