@@ -3,8 +3,8 @@
   "start_date": "2025-10-01",
   "end_date": "2026-01-02",
   "initial_value": 10000,
-  "final_value": 10251.01,
-  "total_return": 2.51,
+  "final_value": 10250.41,
+  "total_return": 2.5,
   "portfolio_history": [
     [
       "2025-10-01",
@@ -264,7 +264,7 @@
     ],
     [
       "2026-01-02",
-      10251.01
+      10250.41
     ]
   ]
 }
