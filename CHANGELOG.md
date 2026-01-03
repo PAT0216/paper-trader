@@ -47,6 +47,9 @@ This release fixes critical issues with GitHub Actions workflows that were causi
 - All trade workflows: Now pass `--strategy {ml|lstm|momentum}` flag
 - Created `data/snapshots/` directory for per-strategy files
 
+> [!CAUTION]
+> **Local Testing Warning**: Never run snapshot scripts locally and commit the results without verifying your local `market.db` has current prices. Local caches are often stale. See `docs/DEVELOPMENT.md` for safe testing patterns.
+
 ---
 
 ## [1.8.0] - 2025-12-11
