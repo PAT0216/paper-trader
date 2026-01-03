@@ -2,8 +2,8 @@ name: LSTM Strategy Trade
 
 on:
   schedule:
-    # Run Mon-Fri at 9:30 PM UTC (after cache refresh)
-    - cron: '30 21 * * 1-5'
+    # Run Mon-Fri at 9:45 PM UTC (15 min after ML to avoid conflicts)
+    - cron: '45 21 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for rebasing
 
       - name: Restore Market Data Cache
         uses: actions/cache@v4
@@ -81,18 +83,37 @@ jobs:
             exit 0
           fi
           
-          git commit -m "LSTM: Daily trade $(date +%Y-%m-%d)"
+          git commit -m "🧠 LSTM: Daily trade $(date +%Y-%m-%d)"
           
-          git pull --rebase origin main --allow-unrelated-histories || {
-            echo "Rebase failed, trying merge strategy..."
-            git rebase --abort 2>/dev/null || true
-            git pull origin main --no-rebase || true
-          }
+          # Retry push up to 3 times with pull between attempts
+          for i in 1 2 3; do
+            echo "Push attempt $i..."
+            git pull --rebase origin main || {
+              echo "Rebase failed, resetting and using merge..."
+              git rebase --abort 2>/dev/null || true
+              git reset --soft HEAD~1
+              git stash
+              git pull origin main
+              git stash pop
+              git add -A
+              git commit -m "🧠 LSTM: Daily trade $(date +%Y-%m-%d)"
+            }
+            
+            if git push origin main; then
+              echo "✅ Push successful!"
+              exit 0
+            fi
+            
+            echo "Push attempt $i failed, waiting 10s..."
+            sleep 10
+          done
           
-          git push origin main || echo "Push failed, will retry on next run"
+          echo "❌ All push attempts failed"
+          exit 1
 
       - name: Move Docker cache
         if: always()
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+
