@@ -4,8 +4,8 @@
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10815.92,
-      "return_pct": 8.16,
+      "value": 10772.79,
+      "return_pct": 7.73,
       "cash": 1155.98,
       "holdings": {
         "LRCX": 6,
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 10184.24,
-      "return_pct": 1.84,
+      "value": 10272.62,
+      "return_pct": 2.73,
       "cash": 1173.91,
       "holdings": {
         "INTC": 25,
