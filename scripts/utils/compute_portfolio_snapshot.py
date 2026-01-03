@@ -4,17 +4,25 @@ Outputs a JSON snapshot for the dashboard to read.
 
 IMPORTANT: Portfolio values come from the ledger's PORTFOLIO,VALUE rows
 (the authoritative source), NOT from recalculating holdings × prices.
+
+Usage:
+  python compute_portfolio_snapshot.py                     # All strategies (legacy, conflicts)
+  python compute_portfolio_snapshot.py --strategy ml       # Only ML strategy
+  python compute_portfolio_snapshot.py --strategy lstm     # Only LSTM strategy
+  python compute_portfolio_snapshot.py --strategy momentum # Only Momentum strategy
 """
 
 import pandas as pd
 import sqlite3
 import json
 import os
+import argparse
 from datetime import datetime
 
 # Paths
 DB_PATH = 'data/market.db'
 OUTPUT_PATH = 'data/portfolio_snapshot.json'
+SNAPSHOTS_DIR = 'data/snapshots'
 INITIAL_CAPITAL = 10000
 
 
@@ -190,75 +198,126 @@ def append_portfolio_value_to_ledger(ledger_path: str, value: float, date_str: s
         return False
 
 
-def main():
-    print("=" * 50)
-    print("COMPUTING PORTFOLIO SNAPSHOT")
-    print("=" * 50)
-    
-    snapshot = {
-        'timestamp': datetime.utcnow().isoformat() + 'Z',
-        'price_date': get_latest_date(DB_PATH),
-        'initial_capital': INITIAL_CAPITAL,
-        'portfolios': {}
-    }
-    
-    # Process each ledger
+def process_single_strategy(strategy: str) -> dict:
+    """
+    Process a single strategy and write its snapshot to data/snapshots/{strategy}.json.
+    This is the conflict-free approach - each workflow writes to its own file.
+    """
     ledgers = {
         'momentum': 'ledger_momentum.csv',
         'ml': 'ledger_ml.csv',
         'lstm': 'ledger_lstm.csv'
     }
     
-    all_tickers = set()
-    portfolio_data = {}
+    if strategy not in ledgers:
+        print(f"Unknown strategy: {strategy}")
+        return {}
     
-    # First pass: collect all tickers and holdings
-    for name, path in ledgers.items():
-        holdings, cash = get_current_holdings(path)
-        portfolio_data[name] = {'holdings': holdings, 'cash': cash}
-        all_tickers.update(holdings.keys())
-        print(f"\n{name.upper()}:")
-        print(f"  Holdings: {len(holdings)} positions")
-        print(f"  Cash: ${cash:,.2f}")
+    ledger_path = ledgers[strategy]
+    print(f"\n{'='*50}")
+    print(f"COMPUTING {strategy.upper()} SNAPSHOT")
+    print(f"{'='*50}")
     
-    # Fetch prices for all tickers at once
-    print(f"\nFetching prices for {len(all_tickers)} tickers...")
-    prices = get_latest_prices(list(all_tickers), DB_PATH)
+    # Get holdings and compute value
+    holdings, cash = get_current_holdings(ledger_path)
+    print(f"\n{strategy.upper()}:")
+    print(f"  Holdings: {len(holdings)} positions")
+    print(f"  Cash: ${cash:,.2f}")
+    
+    # Fetch prices
+    prices = get_latest_prices(list(holdings.keys()), DB_PATH)
     print(f"  Got prices for {len(prices)} tickers")
     
-    # Second pass: compute values
-    for name, data in portfolio_data.items():
-        holdings = data['holdings']
-        cash = data['cash']
-        value = compute_portfolio_value(holdings, prices, cash)
-        return_pct = ((value / INITIAL_CAPITAL) - 1) * 100
-        
-        snapshot['portfolios'][name] = {
-            'value': round(value, 2),
-            'return_pct': round(return_pct, 2),
-            'cash': round(cash, 2),
-            'holdings': {k: int(v) for k, v in holdings.items()},
-            'positions': len(holdings)
-        }
-        
-        print(f"\n{name.upper()} RESULT:")
-        print(f"  Value: ${value:,.2f}")
-        print(f"  Return: {return_pct:+.2f}%")
+    # Compute value
+    value = compute_portfolio_value(holdings, prices, cash)
+    return_pct = ((value / INITIAL_CAPITAL) - 1) * 100
     
-    # Append daily PORTFOLIO,VALUE entries to ledgers
-    # This ensures the chart has continuous daily data
+    print(f"\n{strategy.upper()} RESULT:")
+    print(f"  Value: ${value:,.2f}")
+    print(f"  Return: {return_pct:+.2f}%")
+    
+    # Append daily value to ledger
     price_date = get_latest_date(DB_PATH)
-    print(f"\n📊 Updating ledgers with daily values for {price_date}...")
-    for name, path in ledgers.items():
-        value = snapshot['portfolios'][name]['value']
-        append_portfolio_value_to_ledger(path, value, price_date, name)
+    print(f"\n📊 Updating ledger with daily value for {price_date}...")
+    append_portfolio_value_to_ledger(ledger_path, value, price_date, strategy)
+    
+    # Create snapshot
+    snapshot = {
+        'timestamp': datetime.utcnow().isoformat() + 'Z',
+        'price_date': price_date,
+        'initial_capital': INITIAL_CAPITAL,
+        'strategy': strategy,
+        'value': round(value, 2),
+        'return_pct': round(return_pct, 2),
+        'cash': round(cash, 2),
+        'holdings': {k: int(v) for k, v in holdings.items()},
+        'positions': len(holdings)
+    }
+    
+    # Save to strategy-specific file
+    os.makedirs(SNAPSHOTS_DIR, exist_ok=True)
+    snapshot_path = os.path.join(SNAPSHOTS_DIR, f'{strategy}.json')
+    with open(snapshot_path, 'w') as f:
+        json.dump(snapshot, f, indent=2)
+    
+    print(f"\n✅ Saved snapshot to {snapshot_path}")
+    
+    return snapshot
+
+
+def consolidate_snapshots() -> dict:
+    """
+    Read all per-strategy snapshots and merge into portfolio_snapshot.json.
+    Called after each workflow to update the combined snapshot.
+    """
+    print(f"\n{'='*50}")
+    print("CONSOLIDATING SNAPSHOTS")
+    print(f"{'='*50}")
+    
+    combined = {
+        'timestamp': datetime.utcnow().isoformat() + 'Z',
+        'price_date': get_latest_date(DB_PATH),
+        'initial_capital': INITIAL_CAPITAL,
+        'portfolios': {}
+    }
+    
+    # Read each strategy snapshot
+    strategies = ['momentum', 'ml', 'lstm']
+    for strategy in strategies:
+        snapshot_path = os.path.join(SNAPSHOTS_DIR, f'{strategy}.json')
+        if os.path.exists(snapshot_path):
+            with open(snapshot_path, 'r') as f:
+                data = json.load(f)
+            combined['portfolios'][strategy] = {
+                'value': data.get('value', 0),
+                'return_pct': data.get('return_pct', 0),
+                'cash': data.get('cash', 0),
+                'holdings': data.get('holdings', {}),
+                'positions': data.get('positions', 0)
+            }
+            print(f"  ✓ Loaded {strategy}: ${data.get('value', 0):,.2f}")
+        else:
+            print(f"  ⚠ No snapshot for {strategy}")
     
     # Add SPY benchmark
+    add_spy_benchmark(combined)
+    
+    # Save combined snapshot
+    with open(OUTPUT_PATH, 'w') as f:
+        json.dump(combined, f, indent=2)
+    
+    print(f"\n✅ Saved combined snapshot to {OUTPUT_PATH}")
+    return combined
+
+
+def add_spy_benchmark(snapshot: dict):
+    """Add SPY benchmark to snapshot."""
     print("\n📈 Computing SPY benchmark...")
     try:
         # Get first ledger date
         first_date = None
-        for path in ledgers.values():
+        ledgers = ['ledger_momentum.csv', 'ledger_ml.csv', 'ledger_lstm.csv']
+        for path in ledgers:
             if os.path.exists(path):
                 df = pd.read_csv(path)
                 if not df.empty and 'date' in df.columns:
@@ -267,8 +326,7 @@ def main():
         
         spy_df = None
         
-        # ALWAYS fetch SPY fresh from yfinance for accurate benchmark
-        # This ensures SPY chart stays current regardless of cache state
+        # Fetch SPY from yfinance
         if first_date:
             try:
                 import yfinance as yf
@@ -280,26 +338,23 @@ def main():
                         'date': hist['Date'].astype(str).str[:10],
                         'price': hist['Close']
                     })
-                    print(f"  Fetched {len(spy_df)} days of SPY from yfinance (fresh)")
+                    print(f"  Fetched {len(spy_df)} days of SPY from yfinance")
             except Exception as e:
-                print(f"  yfinance fetch failed: {e}, trying database cache...")
+                print(f"  yfinance failed: {e}, trying database...")
         
-        # Fallback to database cache if yfinance fails
+        # Fallback to database
         if spy_df is None and first_date and os.path.exists(DB_PATH):
             try:
                 con = sqlite3.connect(DB_PATH)
                 spy_df = pd.read_sql_query("""
                     SELECT date, COALESCE(adj_close, close) AS price
                     FROM price_data
-                    WHERE ticker = 'SPY'
-                      AND date >= ?
+                    WHERE ticker = 'SPY' AND date >= ?
                     ORDER BY date ASC
                 """, con, params=(first_date,))
                 con.close()
                 if not spy_df.empty:
                     print(f"  Using cached SPY data ({len(spy_df)} days)")
-                else:
-                    spy_df = None
             except Exception as db_err:
                 print(f"  Database fallback failed: {db_err}")
         
@@ -319,39 +374,50 @@ def main():
                 'end_date': str(spy_df['date'].iloc[-1])
             }
             print(f"  SPY: {spy_return:+.2f}% (${spy_value:,.2f})")
-        else:
-            print("  No SPY data found")
+            
+            # Save SPY history for chart
+            spy_history = {
+                'ticker': 'SPY',
+                'start_date': first_date,
+                'end_date': str(spy_df['date'].iloc[-1]),
+                'initial_value': INITIAL_CAPITAL,
+                'final_value': round(spy_value, 2),
+                'total_return': round(spy_return, 2),
+                'portfolio_history': [
+                    [str(row['date'])[:10], round(INITIAL_CAPITAL * (row['price'] / spy_start), 2)]
+                    for _, row in spy_df.iterrows()
+                ]
+            }
+            with open('data/spy_benchmark.json', 'w') as f:
+                json.dump(spy_history, f, indent=2)
     except Exception as e:
         print(f"  Error: {e}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Compute portfolio snapshot')
+    parser.add_argument('--strategy', type=str, choices=['ml', 'lstm', 'momentum'],
+                       help='Process only this strategy (writes to data/snapshots/{strategy}.json)')
+    parser.add_argument('--consolidate', action='store_true',
+                       help='Consolidate all strategy snapshots into portfolio_snapshot.json')
+    args = parser.parse_args()
     
-    # Save snapshot
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, 'w') as f:
-        json.dump(snapshot, f, indent=2)
-    
-    # Also save SPY benchmark history for the chart
-    if spy_df is not None and not spy_df.empty:
-        spy_history = {
-            'ticker': 'SPY',
-            'start_date': first_date,
-            'end_date': str(spy_df['date'].iloc[-1]),
-            'initial_value': INITIAL_CAPITAL,
-            'final_value': round(INITIAL_CAPITAL * (spy_df['price'].iloc[-1] / spy_df['price'].iloc[0]), 2),
-            'total_return': round(((spy_df['price'].iloc[-1] / spy_df['price'].iloc[0]) - 1) * 100, 2),
-            'portfolio_history': [
-                [str(row['date'])[:10], round(INITIAL_CAPITAL * (row['price'] / spy_df['price'].iloc[0]), 2)]
-                for _, row in spy_df.iterrows()
-            ]
-        }
-        with open('data/spy_benchmark.json', 'w') as f:
-            json.dump(spy_history, f, indent=2)
-        print(f"   Saved SPY history ({len(spy_history['portfolio_history'])} days) to data/spy_benchmark.json")
-    
-    print(f"\n✅ Saved snapshot to {OUTPUT_PATH}")
-    print(f"   Price date: {snapshot['price_date']}")
-    
-    return snapshot
+    if args.strategy:
+        # Single strategy mode (used by workflows)
+        process_single_strategy(args.strategy)
+        # Also consolidate after each strategy update
+        consolidate_snapshots()
+    elif args.consolidate:
+        # Just consolidate existing snapshots
+        consolidate_snapshots()
+    else:
+        # Legacy mode: process all strategies at once (can cause conflicts)
+        print("WARNING: Running in legacy mode. Use --strategy for conflict-free operation.")
+        for strategy in ['momentum', 'ml', 'lstm']:
+            process_single_strategy(strategy)
+        consolidate_snapshots()
 
 
 if __name__ == "__main__":
     main()
+

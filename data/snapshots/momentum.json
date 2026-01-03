@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-01-03T05:19:31.976380Z",
+  "price_date": "2025-12-22",
+  "initial_capital": 10000,
+  "strategy": "momentum",
+  "value": 10815.92,
+  "return_pct": 8.16,
+  "cash": 1155.98,
+  "holdings": {
+    "LRCX": 6,
+    "WBD": 41,
+    "APP": 1,
+    "NEM": 10,
+    "HOOD": 8,
+    "MU": 4,
+    "STX": 3,
+    "WDC": 6,
+    "PLTR": 5,
+    "AVGO": 2
+  },
+  "positions": 10
+}

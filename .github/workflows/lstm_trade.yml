@@ -69,7 +69,7 @@ jobs:
             -v ${{ github.workspace }}:/app \
             paper-trader:latest \
             conda run --no-capture-output -n paper-trader \
-            python scripts/utils/compute_portfolio_snapshot.py
+            python scripts/utils/compute_portfolio_snapshot.py --strategy lstm
 
       - name: Push Ledger Changes
         run: |

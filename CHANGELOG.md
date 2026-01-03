@@ -5,6 +5,50 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-01-03
+
+### 🔧 Workflow Reliability & Conflict Prevention
+
+This release fixes critical issues with GitHub Actions workflows that were causing merge conflicts and failed pushes when multiple strategies ran simultaneously.
+
+#### Root Cause
+- All 3 trading workflows (ML, LSTM, Momentum) were scheduled at the same time (21:30 UTC)
+- All workflows wrote to the same `data/portfolio_snapshot.json` file
+- Concurrent git pushes caused merge conflicts
+- Push failures were silent (`echo "Push failed"` instead of `exit 1`)
+
+#### Fixed
+
+**Per-Strategy Snapshots (Conflict-Free Architecture)**
+- Each workflow now writes to its own file: `data/snapshots/{strategy}.json`
+- Automatic consolidation into `data/portfolio_snapshot.json` after each workflow
+- No more merge conflicts - each strategy only modifies its own files
+
+**Staggered Workflow Schedules**
+| Workflow | Old Schedule | New Schedule |
+|----------|--------------|--------------|
+| ML | 21:30 UTC | 21:30 UTC |
+| LSTM | 21:30 UTC | **21:45 UTC** (+15 min) |
+| Momentum | 21:30 UTC | **22:00 UTC** (+30 min) |
+
+**Robust Push Logic**
+- 3 retry attempts with 10-second delays
+- Fallback to merge if rebase fails
+- Explicit `exit 1` on failure (no silent failures)
+- Full git history fetch (`fetch-depth: 0`) for proper rebasing
+
+**Disk Space Fixes**
+- Added disk cleanup step (frees ~10GB before Docker build)
+- Changed `tensorflow-macos` → `tensorflow-cpu` (smaller package)
+- Moved Sentinull dependencies to separate `sentinull/requirements.txt`
+
+#### Changed
+- `scripts/utils/compute_portfolio_snapshot.py`: Added `--strategy` argument
+- All trade workflows: Now pass `--strategy {ml|lstm|momentum}` flag
+- Created `data/snapshots/` directory for per-strategy files
+
+---
+
 ## [1.8.0] - 2025-12-11
 
 ### 🧪 Phase 8: Comprehensive Testing & Validation
