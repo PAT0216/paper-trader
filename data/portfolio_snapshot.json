@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-03T05:31:03.850715Z",
+  "timestamp": "2026-01-03T22:30:11.406228Z",
   "price_date": "2026-01-02",
   "initial_capital": 10000,
   "portfolios": {
@@ -20,23 +20,6 @@
         "AVGO": 2
       },
       "positions": 10
-    },
-    "ml": {
-      "value": 10272.62,
-      "return_pct": 2.73,
-      "cash": 1173.91,
-      "holdings": {
-        "INTC": 25,
-        "AVGO": 4,
-        "HOOD": 8,
-        "LYB": 23,
-        "GLW": 11,
-        "PSKY": 76,
-        "MCHP": 15,
-        "GNRC": 7,
-        "NFLX": 9
-      },
-      "positions": 9
     },
     "lstm": {
       "value": 10297.55,
