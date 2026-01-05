@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-05T21:47:30.615922Z",
+  "timestamp": "2026-01-05T21:59:21.689907Z",
   "price_date": "2026-01-05",
   "initial_capital": 10000,
   "portfolios": {
@@ -39,8 +39,8 @@
       "positions": 9
     },
     "lstm": {
-      "value": 10297.55,
-      "return_pct": 2.98,
+      "value": 10322.11,
+      "return_pct": 3.22,
       "cash": 589.14,
       "holdings": {
         "LIN": 2,
@@ -50,8 +50,8 @@
         "SO": 9,
         "DUK": 8,
         "PPL": 27,
-        "WEC": 10,
         "IRM": 13,
+        "WEC": 10,
         "TSLA": 1,
         "AVGO": 1
       },
