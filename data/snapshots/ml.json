@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-01-05T21:47:30.615715Z",
+  "price_date": "2026-01-05",
+  "initial_capital": 10000,
+  "strategy": "ml",
+  "value": 10397.3,
+  "return_pct": 3.97,
+  "cash": 1450.59,
+  "holdings": {
+    "INTC": 25,
+    "AVGO": 5,
+    "HOOD": 8,
+    "LYB": 23,
+    "GLW": 11,
+    "MCHP": 15,
+    "PSKY": 76,
+    "NFLX": 9,
+    "PEP": 3
+  },
+  "positions": 9
+}
