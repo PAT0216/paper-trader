@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-01-06T21:59:33.754017Z",
-  "price_date": "2026-01-05",
+  "timestamp": "2026-01-07T21:59:28.649764Z",
+  "price_date": "2026-01-07",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 10322.11,
-  "return_pct": 3.22,
+  "value": 10288.08,
+  "return_pct": 2.88,
   "cash": 589.14,
   "holdings": {
     "LIN": 2,
@@ -14,8 +14,8 @@
     "SO": 9,
     "DUK": 8,
     "PPL": 27,
-    "IRM": 13,
     "WEC": 10,
+    "IRM": 13,
     "TSLA": 1,
     "AVGO": 1
   },
