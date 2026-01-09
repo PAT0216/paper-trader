@@ -1,20 +1,19 @@
 {
-  "timestamp": "2026-01-08T21:47:39.951872Z",
-  "price_date": "2026-01-07",
+  "timestamp": "2026-01-09T21:46:03.482528Z",
+  "price_date": "2026-01-09",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 10446.43,
-  "return_pct": 4.46,
-  "cash": 1704.85,
+  "value": 10600.19,
+  "return_pct": 6.0,
+  "cash": 2832.59,
   "holdings": {
     "INTC": 25,
     "AVGO": 5,
     "HOOD": 8,
-    "MCHP": 15,
-    "GLW": 11,
     "LYB": 23,
+    "GLW": 11,
     "NFLX": 9,
     "PEP": 8
   },
-  "positions": 8
+  "positions": 7
 }
