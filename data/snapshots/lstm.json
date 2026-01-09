@@ -1,23 +1,24 @@
 {
-  "timestamp": "2026-01-08T21:59:24.165492Z",
-  "price_date": "2026-01-07",
+  "timestamp": "2026-01-09T21:58:38.094762Z",
+  "price_date": "2026-01-09",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 10288.08,
-  "return_pct": 2.88,
-  "cash": 589.14,
+  "value": 10448.4,
+  "return_pct": 4.48,
+  "cash": 808.94,
   "holdings": {
     "LIN": 2,
-    "POOL": 4,
     "MSI": 3,
     "VICI": 42,
     "SO": 9,
-    "DUK": 8,
     "PPL": 27,
+    "DUK": 8,
     "WEC": 10,
     "IRM": 13,
     "TSLA": 1,
-    "AVGO": 1
+    "AVGO": 1,
+    "AMD": 3,
+    "NFLX": 2
   },
-  "positions": 11
+  "positions": 12
 }
