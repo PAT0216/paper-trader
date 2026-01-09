@@ -201,3 +201,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-01-03,AVGO,BUY,347.79,1,347.79,384.2,10021.6,lstm,,
 2026-01-05,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10322.11,lstm,,
 2026-01-07,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10288.08,lstm,,
+2026-01-09,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10449.29,lstm,,

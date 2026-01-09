@@ -600,3 +600,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-01-07,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10447.24,ml,,
 2026-01-07,PSKY,SELL,12.36,76,939.65,939.65,8771.62,ml,,
 2026-01-07,PEP,BUY,137.08,5,685.39,254.26,8771.62,ml,,
+2026-01-09,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10600.75,ml,,
