@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-14T21:16:15.898859Z",
+  "timestamp": "2026-01-14T21:47:54.165236Z",
   "price_date": "2026-01-13",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 10645.82,
-      "return_pct": 6.46,
+      "value": 10818.62,
+      "return_pct": 8.19,
       "cash": 2832.59,
       "holdings": {
         "INTC": 25,

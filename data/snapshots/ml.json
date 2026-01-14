@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-01-13T21:47:30.712289Z",
-  "price_date": "2026-01-12",
+  "timestamp": "2026-01-14T21:47:54.165057Z",
+  "price_date": "2026-01-13",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 10645.82,
-  "return_pct": 6.46,
+  "value": 10818.62,
+  "return_pct": 8.19,
   "cash": 2832.59,
   "holdings": {
     "INTC": 25,
