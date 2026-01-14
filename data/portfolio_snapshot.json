@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-14T10:47:46.755900Z",
+  "timestamp": "2026-01-14T21:16:15.898859Z",
   "price_date": "2026-01-13",
   "initial_capital": 10000,
   "portfolios": {
@@ -60,10 +60,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 693.77,
-    "return_pct": 4.09,
-    "value": 10409.45,
+    "end_price": 690.36,
+    "return_pct": 3.58,
+    "value": 10358.29,
     "start_date": "2025-10-01",
-    "end_date": "2026-01-13"
+    "end_date": "2026-01-14"
   }
 }
