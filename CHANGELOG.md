@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.9.1] - 2026-01-14
 
-### 🔧 Fix Stale Monthly Strategy Values in Dashboard
+### Fix Stale Monthly Strategy Values in Dashboard
 
 This release fixes an issue where monthly strategies (momentum) showed stale portfolio values in the dashboard between monthly rebalances.
 
