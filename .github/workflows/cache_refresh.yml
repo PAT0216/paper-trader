@@ -83,9 +83,9 @@ jobs:
           path: data/market.db
           key: market-data-v3-${{ github.run_id }}
 
-      - name: Compute Portfolio Snapshot
+      - name: Update Portfolio Snapshot Values
         run: |
-          python scripts/utils/compute_portfolio_snapshot.py
+          python scripts/utils/compute_portfolio_snapshot.py --update-value-only
 
       - name: Commit Updates
         run: |

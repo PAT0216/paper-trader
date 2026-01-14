@@ -5,6 +5,41 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-01-14
+
+### 🔧 Fix Stale Monthly Strategy Values in Dashboard
+
+This release fixes an issue where monthly strategies (momentum) showed stale portfolio values in the dashboard between monthly rebalances.
+
+#### Root Cause
+- Dashboard reads values from `data/portfolio_snapshot.json`
+- This file consolidates per-strategy snapshots from `data/snapshots/*.json`
+- Monthly strategies like momentum only update their snapshot when they run (1st-3rd of month)
+- Result: Stale values displayed for ~28 days each month
+
+#### Fixed
+
+**Modular Value Refresh (`--update-value-only`)**
+- Added `update_strategy_value()` function to refresh JSON snapshot values from ledger VALUE rows
+- Added `update_all_strategy_values()` to update all strategies at once
+- Added `--update-value-only` CLI flag to `compute_portfolio_snapshot.py`
+- `cache_refresh.yml` now calls this daily to keep all strategy values fresh
+
+**How It Works**
+- Ledger VALUE rows are authoritative (written by trading logic)
+- Daily cache_refresh updates JSON snapshot values from ledgers
+- Holdings/cash preserved from last actual strategy run
+- No changes needed to individual strategy workflows
+
+#### Files Changed
+- `scripts/utils/compute_portfolio_snapshot.py`: Added value update functions
+- `.github/workflows/cache_refresh.yml`: Uses `--update-value-only` flag
+
+> [!TIP]  
+> **To revert**: Change `--update-value-only` back to no argument in `cache_refresh.yml`, and remove the new functions from `compute_portfolio_snapshot.py`.
+
+---
+
 ## [1.9.0] - 2026-01-03
 
 ### 🔧 Workflow Reliability & Conflict Prevention

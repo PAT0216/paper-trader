@@ -394,15 +394,107 @@ def add_spy_benchmark(snapshot: dict):
         print(f"  Error: {e}")
 
 
+def update_strategy_value(strategy: str) -> bool:
+    """
+    Update a strategy's JSON snapshot with the latest value from its ledger.
+    
+    This is used to keep monthly strategy snapshots current without
+    recalculating holdings. Only updates value and return_pct, preserving
+    the holdings/cash from the last time the strategy actually ran.
+    
+    Usage: Called by cache_refresh workflow to keep all strategy values fresh.
+    
+    Returns: True if updated, False if no update needed or error
+    """
+    ledger_paths = {
+        'momentum': 'ledger_momentum.csv',
+        'ml': 'ledger_ml.csv',
+        'lstm': 'ledger_lstm.csv'
+    }
+    
+    if strategy not in ledger_paths:
+        print(f"Unknown strategy: {strategy}")
+        return False
+    
+    print(f"\n📊 Updating {strategy.upper()} value from ledger...")
+    
+    # Get current value from ledger (authoritative source)
+    ledger_path = ledger_paths[strategy]
+    ledger_value, value_date = get_ledger_portfolio_value(ledger_path)
+    
+    if ledger_value <= 0:
+        print(f"  ⚠ No value found in ledger for {strategy}")
+        return False
+    
+    # Read existing snapshot (to preserve holdings/cash)
+    snapshot_path = os.path.join(SNAPSHOTS_DIR, f'{strategy}.json')
+    if not os.path.exists(snapshot_path):
+        print(f"  ⚠ No existing snapshot for {strategy}")
+        return False
+    
+    with open(snapshot_path, 'r') as f:
+        data = json.load(f)
+    
+    old_value = data.get('value', 0)
+    old_date = data.get('price_date', 'unknown')
+    
+    # Check if update is needed
+    if abs(ledger_value - old_value) < 0.01:
+        print(f"  ✓ {strategy}: Value unchanged (${ledger_value:,.2f})")
+        return False
+    
+    # Update value and return_pct only (preserve holdings/cash)
+    return_pct = ((ledger_value / INITIAL_CAPITAL) - 1) * 100
+    data['value'] = round(ledger_value, 2)
+    data['return_pct'] = round(return_pct, 2)
+    data['price_date'] = value_date
+    data['timestamp'] = datetime.utcnow().isoformat() + 'Z'
+    
+    # Save updated snapshot
+    with open(snapshot_path, 'w') as f:
+        json.dump(data, f, indent=2)
+    
+    print(f"  ✓ {strategy}: ${old_value:,.2f} ({old_date}) → ${ledger_value:,.2f} ({value_date})")
+    return True
+
+
+def update_all_strategy_values() -> int:
+    """
+    Update all strategy snapshots with current values from ledgers.
+    Used by cache_refresh workflow to keep monthly strategy values fresh.
+    
+    Returns: Number of strategies updated
+    """
+    print(f"\n{'='*50}")
+    print("UPDATING ALL STRATEGY VALUES FROM LEDGERS")
+    print(f"{'='*50}")
+    
+    updated = 0
+    for strategy in ['momentum', 'ml', 'lstm']:
+        if update_strategy_value(strategy):
+            updated += 1
+    
+    # Re-consolidate with updated values
+    consolidate_snapshots()
+    
+    print(f"\n✅ Updated {updated} strategy value(s)")
+    return updated
+
+
 def main():
     parser = argparse.ArgumentParser(description='Compute portfolio snapshot')
     parser.add_argument('--strategy', type=str, choices=['ml', 'lstm', 'momentum'],
                        help='Process only this strategy (writes to data/snapshots/{strategy}.json)')
     parser.add_argument('--consolidate', action='store_true',
                        help='Consolidate all strategy snapshots into portfolio_snapshot.json')
+    parser.add_argument('--update-value-only', action='store_true',
+                       help='Update all strategy snapshot values from ledgers (preserves holdings)')
     args = parser.parse_args()
     
-    if args.strategy:
+    if args.update_value_only:
+        # Update values from ledgers (used by cache_refresh for monthly strategies)
+        update_all_strategy_values()
+    elif args.strategy:
         # Single strategy mode (used by workflows)
         process_single_strategy(args.strategy)
         # Also consolidate after each strategy update
