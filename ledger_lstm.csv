@@ -208,3 +208,5 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-01-12,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10495.0,lstm,,
 2026-01-13,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10609.94,lstm,,
 2026-01-15,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10336.1,lstm,,
+2026-01-15,AVGO,SELL,339.72,1,339.72,339.72,9448.38,lstm,,
+2026-01-15,NFLX,BUY,88.59,1,88.59,251.13,9448.38,lstm,,
