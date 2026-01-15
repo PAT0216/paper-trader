@@ -237,8 +237,10 @@ def process_single_strategy(strategy: str) -> dict:
     print(f"  Return: {return_pct:+.2f}%")
     
     # Append daily value to ledger
-    price_date = get_latest_date(DB_PATH)
-    print(f"\n📊 Updating ledger with daily value for {price_date}...")
+    # Use today's date (not DB max date) since workflows only run on trading days
+    # DB max date can lag behind if cache_refresh runs before market data is available
+    price_date = datetime.now().strftime('%Y-%m-%d')
+    print(f"\n[Ledger] Updating with daily value for {price_date}...")
     append_portfolio_value_to_ledger(ledger_path, value, price_date, strategy)
     
     # Create snapshot

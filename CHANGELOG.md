@@ -5,6 +5,26 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-01-15
+
+### Fix Missing Daily VALUE Rows in Ledgers
+
+Dashboard graph was stuck at Jan 12/13 because no new VALUE rows were being created in ledgers.
+
+#### Root Cause
+- `process_single_strategy()` used `get_latest_date(DB_PATH)` to determine the date for VALUE rows
+- Database MAX(date) was Jan 13 (cache_refresh ran before Jan 14 market data was available)
+- When trading workflows ran on Jan 14, they tried to write VALUE rows for Jan 13
+- Jan 13 VALUE rows already existed, so nothing was appended
+
+#### Fixed
+Changed `process_single_strategy()` to use `datetime.now().strftime('%Y-%m-%d')` (today's date) instead of database MAX(date). Since workflows only run on trading days (Mon-Fri cron at market close), today is always a valid trading date.
+
+#### Files Changed
+- `scripts/utils/compute_portfolio_snapshot.py`: Line ~240, use today's date for VALUE rows
+
+---
+
 ## [1.9.1] - 2026-01-14
 
 ### Fix Stale Monthly Strategy Values in Dashboard
