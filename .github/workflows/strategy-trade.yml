@@ -1,0 +1,98 @@
+name: Strategy Trade (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      strategy:
+        description: 'Strategy name (ml, lstm, momentum)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore Market Data Cache
+        uses: actions/cache@v4
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
+          restore-keys: market-data-v3-
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+          df -h
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: docker-${{ runner.os }}-${{ hashFiles('Dockerfile') }}
+          restore-keys: docker-${{ runner.os }}-
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: paper-trader:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Run Strategy
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app paper-trader:latest \
+            conda run --no-capture-output -n paper-trader \
+            python main.py --mode trade --strategy ${{ inputs.strategy }} --portfolio ${{ inputs.strategy }}
+
+      - name: Update Snapshot
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app paper-trader:latest \
+            conda run --no-capture-output -n paper-trader \
+            python scripts/utils/compute_portfolio_snapshot.py --strategy ${{ inputs.strategy }}
+
+      - name: Push Changes
+        run: |
+          git config user.name "PAT0216"
+          git config user.email "69978508+PAT0216@users.noreply.github.com"
+          git add -A
+          
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          
+          git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
+          
+          for i in 1 2 3; do
+            git pull --rebase origin main 2>/dev/null || {
+              git rebase --abort 2>/dev/null || true
+              git reset --soft HEAD~1
+              git stash
+              git pull origin main
+              git stash pop
+              git add -A
+              git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
+            }
+            git push origin main && exit 0
+            sleep 10
+          done
+          exit 1
+
+      - name: Cleanup Docker cache
+        if: always()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache 2>/dev/null || true
