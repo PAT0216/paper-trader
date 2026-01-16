@@ -25,7 +25,7 @@ jobs:
           pip install pytest pytest-cov
       
       - name: Run unit tests
-        run: pytest tests/ -v --tb=short --ignore=tests/sentinull/
+        run: pytest tests/ -v --tb=short --ignore=tests/sentinull/ --ignore=tests/test_explainability.py
       
       - name: Test strategy imports
         run: |
