@@ -74,19 +74,20 @@ jobs:
             exit 0
           fi
           
+          BRANCH="${{ github.ref_name }}"
           git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
           
           for i in 1 2 3; do
-            git pull --rebase origin main 2>/dev/null || {
+            git pull --rebase origin "$BRANCH" 2>/dev/null || {
               git rebase --abort 2>/dev/null || true
               git reset --soft HEAD~1
               git stash
-              git pull origin main
+              git pull origin "$BRANCH"
               git stash pop
               git add -A
               git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
             }
-            git push origin main && exit 0
+            git push origin "$BRANCH" && exit 0
             sleep 10
           done
           exit 1
