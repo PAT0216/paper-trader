@@ -3,112 +3,72 @@ Momentum Strategy - Production Implementation
 
 12-1 Month Momentum Factor (Fama-French style)
 - Buy top N stocks by 12-month return excluding last month
-- Rebalance monthly on first trading day
-- Long-only, equal weight
+- Cross-sectional ranking for signal generation
+- Long-only strategy
 
 Academic basis: Jegadeesh & Titman (1993), Fama-French
 Walk-forward tested: 100% win rate vs SPY (2015-2023)
 """
 
 import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
-from datetime import datetime
+from typing import Dict, Optional
 
 from src.strategies.base import BaseStrategy
-
-
-@dataclass
-class RebalanceOrder:
-    """Represents a single trade order."""
-    ticker: str
-    action: str  # 'BUY' or 'SELL'
-    shares: int
-    price: float
-    reason: str
 
 
 class MomentumStrategy(BaseStrategy):
     """
     Long-only momentum strategy.
     
-    Selects top N stocks by 12-1 month momentum.
-    Designed for monthly rebalancing on first trading day.
+    Selects top N stocks by 12-1 month momentum using cross-sectional ranking.
     
-    Default: 12-month lookback, 15% daily stop-loss
+    Features:
+    - 12-month lookback, skip last month (avoid reversal)
+    - Cross-sectional ranking for signal generation
+    - No training required
     
     Inherits from BaseStrategy for consistent interface.
     """
     
-    DEFAULT_CONFIG_PATH = 'config/momentum_config.yaml'
-    
     def __init__(
         self, 
-        n_stocks: int = 10, 
         lookback_days: int = 252, 
-        skip_days: int = 21,
-        initial_capital: float = 100000.0,
-        stop_loss_pct: float = 0.15,
-        use_6mo_momentum: bool = False
+        skip_days: int = 21
     ):
         """
         Initialize momentum strategy.
         
         Args:
-            n_stocks: Number of stocks to hold (default 10)
             lookback_days: Days for momentum calculation (default 252 = 1 year)
             skip_days: Recent days to skip (default 21 = 1 month)
-            initial_capital: Starting capital in USD (default $100,000)
-            stop_loss_pct: Daily stop-loss threshold (default 15%)
-            use_6mo_momentum: Use 6-month momentum instead of 12-month
         """
-        self.n_stocks = n_stocks
         self.lookback_days = lookback_days
         self.skip_days = skip_days
-        self.initial_capital = initial_capital
-        self.stop_loss_pct = stop_loss_pct
-        self.use_6mo_momentum = use_6mo_momentum
-        
-        self._current_scores: Dict[str, float] = {}
-        self._target_holdings: List[str] = []
-        self._entry_prices: Dict[str, float] = {}
     
-    @classmethod
-    def from_config(cls, config_path: str = None) -> 'MomentumStrategy':
+    def get_name(self) -> str:
+        """Return strategy identifier."""
+        return "momentum"
+    
+    def get_display_name(self) -> str:
+        """Return human-readable name."""
+        return "Momentum 12-1"
+    
+    def needs_training(self) -> bool:
+        """Momentum strategy does not require model training."""
+        return False
+    
+    def validate_data(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
         """
-        Load strategy from YAML config file.
+        Validate data for momentum strategy.
         
-        Args:
-            config_path: Path to config file (default: config/momentum_config.yaml)
-            
-        Returns:
-            Configured MomentumStrategy instance
+        Requires 252+ days for 12-month lookback.
         """
-        import yaml
-        
-        if config_path is None:
-            config_path = cls.DEFAULT_CONFIG_PATH
-        
-        with open(config_path, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        return cls(
-            n_stocks=config.get('strategy', {}).get('n_stocks', 10),
-            lookback_days=config.get('strategy', {}).get('lookback_days', 252),
-            skip_days=config.get('strategy', {}).get('skip_days', 21),
-            initial_capital=config.get('capital', {}).get('initial', 100000),
-            stop_loss_pct=config.get('risk', {}).get('stop_loss_pct', 0.15),
-            use_6mo_momentum=False  # Always use 12-month as per testing
-        )
-    
-    def record_entry_price(self, ticker: str, price: float):
-        """Record entry price for stop-loss tracking."""
-        self._entry_prices[ticker] = price
-    
-    def get_entry_prices(self) -> Dict[str, float]:
-        """Get recorded entry prices."""
-        return self._entry_prices
+        min_days = self.lookback_days
+        return {
+            ticker: df 
+            for ticker, df in data_dict.items() 
+            if len(df) >= min_days
+        }
     
     def calculate_momentum(self, df: pd.DataFrame) -> Optional[float]:
         """
@@ -138,97 +98,6 @@ class MomentumStrategy(BaseStrategy):
         except (IndexError, KeyError):
             return None
     
-    def calculate_momentum_6mo(self, df: pd.DataFrame) -> Optional[float]:
-        """
-        Calculate 6-month momentum (faster signal, better for regime changes).
-        
-        Returns:
-            Momentum as decimal, or None if insufficient data
-        """
-        if len(df) < 126:  # ~6 months
-            return None
-        
-        if isinstance(df.columns, pd.MultiIndex):
-            df = df.copy()
-            df.columns = df.columns.get_level_values(0)
-        
-        price_col = 'Adj Close' if 'Adj Close' in df.columns else 'Close'
-        
-        try:
-            price_start = df[price_col].iloc[-126]
-            price_end = df[price_col].iloc[-21]  # Skip last month
-            
-            if price_start <= 0:
-                return None
-            
-            return (price_end / price_start) - 1
-        except (IndexError, KeyError):
-            return None
-    
-    def check_stop_loss(
-        self,
-        holdings: Dict[str, int],
-        entry_prices: Dict[str, float],
-        current_prices: Dict[str, float],
-        stop_loss_pct: float = 0.15
-    ) -> List[str]:
-        """
-        Daily stop-loss check for each position.
-        
-        Args:
-            holdings: Current positions {ticker: shares}
-            entry_prices: Entry prices {ticker: price}
-            current_prices: Current prices {ticker: price}
-            stop_loss_pct: Stop loss threshold (default 15%)
-            
-        Returns:
-            List of tickers that hit stop-loss
-        """
-        triggered = []
-        
-        for ticker in holdings:
-            if ticker not in entry_prices or ticker not in current_prices:
-                continue
-            
-            entry = entry_prices[ticker]
-            current = current_prices[ticker]
-            
-            if entry > 0:
-                loss = (current - entry) / entry
-                if loss <= -stop_loss_pct:
-                    triggered.append(ticker)
-        
-        return triggered
-    
-    def check_portfolio_drawdown(
-        self,
-        current_value: float,
-        peak_value: float,
-        warning_pct: float = 0.10,
-        emergency_pct: float = 0.20
-    ) -> Tuple[bool, bool, float]:
-        """
-        Check portfolio-level drawdown for emergency exit.
-        
-        Args:
-            current_value: Current portfolio value
-            peak_value: High water mark
-            warning_pct: Warning threshold (default 10%)
-            emergency_pct: Emergency exit threshold (default 20%)
-            
-        Returns:
-            (warning_triggered, emergency_triggered, drawdown_pct)
-        """
-        if peak_value <= 0:
-            return False, False, 0.0
-        
-        drawdown = (peak_value - current_value) / peak_value
-        
-        warning = drawdown >= warning_pct
-        emergency = drawdown >= emergency_pct
-        
-        return warning, emergency, drawdown
-    
     def rank_universe(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, float]:
         """
         Calculate momentum for all stocks and rank them.
@@ -242,180 +111,29 @@ class MomentumStrategy(BaseStrategy):
         scores = {}
         
         for ticker, df in data_dict.items():
-            # Use 6-month momentum if enabled (faster regime adaptation)
-            if self.use_6mo_momentum:
-                mom = self.calculate_momentum_6mo(df)
-            else:
-                mom = self.calculate_momentum(df)
-            
+            mom = self.calculate_momentum(df)
             if mom is not None:
                 scores[ticker] = mom
         
         # Sort descending by momentum
-        self._current_scores = dict(
-            sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        )
-        
-        return self._current_scores
+        return dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
     
-    def select_holdings(self, scores: Optional[Dict[str, float]] = None) -> List[str]:
-        """
-        Select top N stocks from ranked scores.
-        
-        Args:
-            scores: Optional pre-calculated scores (uses cached if None)
-            
-        Returns:
-            List of tickers to hold
-        """
-        if scores is None:
-            scores = self._current_scores
-        
-        sorted_tickers = list(scores.keys())[:self.n_stocks]
-        self._target_holdings = sorted_tickers
-        
-        return sorted_tickers
-    
-    def generate_signals(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, str]:
+    def generate_signals(
+        self, 
+        data_dict: Dict[str, pd.DataFrame],
+        top_pct: float = 0.10,
+        bottom_pct: float = 0.10
+    ) -> Dict[str, str]:
         """
         Generate trading signals for all stocks.
         
         Args:
             data_dict: {ticker: OHLCV DataFrame}
+            top_pct: Top percentile for BUY signals
+            bottom_pct: Bottom percentile for SELL signals
             
         Returns:
-            {ticker: 'BUY' | 'HOLD'}
+            {ticker: 'BUY' | 'SELL' | 'HOLD'}
         """
-        # Calculate and rank
         scores = self.rank_universe(data_dict)
-        target = set(self.select_holdings(scores))
-        
-        # Generate signals
-        signals = {}
-        for ticker in data_dict:
-            if ticker in target:
-                signals[ticker] = 'BUY'
-            else:
-                signals[ticker] = 'HOLD'
-        
-        return signals
-    
-    def generate_rebalance_orders(
-        self,
-        current_holdings: Dict[str, int],  # {ticker: shares}
-        target_holdings: List[str],
-        current_prices: Dict[str, float],
-        available_cash: float
-    ) -> List[RebalanceOrder]:
-        """
-        Generate orders to rebalance from current to target holdings.
-        
-        Args:
-            current_holdings: Current positions {ticker: shares}
-            target_holdings: Target tickers to hold
-            current_prices: Latest prices {ticker: price}
-            available_cash: Cash available for buying
-            
-        Returns:
-            List of RebalanceOrder objects
-        """
-        orders = []
-        current_tickers = set(current_holdings.keys())
-        target_tickers = set(target_holdings)
-        
-        # SELLS: Exit positions not in target
-        for ticker in current_tickers - target_tickers:
-            if ticker in current_prices:
-                orders.append(RebalanceOrder(
-                    ticker=ticker,
-                    action='SELL',
-                    shares=current_holdings[ticker],
-                    price=current_prices[ticker],
-                    reason='Exit: not in top momentum'
-                ))
-        
-        # Calculate cash after sells
-        sell_proceeds = sum(
-            current_holdings[o.ticker] * o.price 
-            for o in orders if o.action == 'SELL'
-        )
-        total_cash = available_cash + sell_proceeds
-        
-        # BUYS: New positions
-        new_buys = target_tickers - current_tickers
-        if new_buys and total_cash > 0:
-            weight_per_stock = total_cash / len(new_buys)
-            
-            for ticker in new_buys:
-                if ticker in current_prices:
-                    price = current_prices[ticker]
-                    shares = int(weight_per_stock / price)
-                    
-                    if shares > 0:
-                        orders.append(RebalanceOrder(
-                            ticker=ticker,
-                            action='BUY',
-                            shares=shares,
-                            price=price,
-                            reason=f'Entry: top {self.n_stocks} momentum'
-                        ))
-        
-        return orders
-    
-    def get_current_scores(self) -> Dict[str, float]:
-        """Get last calculated momentum scores."""
-        return self._current_scores
-    
-    def get_target_holdings(self) -> List[str]:
-        """Get current target holdings."""
-        return self._target_holdings
-    
-    def is_rebalance_day(self, date: datetime) -> bool:
-        """
-        Check if date is the first trading day of the month.
-        
-        Note: This is a simple check. In production, use a trading calendar.
-        """
-        # First trading day is typically 1st-3rd of month
-        return date.day <= 3
-    
-    # ==================== BaseStrategy Implementation ====================
-    
-    def get_name(self) -> str:
-        """Return strategy identifier."""
-        return "momentum"
-    
-    def get_display_name(self) -> str:
-        """Return human-readable name."""
-        return "Momentum 12-1"
-    
-    def needs_training(self) -> bool:
-        """Momentum strategy does not require model training."""
-        return False
-    
-    def validate_data(self, data_dict: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
-        """
-        Validate data for momentum strategy.
-        
-        Requires 252+ days for 12-month lookback.
-        """
-        min_days = 252
-        return {
-            ticker: df 
-            for ticker, df in data_dict.items() 
-            if len(df) >= min_days
-        }
-
-
-def load_tickers_from_file(path: str = 'data/sp500_tickers.txt') -> List[str]:
-    """Load ticker list from file."""
-    with open(path, 'r') as f:
-        return [line.strip() for line in f if line.strip()]
-
-
-if __name__ == "__main__":
-    print("Momentum Strategy - Production Module")
-    print("=" * 40)
-    print(f"Holdings: {MomentumStrategy().n_stocks} stocks")
-    print(f"Lookback: 12-1 month momentum")
-    print(f"Rebalance: Monthly")
+        return self._cross_sectional_rank(scores, top_pct, bottom_pct)
