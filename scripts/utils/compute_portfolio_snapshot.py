@@ -12,22 +12,27 @@ Usage:
   python compute_portfolio_snapshot.py --strategy momentum # Only Momentum strategy
 """
 
-import pandas as pd
-import sqlite3
 import json
 import os
 import argparse
 from datetime import datetime
-try:
-    from zoneinfo import ZoneInfo
-except ImportError:
-    from backports.zoneinfo import ZoneInfo
+import sys
 
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-def get_market_date() -> str:
-    """Get today's date in New York timezone (market time)."""
-    ny_tz = ZoneInfo('America/New_York')
-    return datetime.now(ny_tz).strftime('%Y-%m-%d')
+from src.trading.ledger_utils import (
+    get_ledger_portfolio_value,
+    get_current_holdings_from_ledger,
+    append_portfolio_value_to_ledger
+)
+from src.data.price_utils import (
+    get_market_date,
+    get_latest_prices,
+    get_latest_date,
+    compute_portfolio_value
+)
+
 
 # Paths
 DB_PATH = 'data/market.db'
@@ -43,15 +48,18 @@ def is_github_actions() -> bool:
 
 def get_db_freshness_days() -> int:
     """Get how many days old the database is."""
+    import sqlite3
+    import pandas as pd
+    
     if not os.path.exists(DB_PATH):
         return 999
     
-    import sqlite3
     con = sqlite3.connect(DB_PATH)
     try:
         result = pd.read_sql_query("SELECT MAX(date) as max_date FROM price_data", con)
         if result.empty or pd.isna(result['max_date'].iloc[0]):
             return 999
+        import pandas as pd
         db_date = pd.to_datetime(result['max_date'].iloc[0])
         today = pd.to_datetime(get_market_date())
         return (today - db_date).days
@@ -94,178 +102,6 @@ def check_data_safety(force: bool = False) -> bool:
     return True
 
 
-def get_ledger_portfolio_value(ledger_path: str) -> tuple[float, str]:
-    """
-    Get the latest PORTFOLIO,VALUE entry from the ledger.
-    This is the authoritative source of truth for portfolio value.
-    Returns: (portfolio_value, date_str)
-    """
-    if not os.path.exists(ledger_path):
-        return 0, ""
-    
-    df = pd.read_csv(ledger_path)
-    if df.empty:
-        return 0, ""
-    
-    # Filter to PORTFOLIO,VALUE rows only
-    value_rows = df[(df['ticker'] == 'PORTFOLIO') & (df['action'] == 'VALUE')]
-    
-    if value_rows.empty:
-        return 0, ""
-    
-    # Get the latest entry
-    value_rows = value_rows.sort_values('date')
-    latest = value_rows.iloc[-1]
-    
-    # The value is stored in 'total_value' or 'cash_balance' column
-    value = latest.get('total_value', latest.get('cash_balance', 0))
-    date_str = str(latest['date'])[:10]
-    
-    return float(value), date_str
-
-
-def get_current_holdings(ledger_path: str) -> tuple[dict, float]:
-    """
-    Parse ledger to get current holdings and cash balance.
-    
-    IMPORTANT: Cash is calculated from transaction amounts, NOT from the
-    cash_balance column (which may be incorrect in some ledgers).
-    
-    Returns: (holdings_dict, cash_balance)
-    """
-    if not os.path.exists(ledger_path):
-        return {}, 0
-    
-    df = pd.read_csv(ledger_path)
-    if df.empty:
-        return {}, 0
-    
-    holdings = {}
-    cash = 0
-    
-    # Sort by date and process in order
-    df = df.sort_values('date')
-    
-    for _, row in df.iterrows():
-        action = row.get('action', '')
-        ticker = row.get('ticker', '')
-        amount = row.get('amount', 0)
-        shares = row.get('shares', 0)
-        
-        if action == 'DEPOSIT':
-            # Deposit adds to cash
-            cash += amount if amount > 0 else row.get('cash_balance', 0)
-        elif action == 'BUY':
-            # BUY: subtract amount from cash, add shares to holdings
-            cash -= amount
-            holdings[ticker] = holdings.get(ticker, 0) + shares
-        elif action == 'SELL':
-            # SELL: add amount to cash, subtract shares from holdings
-            cash += amount
-            if ticker in holdings:
-                holdings[ticker] -= shares
-                if holdings[ticker] <= 0:
-                    del holdings[ticker]
-        # Skip PORTFOLIO,VALUE rows (they don't affect holdings/cash)
-    
-    return holdings, cash
-
-
-def get_latest_prices(tickers: list, db_path: str) -> dict:
-    """Fetch latest prices for given tickers from the database."""
-    if not tickers or not os.path.exists(db_path):
-        return {}
-    
-    con = sqlite3.connect(db_path)
-    try:
-        ticker_list = ','.join([f"'{t}'" for t in tickers])
-        query = f"""
-            SELECT ticker, date, COALESCE(adj_close, close) AS price
-            FROM price_data
-            WHERE ticker IN ({ticker_list})
-            ORDER BY date DESC
-        """
-        df = pd.read_sql_query(query, con)
-        
-        # Get latest price for each ticker
-        latest = df.groupby('ticker').first().reset_index()
-        return dict(zip(latest['ticker'], latest['price']))
-    finally:
-        con.close()
-
-
-def get_latest_date(db_path: str) -> str:
-    """Get the most recent date in the database."""
-    if not os.path.exists(db_path):
-        return get_market_date()
-    
-    con = sqlite3.connect(db_path)
-    try:
-        result = pd.read_sql_query("SELECT MAX(date) as max_date FROM price_data", con)
-        return result['max_date'].iloc[0] if not result.empty else get_market_date()
-    finally:
-        con.close()
-
-
-def compute_portfolio_value(holdings: dict, prices: dict, cash: float) -> float:
-    """Calculate total portfolio value."""
-    total = cash
-    for ticker, shares in holdings.items():
-        if ticker in prices:
-            total += shares * prices[ticker]
-    return total
-
-
-def append_portfolio_value_to_ledger(ledger_path: str, value: float, date_str: str, strategy: str) -> bool:
-    """
-    Append a PORTFOLIO,VALUE row to the ledger for the given date.
-    
-    This ensures the ledger has a daily record of portfolio value,
-    which is used by the dashboard chart. Only appends if no entry
-    exists for this date yet.
-    
-    Returns: True if appended, False if already exists or error
-    """
-    if not os.path.exists(ledger_path):
-        return False
-    
-    try:
-        df = pd.read_csv(ledger_path)
-        
-        # Check if we already have an entry for this date
-        existing = df[(df['ticker'] == 'PORTFOLIO') & 
-                      (df['action'] == 'VALUE') & 
-                      (df['date'].astype(str).str[:10] == date_str)]
-        
-        if not existing.empty:
-            print(f"  {strategy}: Already has entry for {date_str}")
-            return False
-        
-        # Create new row matching ledger format
-        new_row = pd.DataFrame([{
-            'date': date_str,
-            'ticker': 'PORTFOLIO',
-            'action': 'VALUE',
-            'price': 1.0,
-            'shares': 0,
-            'amount': 0.0,
-            'cash_balance': 0.0,
-            'total_value': round(value, 2),
-            'strategy': strategy,
-            'momentum_score' if 'momentum' in strategy else 'confidence': ''
-        }])
-        
-        # Append to ledger
-        df = pd.concat([df, new_row], ignore_index=True)
-        df.to_csv(ledger_path, index=False)
-        print(f"  {strategy}: Appended value ${value:,.2f} for {date_str}")
-        return True
-        
-    except Exception as e:
-        print(f"  {strategy}: Error appending value - {e}")
-        return False
-
-
 def process_single_strategy(strategy: str) -> dict:
     """
     Process a single strategy and write its snapshot to data/snapshots/{strategy}.json.
@@ -287,7 +123,7 @@ def process_single_strategy(strategy: str) -> dict:
     print(f"{'='*50}")
     
     # Get holdings and compute value
-    holdings, cash = get_current_holdings(ledger_path)
+    holdings, cash = get_current_holdings_from_ledger(ledger_path)
     print(f"\n{strategy.upper()}:")
     print(f"  Holdings: {len(holdings)} positions")
     print(f"  Cash: ${cash:,.2f}")
@@ -328,7 +164,7 @@ def process_single_strategy(strategy: str) -> dict:
     with open(snapshot_path, 'w') as f:
         json.dump(snapshot, f, indent=2)
     
-    print(f"\n✅ Saved snapshot to {snapshot_path}")
+    print(f"\nSaved snapshot to {snapshot_path}")
     
     return snapshot
 
@@ -363,9 +199,9 @@ def consolidate_snapshots() -> dict:
                 'holdings': data.get('holdings', {}),
                 'positions': data.get('positions', 0)
             }
-            print(f"  ✓ Loaded {strategy}: ${data.get('value', 0):,.2f}")
+            print(f"  Loaded {strategy}: ${data.get('value', 0):,.2f}")
         else:
-            print(f"  ⚠ No snapshot for {strategy}")
+            print(f"  No snapshot for {strategy}")
     
     # Add SPY benchmark
     add_spy_benchmark(combined)
@@ -374,13 +210,16 @@ def consolidate_snapshots() -> dict:
     with open(OUTPUT_PATH, 'w') as f:
         json.dump(combined, f, indent=2)
     
-    print(f"\n✅ Saved combined snapshot to {OUTPUT_PATH}")
+    print(f"\nSaved combined snapshot to {OUTPUT_PATH}")
     return combined
 
 
 def add_spy_benchmark(snapshot: dict):
     """Add SPY benchmark to snapshot."""
-    print("\n📈 Computing SPY benchmark...")
+    import pandas as pd
+    import sqlite3
+    
+    print("\nComputing SPY benchmark...")
     try:
         # Get first ledger date
         first_date = None
@@ -466,15 +305,7 @@ def update_strategy_value(strategy: str) -> bool:
     """
     Compute current portfolio value and append VALUE row to ledger.
     
-    This is used by cache_refresh to keep ALL strategies current daily,
-    including monthly strategies like momentum that don't trade daily.
-    
-    Process:
-    1. Read holdings/cash from the strategy's JSON snapshot
-    2. Fetch latest prices from database
-    3. Compute portfolio value
-    4. Append VALUE row to ledger (for chart)
-    5. Update JSON snapshot (for dashboard cells)
+    Used by cache_refresh to keep ALL strategies current daily.
     
     Returns: True if updated, False if no update needed or error
     """
@@ -558,7 +389,7 @@ def update_all_strategy_values() -> int:
     # Re-consolidate with updated values
     consolidate_snapshots()
     
-    print(f"\n✅ Updated {updated} strategy value(s)")
+    print(f"\nUpdated {updated} strategy value(s)")
     return updated
 
 
@@ -601,4 +432,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
