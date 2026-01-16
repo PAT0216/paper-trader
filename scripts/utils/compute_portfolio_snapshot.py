@@ -398,13 +398,17 @@ def add_spy_benchmark(snapshot: dict):
 
 def update_strategy_value(strategy: str) -> bool:
     """
-    Update a strategy's JSON snapshot with the latest value from its ledger.
+    Compute current portfolio value and append VALUE row to ledger.
     
-    This is used to keep monthly strategy snapshots current without
-    recalculating holdings. Only updates value and return_pct, preserving
-    the holdings/cash from the last time the strategy actually ran.
+    This is used by cache_refresh to keep ALL strategies current daily,
+    including monthly strategies like momentum that don't trade daily.
     
-    Usage: Called by cache_refresh workflow to keep all strategy values fresh.
+    Process:
+    1. Read holdings/cash from the strategy's JSON snapshot
+    2. Fetch latest prices from database
+    3. Compute portfolio value
+    4. Append VALUE row to ledger (for chart)
+    5. Update JSON snapshot (for dashboard cells)
     
     Returns: True if updated, False if no update needed or error
     """
@@ -418,45 +422,54 @@ def update_strategy_value(strategy: str) -> bool:
         print(f"Unknown strategy: {strategy}")
         return False
     
-    print(f"\n📊 Updating {strategy.upper()} value from ledger...")
-    
-    # Get current value from ledger (authoritative source)
     ledger_path = ledger_paths[strategy]
-    ledger_value, value_date = get_ledger_portfolio_value(ledger_path)
+    print(f"\n[Value Update] {strategy.upper()}...")
     
-    if ledger_value <= 0:
-        print(f"  ⚠ No value found in ledger for {strategy}")
-        return False
-    
-    # Read existing snapshot (to preserve holdings/cash)
+    # Read existing snapshot for holdings and cash
     snapshot_path = os.path.join(SNAPSHOTS_DIR, f'{strategy}.json')
     if not os.path.exists(snapshot_path):
-        print(f"  ⚠ No existing snapshot for {strategy}")
+        print(f"  No existing snapshot for {strategy}")
         return False
     
     with open(snapshot_path, 'r') as f:
         data = json.load(f)
     
+    holdings = data.get('holdings', {})
+    cash = data.get('cash', 0)
     old_value = data.get('value', 0)
-    old_date = data.get('price_date', 'unknown')
     
-    # Check if update is needed
-    if abs(ledger_value - old_value) < 0.01:
-        print(f"  ✓ {strategy}: Value unchanged (${ledger_value:,.2f})")
+    if not holdings:
+        print(f"  No holdings in snapshot for {strategy}")
         return False
     
-    # Update value and return_pct only (preserve holdings/cash)
-    return_pct = ((ledger_value / INITIAL_CAPITAL) - 1) * 100
-    data['value'] = round(ledger_value, 2)
+    # Fetch latest prices from database
+    prices = get_latest_prices(list(holdings.keys()), DB_PATH)
+    if not prices:
+        print(f"  Could not fetch prices for {strategy}")
+        return False
+    
+    # Compute portfolio value
+    value = compute_portfolio_value(holdings, prices, cash)
+    return_pct = ((value / INITIAL_CAPITAL) - 1) * 100
+    
+    # Append VALUE row to ledger for today
+    today = datetime.now().strftime('%Y-%m-%d')
+    appended = append_portfolio_value_to_ledger(ledger_path, value, today, strategy)
+    
+    # Update JSON snapshot
+    data['value'] = round(value, 2)
     data['return_pct'] = round(return_pct, 2)
-    data['price_date'] = value_date
+    data['price_date'] = today
     data['timestamp'] = datetime.utcnow().isoformat() + 'Z'
     
-    # Save updated snapshot
     with open(snapshot_path, 'w') as f:
         json.dump(data, f, indent=2)
     
-    print(f"  ✓ {strategy}: ${old_value:,.2f} ({old_date}) → ${ledger_value:,.2f} ({value_date})")
+    if appended:
+        print(f"  {strategy}: ${old_value:,.2f} -> ${value:,.2f} (appended to ledger)")
+    else:
+        print(f"  {strategy}: ${value:,.2f} (already in ledger for {today})")
+    
     return True
 
 

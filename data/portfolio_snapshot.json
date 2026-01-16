@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-16T06:28:45.048330Z",
-  "price_date": "2026-01-15",
+  "timestamp": "2026-01-16T06:33:03.516815Z",
+  "price_date": "2025-12-22",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11593.42,
-      "return_pct": 15.93,
+      "value": 10815.92,
+      "return_pct": 8.16,
       "cash": 1155.98,
       "holdings": {
         "LRCX": 6,
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 10856.73,
-      "return_pct": 8.57,
+      "value": 11119.59,
+      "return_pct": 11.2,
       "cash": 4479.86,
       "holdings": {
         "HOOD": 8,
@@ -40,8 +40,8 @@
       "positions": 10
     },
     "lstm": {
-      "value": 10336.1,
-      "return_pct": 3.36,
+      "value": 10340.17,
+      "return_pct": 3.4,
       "cash": 1060.07,
       "holdings": {
         "LIN": 2,

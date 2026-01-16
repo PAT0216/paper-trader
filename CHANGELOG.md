@@ -5,6 +5,32 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.3] - 2026-01-16
+
+### Fix Momentum Missing from Chart (Daily VALUE Rows for Monthly Strategies)
+
+Momentum strategy was missing from the dashboard chart because it only got VALUE rows when trading (monthly), not daily.
+
+#### Root Cause
+- `update_strategy_value()` was reading existing VALUE rows from ledgers
+- Momentum only trades monthly, so its ledger stopped getting updates after the last trade
+- No new VALUE rows = no data points on the chart
+
+#### Fixed
+Rewrote `update_strategy_value()` to COMPUTE values fresh from holdings + prices:
+1. Read holdings/cash from strategy's JSON snapshot
+2. Fetch latest prices from database
+3. Compute portfolio value
+4. Append VALUE row to ledger (for chart)
+5. Update JSON snapshot (for cell values)
+
+Now ALL strategies get daily VALUE rows via cache_refresh, regardless of trading frequency.
+
+#### Files Changed
+- `scripts/utils/compute_portfolio_snapshot.py`: Rewrote `update_strategy_value()`
+
+---
+
 ## [1.9.2] - 2026-01-15
 
 ### Fix Missing Daily VALUE Rows in Ledgers
