@@ -36,6 +36,64 @@ SNAPSHOTS_DIR = 'data/snapshots'
 INITIAL_CAPITAL = 10000
 
 
+def is_github_actions() -> bool:
+    """Check if running in GitHub Actions environment."""
+    return os.environ.get('GITHUB_ACTIONS', '').lower() == 'true'
+
+
+def get_db_freshness_days() -> int:
+    """Get how many days old the database is."""
+    if not os.path.exists(DB_PATH):
+        return 999
+    
+    import sqlite3
+    con = sqlite3.connect(DB_PATH)
+    try:
+        result = pd.read_sql_query("SELECT MAX(date) as max_date FROM price_data", con)
+        if result.empty or pd.isna(result['max_date'].iloc[0]):
+            return 999
+        db_date = pd.to_datetime(result['max_date'].iloc[0])
+        today = pd.to_datetime(get_market_date())
+        return (today - db_date).days
+    except:
+        return 999
+    finally:
+        con.close()
+
+
+def check_data_safety(force: bool = False) -> bool:
+    """
+    Check if it's safe to modify data files.
+    
+    Returns True if safe to proceed, False otherwise.
+    Warns if running locally with stale database.
+    """
+    if is_github_actions():
+        return True  # Always safe in CI
+    
+    stale_days = get_db_freshness_days()
+    
+    if stale_days > 1:
+        print(f"\n{'='*60}")
+        print("WARNING: LOCAL EXECUTION DETECTED")
+        print(f"{'='*60}")
+        print(f"Database is {stale_days} days old (last: {get_latest_date(DB_PATH)})")
+        print("Running this script locally with stale data can corrupt")
+        print("the remote repository with incorrect portfolio values.")
+        print()
+        
+        if force:
+            print("--force flag provided. Proceeding anyway...")
+            return True
+        else:
+            print("Use --force to override this safety check.")
+            print("Or run this via GitHub Actions for accurate data.")
+            print(f"{'='*60}\n")
+            return False
+    
+    return True
+
+
 def get_ledger_portfolio_value(ledger_path: str) -> tuple[float, str]:
     """
     Get the latest PORTFOLIO,VALUE entry from the ledger.
@@ -512,7 +570,15 @@ def main():
                        help='Consolidate all strategy snapshots into portfolio_snapshot.json')
     parser.add_argument('--update-value-only', action='store_true',
                        help='Update all strategy snapshot values from ledgers (preserves holdings)')
+    parser.add_argument('--force', action='store_true',
+                       help='Force execution even with stale local database (use with caution)')
     args = parser.parse_args()
+    
+    # Safety check for data-modifying operations
+    if args.update_value_only or args.strategy or (not args.consolidate):
+        if not check_data_safety(force=args.force):
+            print("Aborted. No changes made.")
+            return
     
     if args.update_value_only:
         # Update values from ledgers (used by cache_refresh for monthly strategies)

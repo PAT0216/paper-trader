@@ -5,6 +5,25 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.5] - 2026-01-16
+
+### Add Local Testing Safeguard
+
+Prevents accidental data corruption from running snapshot script locally with stale database.
+
+#### Added
+- `is_github_actions()` - Detects GitHub Actions environment
+- `get_db_freshness_days()` - Calculates how stale local DB is
+- `check_data_safety()` - Blocks execution if DB > 1 day old
+- `--force` flag - Override safety check (use with caution)
+
+#### Behavior
+- In GitHub Actions: Always proceeds (DB is fresh)
+- Locally with fresh DB: Proceeds normally  
+- Locally with stale DB: Blocks with warning, requires `--force` to override
+
+---
+
 ## [1.9.4] - 2026-01-16
 
 ### Fix Date Alignment for VALUE Rows
