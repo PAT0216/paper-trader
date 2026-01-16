@@ -18,6 +18,16 @@ import json
 import os
 import argparse
 from datetime import datetime
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    from backports.zoneinfo import ZoneInfo
+
+
+def get_market_date() -> str:
+    """Get today's date in New York timezone (market time)."""
+    ny_tz = ZoneInfo('America/New_York')
+    return datetime.now(ny_tz).strftime('%Y-%m-%d')
 
 # Paths
 DB_PATH = 'data/market.db'
@@ -129,12 +139,12 @@ def get_latest_prices(tickers: list, db_path: str) -> dict:
 def get_latest_date(db_path: str) -> str:
     """Get the most recent date in the database."""
     if not os.path.exists(db_path):
-        return datetime.now().strftime('%Y-%m-%d')
+        return get_market_date()
     
     con = sqlite3.connect(db_path)
     try:
         result = pd.read_sql_query("SELECT MAX(date) as max_date FROM price_data", con)
-        return result['max_date'].iloc[0] if not result.empty else datetime.now().strftime('%Y-%m-%d')
+        return result['max_date'].iloc[0] if not result.empty else get_market_date()
     finally:
         con.close()
 
@@ -236,10 +246,8 @@ def process_single_strategy(strategy: str) -> dict:
     print(f"  Value: ${value:,.2f}")
     print(f"  Return: {return_pct:+.2f}%")
     
-    # Append daily value to ledger
-    # Use today's date (not DB max date) since workflows only run on trading days
-    # DB max date can lag behind if cache_refresh runs before market data is available
-    price_date = datetime.now().strftime('%Y-%m-%d')
+    # Use database max date since that's when the prices are from
+    price_date = get_latest_date(DB_PATH)
     print(f"\n[Ledger] Updating with daily value for {price_date}...")
     append_portfolio_value_to_ledger(ledger_path, value, price_date, strategy)
     
@@ -452,8 +460,8 @@ def update_strategy_value(strategy: str) -> bool:
     value = compute_portfolio_value(holdings, prices, cash)
     return_pct = ((value / INITIAL_CAPITAL) - 1) * 100
     
-    # Append VALUE row to ledger for today
-    today = datetime.now().strftime('%Y-%m-%d')
+    # Use database max date since that's when the prices are from
+    today = get_latest_date(DB_PATH)
     appended = append_portfolio_value_to_ledger(ledger_path, value, today, strategy)
     
     # Update JSON snapshot

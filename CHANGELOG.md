@@ -5,6 +5,17 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.4] - 2026-01-16
+
+### Fix Date Alignment for VALUE Rows
+
+VALUE rows were dated using current time which could be a day ahead after midnight.
+
+#### Fixed
+Changed VALUE row dating to use database max date (the date of the prices used for calculation) instead of current time. This ensures chart dates match the actual price data.
+
+---
+
 ## [1.9.3] - 2026-01-16
 
 ### Fix Momentum Missing from Chart (Daily VALUE Rows for Monthly Strategies)
