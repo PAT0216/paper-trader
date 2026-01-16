@@ -1,22 +1,20 @@
 {
-  "timestamp": "2026-01-16T06:33:03.318600Z",
+  "timestamp": "2026-01-16T09:26:52.428012Z",
   "price_date": "2026-01-15",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11119.59,
-  "return_pct": 11.2,
-  "cash": 4479.86,
+  "value": 10792.48,
+  "return_pct": 7.92,
+  "cash": 4959.64,
   "holdings": {
-    "HOOD": 8,
     "GLW": 11,
     "NFLX": 19,
     "PEP": 8,
+    "CRM": 2,
     "V": 2,
     "HPQ": 1,
-    "CRM": 2,
-    "DDOG": 3,
-    "VZ": 1,
-    "PSKY": 1
+    "VZ": 13,
+    "ADBE": 1
   },
-  "positions": 10
+  "positions": 8
 }
