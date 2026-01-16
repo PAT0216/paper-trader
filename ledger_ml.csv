@@ -615,3 +615,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-01-15,V,BUY,329.33,2,658.67,1659.36,8126.05,ml,,
 2026-01-15,PSKY,BUY,12.09,1,12.09,1647.27,8126.04,ml,,
 2026-01-15,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10856.73,ml,,
+2026-01-16,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10793.5,ml,,
