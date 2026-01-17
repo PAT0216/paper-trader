@@ -331,9 +331,17 @@ def load_spy_benchmark() -> pd.DataFrame:
 
 
 def get_portfolio_value(df: pd.DataFrame) -> float:
+    """Get latest portfolio value from VALUE entries (stocks + cash)."""
     if df.empty:
         return 0
+    # Use VALUE entries which contain correct portfolio value (stocks + cash)
+    if 'action' in df.columns:
+        value_rows = df[df['action'] == 'VALUE']
+        if not value_rows.empty:
+            return value_rows.iloc[-1]['total_value']
+    # Fallback to last row if no VALUE entries
     return df.iloc[-1]['total_value']
+
 
 
 def get_holdings(df: pd.DataFrame) -> pd.DataFrame:
@@ -554,19 +562,14 @@ cols = st.columns(len(data) + 1)  # +1 for benchmark comparison
 
 for i, (pid, df) in enumerate(data.items()):
     with cols[i]:
-        # Use snapshot value if available, otherwise fallback to ledger
-        if pid in snapshot_portfolios:
-            value = snapshot_portfolios[pid]['value']
-            pnl_pct = snapshot_portfolios[pid]['return_pct']
-            start = snapshot.get('initial_capital', 10000)
-            pnl = value - start
-        else:
-            value = get_portfolio_value(df)
-            start = df[df['action'] == 'DEPOSIT']['amount'].sum()
-            if start == 0:
-                start = 10000
-            pnl = value - start
-            pnl_pct = (pnl / start) * 100 if start > 0 else 0
+        # ALWAYS use ledger VALUE entries as source of truth (most accurate)
+        value = get_portfolio_value(df)
+        start = df[df['action'] == 'DEPOSIT']['amount'].sum()
+        if start == 0:
+            start = 10000
+        pnl = value - start
+        pnl_pct = (pnl / start) * 100 if start > 0 else 0
+
         
         color_class = "positive" if pnl >= 0 else "negative"
         arrow = "+" if pnl >= 0 else ""
@@ -662,6 +665,7 @@ for pid, df in data.items():
     if not history.empty:
         portfolio_histories[pid] = history
         all_portfolio_dates.update(history['date'].tolist())
+
 
 # Add portfolio traces
 for pid, history in portfolio_histories.items():
