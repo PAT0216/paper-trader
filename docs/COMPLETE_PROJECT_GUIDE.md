@@ -2,15 +2,15 @@
 
 > **Private Documentation** - Comprehensive guide to the entire system architecture.
 
-**Last Updated**: December 2025  
+**Last Updated**: January 2026 (v2.0.0)  
 **Transaction Costs**: 5 bps slippage on all trades
 
 ---
 
 ##  System Overview
 
-Paper Trader AI is a **dual-portfolio algorithmic trading system** that:
-- Runs **two independent strategies** (Momentum + ML) in parallel
+Paper Trader AI is a **triple-portfolio algorithmic trading system** that:
+- Runs **three independent strategies** (Momentum, ML, LSTM) in parallel
 - Uses **SQLite caching** to store 4M+ rows of market data
 - Applies **realistic transaction costs** (5 basis points slippage)
 - Deploys via **GitHub Actions** for automated daily trading
@@ -169,44 +169,59 @@ data = fetch_from_cache_only(['AAPL'], '2024-01-01', '2025-01-01')
 
 ### Data Flow
 ```
-GitHub Actions → main.py → ledger_*.csv → dashboard/app.py
-                         → portfolio_snapshot.json
+GitHub Actions → main.py → data/ledgers/ledger_*.csv → dashboard/app.py
+                         → data/snapshots/*.json
+                         → data/portfolio_snapshot.json
 ```
 
 ---
 
-##  File Structure
+##  File Structure (v2.0.0)
 
 ```
 paper-trader/
 ├── main.py                              # Core orchestrator
 ├── config/
 │   └── trading.yaml                     # Strategy configuration
-├── data/
-│   ├── market.db                        # SQLite cache
-│   ├── portfolio_snapshot.json          # Dashboard data
-│   ├── spy_benchmark.json               # SPY history
-│   └── sp500_tickers.txt                # Universe
 ├── src/
-│   ├── data/                            # Cache & loader
+│   ├── strategies/                      # Strategy implementations
+│   │   ├── base.py                      # BaseStrategy ABC
+│   │   ├── momentum_strategy.py         # 12-1 month momentum
+│   │   ├── ml_strategy.py               # XGBoost ensemble
+│   │   ├── lstm_strategy.py             # LSTM neural network
+│   │   └── registry.py                  # Strategy factory
+│   ├── models/                          # ML models
+│   │   ├── trainer.py                   # XGBoost training
+│   │   ├── training_utils.py            # Shared utilities
+│   │   └── lstm/                        # LSTM model
+│   ├── trading/                         # Portfolio & risk
+│   │   ├── portfolio.py                 # Ledger management
+│   │   ├── ledger_utils.py              # Ledger utilities
+│   │   └── risk_manager.py              # Position sizing
+│   ├── data/                            # Data layer
+│   │   ├── cache.py                     # SQLite cache
+│   │   ├── loader.py                    # Data fetching
+│   │   └── price_utils.py               # Price utilities
 │   ├── features/                        # Technical indicators
-│   ├── models/                          # XGBoost training & prediction
-│   ├── trading/                         # Portfolio & risk management
-│   └── backtesting/                     # Costs & performance
+│   └── backtesting/                     # Backtest engine
+├── data/
+│   ├── ledgers/                         # Trade ledgers
+│   │   ├── ledger_ml.csv
+│   │   ├── ledger_lstm.csv
+│   │   └── ledger_momentum.csv
+│   ├── snapshots/                       # Per-strategy snapshots
+│   ├── market.db                        # SQLite cache
+│   └── portfolio_snapshot.json          # Consolidated metrics
 ├── scripts/
-│   ├── backtests/                       # Walk-forward backtests
-│   ├── validation/                      # PIT backtests
-│   └── utils/                           # Utility scripts
+│   ├── utils/                           # Utility scripts
+│   └── simulate_production.py           # 3-day trade simulation
 ├── dashboard/
 │   └── app.py                           # Streamlit application
 ├── models/
 │   ├── xgb_ensemble.joblib              # Trained model
 │   └── model_metadata.json              # Features & metrics
-├── ledger_ml.csv                        # ML trade history
-├── ledger_momentum.csv                  # Momentum trade history
-└── docs/
-    ├── MANUAL.md                        # Technical reference
-    └── COMPLETE_PROJECT_GUIDE.md        # This file
+├── tests/                               # 42 unit tests
+└── docs/                                # Documentation
 ```
 
 ---
@@ -247,9 +262,11 @@ make clean      # Clean artifacts
 
 | Workflow | Schedule | Action |
 |----------|----------|--------|
-| `momentum.yml` | 1st of month, 2pm PT | Monthly momentum rebalance |
-| `ml_strategy.yml` | Daily, 1pm PT | Daily ML trades |
-| `update_cache.yml` | Daily, 6am PT | Refresh market data |
+| `strategy-trade.yml` | Uses reusable template | Shared trade logic |
+| `momentum_trade.yml` | 1st-3rd of month, 10pm UTC | Monthly rebalance |
+| `ml_trade.yml` | Daily, 9:30pm UTC | Daily ML trades |
+| `lstm_trade.yml` | Daily, 9:45pm UTC | Daily LSTM trades |
+| `cache_refresh.yml` | Daily, 9pm UTC | Refresh market data |
 
 ### Secrets Required
 - `GH_TOKEN` - For pushing ledger updates
@@ -276,4 +293,4 @@ make clean      # Clean artifacts
 
 ---
 
-*Built by Prabuddha Tamhane • December 2025*
+*Built by Prabuddha Tamhane • v2.0.0 January 2026*

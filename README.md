@@ -4,6 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
 ![Strategy](https://img.shields.io/badge/strategy-triple--portfolio-orange)
+![Version](https://img.shields.io/badge/version-2.0.0-green)
 
 **Paper Trader AI** is a production-grade algorithmic trading system featuring a **Triple Portfolio Architecture** that runs three independent strategies simultaneously for performance comparison.
 
@@ -16,9 +17,9 @@
 
 | Portfolio | Strategy | Schedule | Ledger |
 |-----------|----------|----------|--------|
-| **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `ledger_momentum.csv` |
-| **ML** | XGBoost ensemble predictions | Daily (weekdays) | `ledger_ml.csv` |
-| **LSTM** | TensorFlow neural network | Daily (weekdays) | `ledger_lstm.csv` |
+| **Momentum** | 12-month momentum + 15% stop-loss | Monthly (1st trading day) | `data/ledgers/ledger_momentum.csv` |
+| **ML** | XGBoost ensemble predictions | Daily (weekdays) | `data/ledgers/ledger_ml.csv` |
+| **LSTM** | TensorFlow neural network | Daily (weekdays) | `data/ledgers/ledger_lstm.csv` |
 
 ### Performance With Transaction Costs (Oct 1 - Dec 19, 2025)
 
@@ -180,26 +181,41 @@ paper-trader/
 ├── config/
 │   └── trading.yaml                # All configuration
 ├── src/
-│   ├── strategies/                 # Strategy infrastructure
+│   ├── strategies/                 # Strategy implementations
 │   │   ├── base.py                 # BaseStrategy ABC
-│   │   ├── momentum_strategy.py    # Momentum implementation
-│   │   ├── ml_strategy.py          # ML implementation
+│   │   ├── momentum_strategy.py    # Momentum (12-1 month)
+│   │   ├── ml_strategy.py          # XGBoost ensemble
+│   │   ├── lstm_strategy.py        # LSTM neural network
 │   │   └── registry.py             # Strategy factory
-│   ├── models/                     # ML models (XGBoost)
-│   ├── trading/                    # Portfolio & risk management
+│   ├── models/                     # ML models
+│   │   ├── trainer.py              # XGBoost training
+│   │   ├── training_utils.py       # Shared training utilities (NEW v2.0)
+│   │   └── lstm/                   # LSTM model
+│   ├── trading/                    # Portfolio & risk
+│   │   ├── portfolio.py            # Ledger management
+│   │   ├── ledger_utils.py         # Ledger utilities (NEW v2.0)
+│   │   └── risk_manager.py         # Position sizing
+│   ├── data/                       # Data layer
+│   │   ├── loader.py               # Data fetching
+│   │   ├── cache.py                # SQLite cache
+│   │   └── price_utils.py          # Price utilities (NEW v2.0)
 │   ├── features/                   # Technical indicators
-│   ├── backtesting/                # Costs & performance metrics
-│   └── data/                       # Data loading & caching
+│   └── backtesting/                # Backtest engine
 ├── scripts/
-│   ├── backtests/                  # Backtest scripts
-│   ├── validation/                 # PIT validation scripts
-│   └── utils/                      # Utility scripts
+│   ├── utils/                      # Utility scripts
+│   │   └── compute_portfolio_snapshot.py
+│   └── simulate_production.py      # Production simulation (NEW v2.0)
 ├── dashboard/
 │   └── app.py                      # Streamlit dashboard
 ├── data/
+│   ├── ledgers/                    # Trade ledgers (NEW v2.0)
+│   │   ├── ledger_ml.csv
+│   │   ├── ledger_lstm.csv
+│   │   └── ledger_momentum.csv
+│   ├── snapshots/                  # Per-strategy snapshots
 │   ├── market.db                   # SQLite price cache
-│   ├── portfolio_snapshot.json     # Dashboard metrics
-│   └── spy_benchmark.json          # SPY chart data
+│   └── portfolio_snapshot.json     # Consolidated metrics
+├── tests/                          # Unit tests (42 tests)
 ├── .github/workflows/              # CI/CD automation
 └── docs/                           # Documentation
 ```
@@ -242,4 +258,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-*Built by Prabuddha Tamhane - December 2025*
+*Built by Prabuddha Tamhane - v2.0.0 January 2026*
