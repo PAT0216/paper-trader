@@ -105,7 +105,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
     print("ML TRAINING PIPELINE (Phase 3 - Anti-Leakage)")
     print("=" * 60)
     
-    print("\n📊 Preparing training data...")
+    print("\n[Data] Preparing training data...")
     all_features = []
     
     for ticker, df in data_dict.items():
@@ -121,7 +121,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
         all_features.append(processed_df)
     
     if not all_features:
-        print("❌ No data to train on.")
+        print("[Error] No data to train on.")
         return None
     
     full_df = pd.concat(all_features)
@@ -153,14 +153,14 @@ def train_model(data_dict, n_splits=5, save_model=True):
     
     dropped = len(full_df) - len(X)
     if dropped > 0:
-        print(f"   ⚠️ Dropped {dropped:,} rows with inf/NaN values")
+        print(f"   [Warn] Dropped {dropped:,} rows with inf/NaN values")
     
     print(f"   Final samples: {len(X):,}")
     print(f"   Features: {len(FEATURE_COLUMNS)}")
     print(f"   Target: Next-day return (regression)")
     
     # Time-Series Cross-Validation
-    print(f"\n⏱️  Running {n_splits}-fold Time-Series Cross-Validation...")
+    print(f"\n[CV] Running {n_splits}-fold Time-Series Cross-Validation...")
     tscv = TimeSeriesSplit(n_splits=n_splits)
     
     fold_metrics = []
@@ -227,7 +227,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
     avg_spearman = np.mean([m['spearman'] for m in fold_metrics])
     avg_top_k = np.mean([m['top_k_accuracy'] for m in fold_metrics])
     
-    print(f"\n📈 Cross-Validation Summary:")
+    print(f"\n[Results] Cross-Validation Summary:")
     print(f"   Avg RMSE: {avg_rmse:.4f} ({avg_rmse*100:.2f}% return)")
     print(f"   Avg MAE:  {avg_mae:.4f}")
     print(f"   Avg R²:   {avg_r2:.4f}")
@@ -238,7 +238,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
     print(f"   Avg Top-10% Accuracy:   {avg_top_k:.2%}")
     
     # Final model: train on ALL data
-    print(f"\n🏋️ Training final model on all {len(X):,} samples...")
+    print(f"\n[Training] Training final model on all {len(X):,} samples...")
     final_model = xgb.XGBRegressor(
         n_estimators=100,
         learning_rate=0.05,
@@ -251,7 +251,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
     # ==================== NOISE-BASED FEATURE SELECTION (Phase 3.7) ====================
     # Compare features against random noise to keep only those with real predictive power
     
-    print(f"\n🔍 Noise-Based Feature Selection:")
+    print(f"\n[Features] Noise-Based Feature Selection:")
     useful_features = select_features_better_than_noise(X, y, FEATURE_COLUMNS)
     dropped_features = [f for f in FEATURE_COLUMNS if f not in useful_features]
     
@@ -259,13 +259,13 @@ def train_model(data_dict, n_splits=5, save_model=True):
     print(f"   Selected: {useful_features}")
     
     if dropped_features:
-        print(f"   ⚠️  Dropping (worse than noise): {dropped_features}")
+        print(f"   [Warn] Dropping (worse than noise): {dropped_features}")
         
         # Retrain with only useful features (maintaining original order)
         feature_indices = [i for i, f in enumerate(FEATURE_COLUMNS) if f in useful_features]
         X_selected = X[:, feature_indices]
         
-        print(f"\n🔄 Retraining with {len(useful_features)} selected features...")
+        print(f"\n[Retrain] Retraining with {len(useful_features)} selected features...")
         final_model = xgb.XGBRegressor(
             n_estimators=100,
             learning_rate=0.05,
@@ -281,7 +281,7 @@ def train_model(data_dict, n_splits=5, save_model=True):
             'importance': final_model.feature_importances_
         }).sort_values('importance', ascending=False)
     else:
-        print("   ✅ All features beat noise - keeping all")
+        print("   [OK] All features beat noise - keeping all")
         feature_importance = pd.DataFrame({
             'feature': FEATURE_COLUMNS,
             'importance': final_model.feature_importances_
@@ -388,15 +388,15 @@ def train_model(data_dict, n_splits=5, save_model=True):
         }
         joblib.dump(model_data, MODEL_FILE)
         
-        print(f"\n💾 Model saved:")
+        print(f"\n[Saved] Model saved:")
         print(f"   JSON (portable): {model_json_path}")
         print(f"   Metadata: {metadata_path}")
         print(f"   Legacy pickle: {MODEL_FILE}")
         print(f"   Selected features: {selected_features}")
         print(f"   Prediction range: [{np.min(train_predictions):.4f}, {np.max(train_predictions):.4f}]")
     
-    print(f"📊 Metrics saved to {RESULTS_LIVE_DIR}/metrics.txt")
-    print(f"📈 Feature importance saved to {RESULTS_LIVE_DIR}/feature_importance.png")
+    print(f"[Metrics] Metrics saved to {RESULTS_LIVE_DIR}/metrics.txt")
+    print(f"[Chart] Feature importance saved to {RESULTS_LIVE_DIR}/feature_importance.png")
     
     return final_model
 
@@ -473,7 +473,7 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
     }
     
     for horizon in HORIZONS:
-        print(f"\n🎯 Training {horizon}-day horizon model...")
+        print(f"\n[Horizon] Training {horizon}-day horizon model...")
         
         # Prepare data with specific horizon
         all_features = []
@@ -484,7 +484,7 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
             all_features.append(processed_df)
         
         if not all_features:
-            print(f"   ❌ No data for {horizon}-day horizon")
+            print(f"   [Error] No data for {horizon}-day horizon")
             continue
         
         full_df = pd.concat(all_features).sort_index()
@@ -513,7 +513,7 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
         print(f"   Samples: {len(X):,}")
         
         if len(X) < 1000:
-            print(f"   ❌ Insufficient samples for {horizon}-day horizon")
+            print(f"   [Error] Insufficient samples for {horizon}-day horizon")
             continue
         
         # STEP 1: Train quick model for feature selection (matching fair_comparison)
@@ -579,13 +579,13 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
         
         ensemble['models'][horizon] = final_model
         ensemble['selected_features'][horizon] = selected_features
-        print(f"   ✅ {horizon}-day model ready ({len(selected_features)} features)")
+        print(f"   [OK] {horizon}-day model ready ({len(selected_features)} features)")
     
     # Save ensemble
     if save_model:
         os.makedirs(MODEL_PATH, exist_ok=True)
         joblib.dump(ensemble, ENSEMBLE_FILE)
-        print(f"\n💾 Ensemble saved to {ENSEMBLE_FILE}")
+        print(f"\n[Saved] Ensemble saved to {ENSEMBLE_FILE}")
     
     # Also save single-horizon model for backward compatibility
     if 1 in ensemble['models']:
@@ -595,10 +595,10 @@ def train_ensemble(data_dict, n_splits=5, save_model=True):
             'all_features': FEATURE_COLUMNS
         }
         joblib.dump(single_model_data, MODEL_FILE)
-        print(f"💾 Single model (1-day) saved to {MODEL_FILE}")
+        print(f"[Saved] Single model (1-day) saved to {MODEL_FILE}")
     
     print("\n" + "=" * 60)
-    print("✅ MULTI-HORIZON ENSEMBLE TRAINING COMPLETE")
+    print("[OK] MULTI-HORIZON ENSEMBLE TRAINING COMPLETE")
     print("=" * 60)
     print(f"   Horizons: {HORIZONS}")
     print(f"   Weights: {list(HORIZON_WEIGHTS.values())}")
