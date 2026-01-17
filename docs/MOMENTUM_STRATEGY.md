@@ -137,7 +137,7 @@ The workflow runs on days 1-3 to catch the first trading day regardless of weeke
 |------|---------|
 | `src/strategies/momentum_strategy.py` | Strategy implementation |
 | `config/settings.yaml` | Risk configuration |
-| `ledger_momentum.csv` | Trade history |
+| `data/ledgers/ledger_momentum.csv` | Trade history |
 | `.github/workflows/momentum_trade.yml` | Automation |
 | `scripts/validation/momentum_rebalance_comparison.py` | Backtest comparison |
 
@@ -152,7 +152,7 @@ flowchart LR
     C --> D[Rank & Select Top 10]
     D --> E[Apply Risk Limits]
     E --> F[Execute Trades]
-    F --> G[ledger_momentum.csv]
+    F --> G[data/ledgers/ledger_momentum.csv]
     G --> H[Dashboard]
 ```
 
@@ -164,8 +164,8 @@ This strategy runs independently alongside the ML strategy:
 
 | Portfolio | Strategy | Ledger |
 |-----------|----------|--------|
-| Momentum | This strategy | `ledger_momentum.csv` |
-| ML | XGBoost ensemble | `ledger_ml.csv` |
+| Momentum | This strategy | `data/ledgers/ledger_momentum.csv` |
+| ML | XGBoost ensemble | `data/ledgers/ledger_ml.csv` |
 
 ### Live Dashboard
 View real-time comparison at: **[paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)**

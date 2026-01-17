@@ -2,7 +2,7 @@
 
 > **Complete Technical Reference** - All functions, classes, and modules documented
 
-**Last Updated**: December 2025  
+**Last Updated**: January 2026 (v2.0.0)  
 **Version**: 2.0 (with Transaction Costs)
 
 ---
@@ -695,7 +695,7 @@ make clean      # Clean artifacts
 
 ---
 
-## Current Performance (Dec 2025)
+## Current Performance (Jan 2026)
 
 ### With 5 bps Transaction Costs (Oct 1 - Dec 19, 2025)
 

@@ -92,7 +92,7 @@ jobs:
           git config user.name "PAT0216"
           git config user.email "69978508+PAT0216@users.noreply.github.com"
           date > .cache_last_updated
-          git add .cache_last_updated data/portfolio_snapshot.json data/spy_benchmark.json ledger_*.csv
+          git add .cache_last_updated data/portfolio_snapshot.json data/spy_benchmark.json data/ledgers/ledger_*.csv
           git diff --cached --quiet || git commit -m "📦 Cache + snapshot updated $(date +%Y-%m-%d)"
           git pull --rebase origin main || true
           git push || echo "No changes to push"

@@ -109,7 +109,7 @@ sequenceDiagram
     participant Trainer as trainer.py
     participant Predictor as predictor.py
     participant Portfolio as portfolio.py
-    participant Ledger as ledger_ml.csv
+    participant Ledger as data/ledgers/ledger_ml.csv
 
     Note over Cache: 9 PM UTC: Cache Refresh
     Cache->>Cache: Update prices via yfinance
@@ -192,7 +192,7 @@ xgb_params = {
 | `src/models/predictor.py` | Ensemble predictions |
 | `src/features/indicators.py` | Technical feature generation |
 | `config/settings.yaml` | Risk settings |
-| `ledger_ml.csv` | Trade history |
+| `data/ledgers/ledger_ml.csv` | Trade history |
 | `.github/workflows/ml_trade.yml` | Daily automation |
 
 ---
@@ -295,7 +295,7 @@ flowchart LR
     D --> E[Ensemble Prediction]
     E --> F[Risk Manager]
     F --> G[Trade Execution]
-    G --> H[ledger_ml.csv]
+    G --> H[data/ledgers/ledger_ml.csv]
     H --> I[Dashboard]
     B --> J[portfolio_snapshot.json]
     J --> I
