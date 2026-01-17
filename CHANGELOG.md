@@ -5,7 +5,63 @@ All notable changes to the Paper Trader AI project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-01-17
+
+### Major Architecture Refactoring (5 Phases Complete)
+
+Comprehensive codebase modernization focused on modularity, maintainability, and reduced complexity.
+
+#### Code Reductions
+
+| Component | Before | After | Reduction |
+|-----------|--------|-------|-----------|
+| Workflows | 369 | 134 | **-64%** |
+| momentum_strategy.py | 421 | 139 | **-67%** |
+| main.py | 393 | 360 | **-8%** |
+| compute_portfolio_snapshot.py | 605 | 434 | **-28%** |
+
+#### New Modules Created
+
+| Module | Lines | Purpose |
+|--------|-------|---------|
+| `src/trading/ledger_utils.py` | 158 | Ledger parsing and VALUE entry management |
+| `src/data/price_utils.py` | 98 | Price fetching and portfolio value computation |
+| `src/models/training_utils.py` | 209 | Shared ML training utilities |
+
+#### Phase 1: Workflow Consolidation
+- Created reusable `strategy-trade.yml` template
+- Reduced 3 duplicate workflows to single source of truth
+- Fixed workflow push to use triggering branch (not hardcoded main)
+
+#### Phase 2: main.py Simplification
+- Moved strategy-specific logic to `strategy.rank_universe()`
+- Reduced inline momentum/ML scoring code
+
+#### Phase 3: Strategy Cleanup
+- Removed 12 unused methods from `momentum_strategy.py`
+- Aligned with lean structure of other strategy classes
+
+#### Phase 4: Snapshot Simplification
+- Extracted `ledger_utils.py` for ledger operations
+- Extracted `price_utils.py` for price fetching
+- Modularized compute_portfolio_snapshot.py
+
+#### Phase 5: Trainer Cleanup
+- Removed 19 emoji print statements from trainer.py
+- Created training_utils.py with shared functions
+
+#### Dashboard Fix
+- Fixed `get_portfolio_value()` to use VALUE entries (stocks + cash)
+- Hero metrics and graph now show consistent, accurate values
+
+#### Tests
+- All 42 unit tests pass
+- CI workflows verified on dev branch
+
+---
+
 ## [1.9.5] - 2026-01-16
+
 
 ### Add Local Testing Safeguard
 
