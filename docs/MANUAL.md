@@ -72,7 +72,7 @@ flowchart TB
 │ • 12-1 Momentum   │     │ • XGBoost Ensemble│     │ • TensorFlow NN   │
 │ • Monthly Rebal   │     │ • Daily Rebalance │     │ • Daily Rebalance │
 │ • 10 Positions    │     │ • 10 Positions    │     │ • 10 Positions    │
-│ ledger_momentum   │     │ ledger_ml.csv     │     │ ledger_lstm.csv   │
+│ ledger_momentum   │     │ data/ledgers/ledger_ml.csv     │     │ data/ledgers/ledger_lstm.csv   │
 └───────────────────┘     └───────────────────┘     └───────────────────┘
                                       │
                                       ▼
@@ -457,8 +457,8 @@ Manages trade recording and portfolio state.
 | `record_trade` | `ticker, action, price, shares, strategy, momentum_score` | bool | Log trade to CSV |
 
 **Ledger Files**:
-- `ledger_momentum.csv` - Momentum strategy trades
-- `ledger_ml.csv` - ML strategy trades
+- `data/ledgers/ledger_momentum.csv` - Momentum strategy trades
+- `data/ledgers/ledger_ml.csv` - ML strategy trades
 
 **CSV Schema**:
 ```
@@ -642,8 +642,8 @@ Streamlit-based live dashboard.
 
 **Data Sources**:
 - `data/portfolio_snapshot.json` - Summary metrics
-- `ledger_momentum.csv` - Trade history
-- `ledger_ml.csv` - Trade history
+- `data/ledgers/ledger_momentum.csv` - Trade history
+- `data/ledgers/ledger_ml.csv` - Trade history
 - `data/spy_benchmark.json` - SPY comparison
 
 ---
@@ -745,8 +745,8 @@ paper-trader/
 │   └── utils/                           # Utility scripts
 ├── dashboard/
 │   └── app.py                           # Streamlit dashboard
-├── ledger_ml.csv                        # ML trade history
-└── ledger_momentum.csv                  # Momentum trade history
+├── data/ledgers/ledger_ml.csv                        # ML trade history
+└── data/ledgers/ledger_momentum.csv                  # Momentum trade history
 ```
 
 ---
