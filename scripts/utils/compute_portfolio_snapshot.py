@@ -108,9 +108,9 @@ def process_single_strategy(strategy: str) -> dict:
     This is the conflict-free approach - each workflow writes to its own file.
     """
     ledgers = {
-        'momentum': 'ledger_momentum.csv',
-        'ml': 'ledger_ml.csv',
-        'lstm': 'ledger_lstm.csv'
+        'momentum': 'data/ledgers/ledger_momentum.csv',
+        'ml': 'data/ledgers/ledger_ml.csv',
+        'lstm': 'data/ledgers/ledger_lstm.csv'
     }
     
     if strategy not in ledgers:
@@ -223,7 +223,7 @@ def add_spy_benchmark(snapshot: dict):
     try:
         # Get first ledger date
         first_date = None
-        ledgers = ['ledger_momentum.csv', 'ledger_ml.csv', 'ledger_lstm.csv']
+        ledgers = ['data/ledgers/ledger_momentum.csv', 'data/ledgers/ledger_ml.csv', 'data/ledgers/ledger_lstm.csv']
         for path in ledgers:
             if os.path.exists(path):
                 df = pd.read_csv(path)

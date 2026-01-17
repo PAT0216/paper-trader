@@ -283,7 +283,7 @@ def load_portfolio_data(portfolio_id: str) -> pd.DataFrame:
     if portfolio_id == "default":
         path = "ledger.csv"
     else:
-        path = f"ledger_{portfolio_id}.csv"
+        path = f"data/ledgers/ledger_{portfolio_id}.csv"
     
     for base in ["", "../", "../../"]:
         full_path = base + path

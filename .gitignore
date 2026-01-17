@@ -44,3 +44,8 @@ docs/SENTINULL_PLAN.md
 docs/QUANT_UPGRADE_ROADMAP.md
 docs/STRATEGY_FEATURES_GUIDE.md
 docs/DEVELOPMENT.md
+.archive/
+.sentinull/
+.data_sentinull/
+.config_sentinull.yaml
+.tests_sentinull/

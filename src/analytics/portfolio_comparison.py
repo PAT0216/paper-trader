@@ -36,9 +36,9 @@ class PortfolioComparison:
     def load_portfolio(self, portfolio_id: str) -> Optional[pd.DataFrame]:
         """Load ledger for a portfolio."""
         if portfolio_id == "default":
-            path = "ledger.csv"
+            path = "data/ledgers/ledger.csv"
         else:
-            path = f"ledger_{portfolio_id}.csv"
+            path = f"data/ledgers/ledger_{portfolio_id}.csv"
         
         if not os.path.exists(path):
             return None
@@ -175,13 +175,15 @@ def get_portfolio_summary() -> Dict:
     
     # Find all ledger files
     portfolios = []
-    for f in os.listdir('.'):
-        if f.startswith('ledger') and f.endswith('.csv'):
-            if f == 'ledger.csv':
-                portfolios.append('default')
-            else:
-                pid = f.replace('ledger_', '').replace('.csv', '')
-                portfolios.append(pid)
+    ledger_dir = 'data/ledgers'
+    if os.path.exists(ledger_dir):
+        for f in os.listdir(ledger_dir):
+            if f.startswith('ledger') and f.endswith('.csv'):
+                if f == 'ledger.csv':
+                    portfolios.append('default')
+                else:
+                    pid = f.replace('ledger_', '').replace('.csv', '')
+                    portfolios.append(pid)
     
     return {
         'portfolios': portfolios,

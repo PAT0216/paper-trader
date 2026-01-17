@@ -26,9 +26,9 @@ class Portfolio:
         
         # Each portfolio has its own ledger file
         if portfolio_id == "default":
-            self.ledger_file = "ledger.csv"
+            self.ledger_file = "data/ledgers/ledger.csv"
         else:
-            self.ledger_file = f"ledger_{portfolio_id}.csv"
+            self.ledger_file = f"data/ledgers/ledger_{portfolio_id}.csv"
         
         # Enhanced columns with strategy tracking
         self.columns = [

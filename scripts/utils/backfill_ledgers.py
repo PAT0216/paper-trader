@@ -221,8 +221,8 @@ def run_momentum_backfill():
     
     # Save the ledger (trades only - dashboard computes daily values dynamically)
     df = pd.DataFrame(ledger)
-    df.to_csv('ledger_momentum.csv', index=False)
-    print(f"\n✅ Saved ledger_momentum.csv with {len(df)} entries")
+    df.to_csv('data/ledgers/ledger_momentum.csv', index=False)
+    print(f"\n✅ Saved data/ledgers/ledger_momentum.csv with {len(df)} entries")
     return df
 
 
@@ -359,8 +359,8 @@ def run_ml_backfill():
             continue
     
     df = pd.DataFrame(ledger)
-    df.to_csv('ledger_ml.csv', index=False)
-    print(f"\n✅ Saved ledger_ml.csv with {len(df)} entries")
+    df.to_csv('data/ledgers/ledger_ml.csv', index=False)
+    print(f"\n✅ Saved data/ledgers/ledger_ml.csv with {len(df)} entries")
     return df
 
 
@@ -377,7 +377,7 @@ if __name__ == "__main__":
     print("=" * 60)
     
     # Check momentum ledger
-    mom_df = pd.read_csv('ledger_momentum.csv')
+    mom_df = pd.read_csv('data/ledgers/ledger_momentum.csv')
     print(f"\nMomentum Ledger:")
     print(f"  Entries: {len(mom_df)}")
     print(f"  Date range: {mom_df['date'].min()} to {mom_df['date'].max()}")
@@ -387,7 +387,7 @@ if __name__ == "__main__":
         print(f"  Final value: ${mom_df.iloc[-1]['total_value']:,.0f}")
     
     # Check ML ledger
-    ml_df = pd.read_csv('ledger_ml.csv')
+    ml_df = pd.read_csv('data/ledgers/ledger_ml.csv')
     print(f"\nML Ledger:")
     print(f"  Entries: {len(ml_df)}")
     print(f"  Date range: {ml_df['date'].min()} to {ml_df['date'].max()}")

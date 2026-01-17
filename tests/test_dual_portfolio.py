@@ -22,6 +22,7 @@ class TestDualPortfolio:
         self.temp_dir = tempfile.mkdtemp()
         self.original_dir = os.getcwd()
         os.chdir(self.temp_dir)
+        os.makedirs("data/ledgers", exist_ok=True)
     
     def teardown_method(self):
         """Clean up temp files."""
@@ -37,10 +38,10 @@ class TestDualPortfolio:
         ml_pf = Portfolio(portfolio_id="ml", start_cash=100000)
         
         # Verify separate files
-        assert mom_pf.ledger_file == "ledger_momentum.csv"
-        assert ml_pf.ledger_file == "ledger_ml.csv"
-        assert os.path.exists("ledger_momentum.csv")
-        assert os.path.exists("ledger_ml.csv")
+        assert mom_pf.ledger_file == "data/ledgers/ledger_momentum.csv"
+        assert ml_pf.ledger_file == "data/ledgers/ledger_ml.csv"
+        assert os.path.exists("data/ledgers/ledger_momentum.csv")
+        assert os.path.exists("data/ledgers/ledger_ml.csv")
     
     def test_portfolios_are_isolated(self):
         """Trades in one portfolio should not affect another."""
@@ -65,7 +66,7 @@ class TestDualPortfolio:
         from src.trading.portfolio import Portfolio
         
         pf = Portfolio(portfolio_id="default", start_cash=100000)
-        assert pf.ledger_file == "ledger.csv"
+        assert pf.ledger_file == "data/ledgers/ledger.csv"
     
     def test_start_cash_configurable(self):
         """Each portfolio should respect its start_cash."""
@@ -87,6 +88,7 @@ class TestPortfolioComparison:
         self.temp_dir = tempfile.mkdtemp()
         self.original_dir = os.getcwd()
         os.chdir(self.temp_dir)
+        os.makedirs("data/ledgers", exist_ok=True)
     
     def teardown_method(self):
         """Clean up."""
