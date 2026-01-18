@@ -1,4 +1,4 @@
-# QuantCore
+# Paper Trader AI
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.10-blue)
@@ -6,7 +6,7 @@
 ![Strategy](https://img.shields.io/badge/strategy-triple--portfolio-orange)
 ![Version](https://img.shields.io/badge/version-2.0.0-green)
 
-**QuantCore** is a production-grade algorithmic trading system featuring a **Triple Portfolio Architecture** that runs three independent strategies simultaneously for performance comparison.
+**Paper Trader AI** is a production-grade algorithmic trading system featuring a **Triple Portfolio Architecture** that runs three independent strategies simultaneously for performance comparison.
 
 ### [View Live Portfolio Dashboard](https://paper-trader-ai.streamlit.app/)
 > Real-time portfolio values, performance charts with SPY benchmark, and trade history updated daily.
