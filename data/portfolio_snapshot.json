@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-16T22:18:15.849876Z",
-  "price_date": "2025-12-22",
+  "timestamp": "2026-01-19T21:16:23.375036Z",
+  "price_date": "2026-01-16",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 10815.92,
-      "return_pct": 8.16,
+      "value": 11562.37,
+      "return_pct": 15.62,
       "cash": 1155.98,
       "holdings": {
         "LRCX": 6,
@@ -22,8 +22,8 @@
       "positions": 10
     },
     "ml": {
-      "value": 10898.5,
-      "return_pct": 8.99,
+      "value": 10761.01,
+      "return_pct": 7.61,
       "cash": 5061.71,
       "holdings": {
         "GLW": 11,
@@ -38,18 +38,18 @@
       "positions": 8
     },
     "lstm": {
-      "value": 10340.17,
-      "return_pct": 3.4,
+      "value": 10835.23,
+      "return_pct": 8.35,
       "cash": 1060.07,
       "holdings": {
         "LIN": 2,
         "MSI": 3,
         "VICI": 42,
         "SO": 9,
-        "PPL": 27,
         "DUK": 8,
-        "WEC": 10,
+        "PPL": 27,
         "IRM": 13,
+        "WEC": 10,
         "TSLA": 1,
         "AMD": 3,
         "NFLX": 3
