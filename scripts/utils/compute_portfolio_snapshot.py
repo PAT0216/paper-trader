@@ -310,9 +310,9 @@ def update_strategy_value(strategy: str) -> bool:
     Returns: True if updated, False if no update needed or error
     """
     ledger_paths = {
-        'momentum': 'ledger_momentum.csv',
-        'ml': 'ledger_ml.csv',
-        'lstm': 'ledger_lstm.csv'
+        'momentum': 'data/ledgers/ledger_momentum.csv',
+        'ml': 'data/ledgers/ledger_ml.csv',
+        'lstm': 'data/ledgers/ledger_lstm.csv'
     }
     
     if strategy not in ledger_paths:
