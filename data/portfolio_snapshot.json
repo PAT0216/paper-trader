@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-01-19T21:16:23.375036Z",
+  "timestamp": "2026-01-20T05:31:58.018182Z",
   "price_date": "2026-01-16",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11562.37,
+      "value": 11562.28,
       "return_pct": 15.62,
       "cash": 1155.98,
       "holdings": {
@@ -38,7 +38,7 @@
       "positions": 8
     },
     "lstm": {
-      "value": 10835.23,
+      "value": 10835.25,
       "return_pct": 8.35,
       "cash": 1060.07,
       "holdings": {
