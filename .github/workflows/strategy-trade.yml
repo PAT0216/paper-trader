@@ -53,13 +53,13 @@ jobs:
 
       - name: Run Strategy
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app paper-trader:latest \
+          docker run --rm -e GITHUB_ACTIONS=true -v ${{ github.workspace }}:/app paper-trader:latest \
             conda run --no-capture-output -n paper-trader \
             python main.py --mode trade --strategy ${{ inputs.strategy }} --portfolio ${{ inputs.strategy }}
 
       - name: Update Snapshot
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app paper-trader:latest \
+          docker run --rm -e GITHUB_ACTIONS=true -v ${{ github.workspace }}:/app paper-trader:latest \
             conda run --no-capture-output -n paper-trader \
             python scripts/utils/compute_portfolio_snapshot.py --strategy ${{ inputs.strategy }}
 
