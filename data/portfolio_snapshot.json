@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-20T21:48:47.650209Z",
+  "timestamp": "2026-01-20T21:58:38.085732Z",
   "price_date": "2026-01-20",
   "initial_capital": 10000,
   "portfolios": {
@@ -39,9 +39,9 @@
       "positions": 9
     },
     "lstm": {
-      "value": 10835.25,
-      "return_pct": 8.35,
-      "cash": 1060.07,
+      "value": 10728.76,
+      "return_pct": 7.29,
+      "cash": 1490.12,
       "holdings": {
         "LIN": 2,
         "MSI": 3,
@@ -50,12 +50,11 @@
         "DUK": 8,
         "PPL": 27,
         "IRM": 13,
-        "WEC": 10,
         "TSLA": 1,
-        "AMD": 3,
-        "NFLX": 3
+        "NFLX": 3,
+        "BAC": 26
       },
-      "positions": 11
+      "positions": 10
     }
   },
   "benchmark": {
