@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-21T21:24:03.358368Z",
+  "timestamp": "2026-01-21T21:55:53.610973Z",
   "price_date": "2026-01-20",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11533.08,
-      "return_pct": 15.33,
+      "value": 10815.92,
+      "return_pct": 8.16,
       "cash": 1155.98,
       "holdings": {
         "LRCX": 6,
