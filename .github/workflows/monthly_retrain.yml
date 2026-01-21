@@ -61,7 +61,7 @@ jobs:
         if: ${{ github.event.inputs.strategy == 'ml' || github.event.inputs.strategy == 'both' || github.event_name == 'schedule' }}
         run: |
           echo "Retraining ML Ensemble model..."
-          docker run --rm \
+          docker run --rm -e GITHUB_ACTIONS=true \
             -v ${{ github.workspace }}:/app \
             paper-trader:latest \
             conda run --no-capture-output -n paper-trader \
@@ -72,7 +72,7 @@ jobs:
         if: ${{ github.event.inputs.strategy == 'lstm' || github.event.inputs.strategy == 'both' || github.event_name == 'schedule' }}
         run: |
           echo "Retraining LSTM model..."
-          docker run --rm \
+          docker run --rm -e GITHUB_ACTIONS=true \
             -v ${{ github.workspace }}:/app \
             paper-trader:latest \
             conda run --no-capture-output -n paper-trader \

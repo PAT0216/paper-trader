@@ -143,8 +143,7 @@ def append_portfolio_value_to_ledger(
             'amount': 0.0,
             'cash_balance': 0.0,
             'total_value': round(value, 2),
-            'strategy': strategy,
-            'momentum_score' if 'momentum' in strategy else 'confidence': ''
+            'strategy': strategy
         }])
         
         # Append to ledger

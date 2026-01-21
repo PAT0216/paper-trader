@@ -15,6 +15,11 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import logging
 
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    from backports.zoneinfo import ZoneInfo
+
 from src.data.cache import DataCache, get_cache
 
 logger = logging.getLogger(__name__)
@@ -92,7 +97,8 @@ def _fetch_single_ticker(
             # We have cached data - only fetch new bars
             last_date = datetime.strptime(last_cached, '%Y-%m-%d')
             fetch_start = last_date + timedelta(days=1)
-            today = datetime.now()
+            ny_tz = ZoneInfo('America/New_York')
+            today = datetime.now(ny_tz)
             
             if fetch_start.date() > today.date():
                 # Cache is fully up to date (has today's data already)
