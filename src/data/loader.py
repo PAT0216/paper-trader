@@ -94,8 +94,8 @@ def _fetch_single_ticker(
             fetch_start = last_date + timedelta(days=1)
             today = datetime.now()
             
-            if fetch_start.date() >= today.date():
-                # Cache is up to date
+            if fetch_start.date() > today.date():
+                # Cache is fully up to date (has today's data already)
                 cached_df = cache.get_price_data(ticker)
                 if not cached_df.empty:
                     return cached_df
