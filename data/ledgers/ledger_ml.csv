@@ -639,3 +639,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-01-20,FDS,SELL,276.91,1,276.91,746.56,5982.56,ml,,
 2026-01-20,DECK,BUY,98.03,5,490.14,256.42,5982.56,ml,,
 2026-01-20,PFE,BUY,25.53,1,25.53,230.89,5953.84,ml,,
+2026-01-21,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10743.82,ml,,
