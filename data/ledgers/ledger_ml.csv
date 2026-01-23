@@ -647,3 +647,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-01-22,NWSA,BUY,26.74,2,53.49,2218.69,5594.3,ml,,
 2026-01-22,DIS,BUY,113.27,6,679.6,1539.09,5593.71,ml,,
 2026-01-22,KVUE,BUY,17.76,1,17.76,1521.33,5593.73,ml,,
+2026-01-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10676.41,ml,,

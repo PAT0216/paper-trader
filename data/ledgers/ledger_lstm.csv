@@ -218,3 +218,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-01-21,BAC,BUY,52.13,4,208.52,221.53,9319.74,lstm,,
 2026-01-21,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10767.01,lstm,,
 2026-01-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10761.14,lstm,,
+2026-01-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10769.21,lstm,,

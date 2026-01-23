@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-01-22T21:19:12.518523Z",
-  "price_date": "2026-01-22",
+  "timestamp": "2026-01-23T21:17:14.026551Z",
+  "price_date": "2026-01-23",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 11801.91,
+  "value": 11801.98,
   "return_pct": 18.02,
   "cash": 1155.98,
   "holdings": {
