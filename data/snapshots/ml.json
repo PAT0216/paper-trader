@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-01-23T21:17:14.400888Z",
+  "timestamp": "2026-01-23T21:46:53.631961Z",
   "price_date": "2026-01-23",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 10676.41,
+  "value": 10676.42,
   "return_pct": 6.76,
   "cash": 6476.15,
   "holdings": {
     "GLW": 11,
     "HPQ": 1,
-    "UNH": 2,
     "DIS": 12,
+    "UNH": 2,
     "KVUE": 3,
-    "PFE": 1,
     "DECK": 5,
-    "AMZN": 2,
-    "NWSA": 2
+    "PFE": 1,
+    "NWSA": 2,
+    "AMZN": 2
   },
   "positions": 9
 }

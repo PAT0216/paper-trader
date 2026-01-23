@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-23T21:17:14.779054Z",
+  "timestamp": "2026-01-23T21:46:53.632201Z",
   "price_date": "2026-01-23",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,19 +22,19 @@
       "positions": 10
     },
     "ml": {
-      "value": 10676.41,
+      "value": 10676.42,
       "return_pct": 6.76,
       "cash": 6476.15,
       "holdings": {
         "GLW": 11,
         "HPQ": 1,
-        "UNH": 2,
         "DIS": 12,
+        "UNH": 2,
         "KVUE": 3,
-        "PFE": 1,
         "DECK": 5,
-        "AMZN": 2,
-        "NWSA": 2
+        "PFE": 1,
+        "NWSA": 2,
+        "AMZN": 2
       },
       "positions": 9
     },
@@ -60,9 +60,9 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 689.13,
-    "return_pct": 3.4,
-    "value": 10339.84,
+    "end_price": 689.23,
+    "return_pct": 3.41,
+    "value": 10341.34,
     "start_date": "2025-10-01",
     "end_date": "2026-01-23"
   }
