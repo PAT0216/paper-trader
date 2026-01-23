@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-23T21:46:53.632201Z",
+  "timestamp": "2026-01-23T21:59:58.562445Z",
   "price_date": "2026-01-23",
   "initial_capital": 10000,
   "portfolios": {
@@ -47,8 +47,8 @@
         "MSI": 3,
         "VICI": 42,
         "SO": 9,
-        "DUK": 8,
         "PPL": 27,
+        "DUK": 8,
         "IRM": 13,
         "TSLA": 1,
         "NFLX": 3,
