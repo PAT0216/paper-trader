@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-26T21:19:34.273545Z",
+  "timestamp": "2026-01-26T21:50:31.681870Z",
   "price_date": "2026-01-26",
   "initial_capital": 10000,
   "strategy": "ml",
@@ -9,13 +9,13 @@
   "holdings": {
     "GLW": 11,
     "HPQ": 1,
-    "DIS": 12,
     "UNH": 2,
+    "DIS": 12,
     "KVUE": 3,
-    "DECK": 5,
     "PFE": 1,
-    "NWSA": 2,
-    "AMZN": 2
+    "DECK": 5,
+    "AMZN": 2,
+    "NWSA": 2
   },
   "positions": 9
 }

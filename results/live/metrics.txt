@@ -3,23 +3,23 @@ ML MODEL METRICS (Phase 3.7 - Noise-Based Feature Selection)
 ==================================================
 
 Cross-Validation Results:
-  Fold 1: RMSE=0.0154, MAE=0.0104, Dir.Acc=51.37%
-  Fold 2: RMSE=0.0164, MAE=0.0109, Dir.Acc=52.69%
-  Fold 3: RMSE=0.0252, MAE=0.0155, Dir.Acc=53.20%
+  Fold 1: RMSE=0.0154, MAE=0.0104, Dir.Acc=51.32%
+  Fold 2: RMSE=0.0164, MAE=0.0109, Dir.Acc=52.72%
+  Fold 3: RMSE=0.0252, MAE=0.0155, Dir.Acc=53.23%
   Fold 4: RMSE=0.0210, MAE=0.0147, Dir.Acc=51.55%
   Fold 5: RMSE=0.0200, MAE=0.0129, Dir.Acc=52.04%
 
 Average Metrics:
   RMSE: 0.0196
   MAE:  0.0129
-  R²:   -0.0038
+  R²:   -0.0035
   Directional Accuracy: 52.17%
 
   --- RANKING METRICS ---
-  Spearman Rank Corr: 0.0245
-  Top-10% Accuracy: 0.00%
+  Spearman Rank Corr: 0.0251
+  Top-10% Accuracy: 2.00%
 
-  Training Samples: 1,868,838
+  Training Samples: 1,869,333
   CV Folds: 5
 
 Noise-Based Feature Selection:
