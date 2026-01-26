@@ -220,3 +220,5 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-01-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10761.14,lstm,,
 2026-01-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10769.21,lstm,,
 2026-01-26,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10794.29,lstm,,
+2026-01-26,LIN,SELL,454.8,2,909.6,909.6,9169.46,lstm,,
+2026-01-26,NFLX,BUY,85.74,8,685.94,223.66,9169.46,lstm,,

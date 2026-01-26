@@ -1,22 +1,21 @@
 {
-  "timestamp": "2026-01-26T21:19:34.666131Z",
+  "timestamp": "2026-01-26T22:03:01.191694Z",
   "price_date": "2026-01-26",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 10794.29,
-  "return_pct": 7.94,
-  "cash": 1281.6,
+  "value": 10793.49,
+  "return_pct": 7.93,
+  "cash": 1505.26,
   "holdings": {
-    "LIN": 2,
     "MSI": 3,
     "VICI": 42,
     "SO": 9,
-    "PPL": 27,
     "DUK": 8,
+    "PPL": 27,
     "IRM": 13,
     "TSLA": 1,
-    "NFLX": 3,
+    "NFLX": 11,
     "BAC": 30
   },
-  "positions": 10
+  "positions": 9
 }
