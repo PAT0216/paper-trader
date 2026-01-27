@@ -48,3 +48,6 @@ docs/STRATEGY_FEATURES_GUIDE.md
 .data_sentinull/
 .config_sentinull.yaml
 .tests_sentinull/
+
+# Session progress notes
+progress.md

@@ -21,13 +21,12 @@
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `data/ledgers/ledger_ml.csv` |
 | **LSTM** | TensorFlow neural network | Daily (weekdays) | `data/ledgers/ledger_lstm.csv` |
 
-### Performance With Transaction Costs (Oct 1 - Dec 19, 2025)
+### Live Performance (Oct 1, 2025 - Jan 26, 2026)
 
 | Metric | Momentum | ML Ensemble | LSTM | SPY |
 |--------|----------|-------------|------|-----|
-| **Return** | +7.20% | +1.58% | +1.59% | +2.12% |
-| **Excess vs SPY** | +5.08% | -0.54% | -0.53% | — |
-| **Total Trades** | 50 | 526 | 134 | — |
+| **Return** | +18.65% | +6.95% | +7.93% | +3.94% |
+| **Excess vs SPY** | +14.71% | +3.01% | +3.99% | — |
 | **Slippage** | 5 bps | 5 bps | 5 bps | — |
 
 > All strategies include realistic transaction costs (5 basis points slippage on all trades).
@@ -87,7 +86,7 @@ cd dashboard && streamlit run app.py
 - **Portfolio drawdown control**: Warning at -15%, halt at -20%, liquidate at -25%
 
 ### Infrastructure
-- **SQLite data cache**: 4.3M+ rows, 503 S&P 500 tickers
+- **SQLite data cache**: 516 MB, 503 S&P 500 tickers
 - **GitHub Actions**: Automated trading + universe sync
 - **Streamlit Dashboard**: Live comparison with SPY benchmark
 - **Point-in-time Universe**: Monthly S&P 500 sync
@@ -102,7 +101,7 @@ cd dashboard && streamlit run app.py
 
 | Stage | Components | Description |
 |-------|------------|-------------|
-| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (4.3M+ rows) |
+| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (516 MB cache) |
 | **2. Feature Engineering** | Technical indicators, momentum factors, LSTM sequences | Transform raw data for model consumption |
 | **3. Model Layer** | Momentum, XGBoost Ensemble, LSTM Neural Network | Three independent trading strategies |
 | **4. Trading Engine** | Risk management, position sizing, transaction costs | Trade execution with 5 bps slippage |
@@ -168,6 +167,8 @@ flowchart LR
 | **Cache Refresh** | Update price data + snapshot | Daily, 9 PM UTC |
 | **Momentum Strategy Trade** | Monthly momentum rebalance | 1st-3rd of month, 9:30 PM UTC |
 | **ML Strategy Trade** | Daily ML predictions | Mon-Fri, 9:30 PM UTC |
+| **LSTM Strategy Trade** | Daily LSTM predictions | Mon-Fri, 9:45 PM UTC |
+| **Monthly Retrain** | Retrain LSTM model | 2nd of month, 10 PM UTC |
 
 Run manually: **Actions** > Select workflow > **Run workflow**
 
@@ -179,7 +180,9 @@ Run manually: **Actions** > Select workflow > **Run workflow**
 paper-trader/
 ├── main.py                         # Core trading logic
 ├── config/
-│   └── trading.yaml                # All configuration
+│   ├── settings.yaml               # Main configuration
+│   ├── momentum_config.yaml        # Momentum strategy settings
+│   └── backtest_settings.yaml      # Backtest parameters
 ├── src/
 │   ├── strategies/                 # Strategy implementations
 │   │   ├── base.py                 # BaseStrategy ABC
@@ -215,7 +218,7 @@ paper-trader/
 │   ├── snapshots/                  # Per-strategy snapshots
 │   ├── market.db                   # SQLite price cache
 │   └── portfolio_snapshot.json     # Consolidated metrics
-├── tests/                          # Unit tests (42 tests)
+├── tests/                          # Unit tests (75 tests)
 ├── .github/workflows/              # CI/CD automation
 └── docs/                           # Documentation
 ```
