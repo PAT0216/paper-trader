@@ -25,9 +25,10 @@
 
 | Metric | Momentum | ML Ensemble | LSTM | SPY |
 |--------|----------|-------------|------|-----|
-| **Return** | +18.65% | +6.95% | +7.93% | +3.94% |
-| **Excess vs SPY** | +14.71% | +3.01% | +3.99% | — |
-| **Slippage** | 5 bps | 5 bps | 5 bps | — |
+| **Return** | +18.65% | +6.95% | +7.94% | +3.94% |
+| **Sharpe Ratio** | 2.04 | 0.92 | 1.65 | 0.97 |
+| **Max Drawdown** | -9.1% | -14.8% | -7.8% | -5.1% |
+| **Excess vs SPY** | +14.71% | +3.01% | +4.00% | — |
 
 > All strategies include realistic transaction costs (5 basis points slippage on all trades).
 
@@ -49,6 +50,70 @@ python main.py --strategy ml --portfolio ml
 # Launch comparison dashboard
 cd dashboard && streamlit run app.py
 ```
+
+---
+
+## Docker Setup
+
+Run Paper Trader in a containerized environment for consistent, reproducible execution.
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) installed
+- [Docker Compose](https://docs.docker.com/compose/install/) (included with Docker Desktop)
+
+### Build the Image
+
+```bash
+# Build the Docker image
+docker build -t paper-trader .
+
+# Or use Docker Compose
+docker compose build
+```
+
+### Run with Docker Compose
+
+```bash
+# Start the trading bot (runs main.py by default)
+docker compose up
+
+# Run in background
+docker compose up -d
+
+# Stop containers
+docker compose down
+```
+
+### Run Specific Strategies
+
+```bash
+# Run momentum strategy
+docker run --rm -v $(pwd):/app paper-trader \
+  conda run -n paper-trader python main.py --strategy momentum --portfolio momentum
+
+# Run ML strategy
+docker run --rm -v $(pwd):/app paper-trader \
+  conda run -n paper-trader python main.py --strategy ml --portfolio ml
+
+# Run LSTM strategy
+docker run --rm -v $(pwd):/app paper-trader \
+  conda run -n paper-trader python main.py --strategy lstm --portfolio lstm
+```
+
+### Run Tests in Docker
+
+```bash
+docker run --rm -v $(pwd):/app paper-trader \
+  conda run -n paper-trader pytest tests/ -v
+```
+
+### Launch Dashboard
+
+```bash
+docker run --rm -p 8501:8501 -v $(pwd):/app paper-trader \
+  conda run -n paper-trader streamlit run dashboard/app.py --server.address 0.0.0.0
+```
+Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ---
 
@@ -86,7 +151,7 @@ cd dashboard && streamlit run app.py
 - **Portfolio drawdown control**: Warning at -15%, halt at -20%, liquidate at -25%
 
 ### Infrastructure
-- **SQLite data cache**: 516 MB, 503 S&P 500 tickers
+- **SQLite data cache**: 4.3M+ rows, 503 S&P 500 tickers
 - **GitHub Actions**: Automated trading + universe sync
 - **Streamlit Dashboard**: Live comparison with SPY benchmark
 - **Point-in-time Universe**: Monthly S&P 500 sync
@@ -101,7 +166,7 @@ cd dashboard && streamlit run app.py
 
 | Stage | Components | Description |
 |-------|------------|-------------|
-| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (516 MB cache) |
+| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (4.3M+ rows) |
 | **2. Feature Engineering** | Technical indicators, momentum factors, LSTM sequences | Transform raw data for model consumption |
 | **3. Model Layer** | Momentum, XGBoost Ensemble, LSTM Neural Network | Three independent trading strategies |
 | **4. Trading Engine** | Risk management, position sizing, transaction costs | Trade execution with 5 bps slippage |

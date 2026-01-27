@@ -172,10 +172,13 @@ install:
 .PHONY: status
 status:
 	@echo "$(YELLOW)📋 Portfolio Status:$(NC)"
-	@if [ -f ledger.csv ]; then \
-		tail -n 10 ledger.csv | column -t -s ','; \
+	@if [ -d data/ledgers ]; then \
+		for ledger in data/ledgers/ledger_*.csv; do \
+			echo "\n=== $$ledger ==="; \
+			tail -n 5 "$$ledger" | column -t -s ','; \
+		done; \
 	else \
-		echo "No ledger found. Run 'make trade' first."; \
+		echo "No ledgers found. Run 'make trade' first."; \
 	fi
 
 # ℹ️ Help
@@ -189,6 +192,7 @@ help:
 	@echo ""
 	@echo "$(YELLOW)Execution:$(NC)"
 	@echo "  make trade               - Run trading bot (fetch data, train, execute trades)"
+	@echo "  make trade-momentum      - Run momentum strategy specifically"
 	@echo "  make train               - Train model only (no trade execution)"
 	@echo "  make validate            - Validate data quality for sample tickers"
 	@echo ""
@@ -208,7 +212,7 @@ help:
 	@echo "  make india-test          - Test model on Indian market (cross-market validation)"
 	@echo ""
 	@echo "$(YELLOW)Testing:$(NC)"
-	@echo "  make test                - Run unit test suite (55 tests)"
+	@echo "  make test                - Run unit test suite (75 tests)"
 	@echo "  make test-coverage       - Run tests with HTML coverage report"
 	@echo ""
 	@echo "$(YELLOW)Docker:$(NC)"
