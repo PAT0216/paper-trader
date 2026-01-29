@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-29T21:23:28.853801Z",
+  "timestamp": "2026-01-29T21:54:45.616022Z",
   "price_date": "2026-01-29",
   "initial_capital": 10000,
   "strategy": "ml",
@@ -13,8 +13,8 @@
     "KVUE": 3,
     "DECK": 5,
     "PFE": 1,
-    "AMZN": 2,
-    "NWSA": 2
+    "NWSA": 2,
+    "AMZN": 2
   },
   "positions": 8
 }

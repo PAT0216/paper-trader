@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-29T21:23:29.206473Z",
+  "timestamp": "2026-01-29T21:54:45.616265Z",
   "price_date": "2026-01-29",
   "initial_capital": 10000,
   "portfolios": {
@@ -32,8 +32,8 @@
         "KVUE": 3,
         "DECK": 5,
         "PFE": 1,
-        "AMZN": 2,
-        "NWSA": 2
+        "NWSA": 2,
+        "AMZN": 2
       },
       "positions": 8
     },
@@ -57,9 +57,9 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 694.07,
+    "end_price": 694.04,
     "return_pct": 4.14,
-    "value": 10413.96,
+    "value": 10413.51,
     "start_date": "2025-10-01",
     "end_date": "2026-01-29"
   }
