@@ -11,6 +11,7 @@ from src.trading.risk_manager import RiskManager, RiskLimits, DrawdownController
 from src.backtesting.costs import TransactionCostModel
 from src.strategies import get_strategy, list_strategies
 import numpy as np
+import pandas as pd
 
 def main():
     # Use registry for dynamic strategy choices
@@ -109,7 +110,18 @@ def main():
         print(" No valid data after validation.")
         sys.exit(1)
         
-    current_prices = {t: df['Close'].iloc[-1] for t, df in data_dict.items()}
+    # Build current prices dict, filtering out NaN values
+    current_prices = {}
+    nan_price_tickers = []
+    for t, df in data_dict.items():
+        price = df['Close'].iloc[-1]
+        if pd.notna(price) and price > 0:
+            current_prices[t] = price
+        else:
+            nan_price_tickers.append(t)
+    
+    if nan_price_tickers:
+        print(f"  Warning: {len(nan_price_tickers)} tickers have invalid prices, skipping: {nan_price_tickers[:5]}{'...' if len(nan_price_tickers) > 5 else ''}")
 
     # 3. Operations based on Mode
     # Load strategy instance for training check

@@ -159,6 +159,16 @@ class RiskManager:
         Returns:
             Tuple of (shares_to_buy, reason) where reason explains the sizing logic
         """
+        # Guard against invalid inputs (NaN prices cause int() to crash)
+        if pd.isna(current_price) or current_price <= 0:
+            return 0, f"Invalid price: {current_price}"
+        
+        if pd.isna(portfolio_value) or portfolio_value <= 0:
+            return 0, f"Invalid portfolio value: {portfolio_value}"
+        
+        if pd.isna(available_cash) or available_cash < 0:
+            return 0, f"Invalid cash: {available_cash}"
+        
         if available_cash < current_price:
             return 0, "Insufficient cash for even 1 share"
         
