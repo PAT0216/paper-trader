@@ -255,6 +255,11 @@ def main():
         # Sells
         for ticker, action in signals.items():
             if action == "SELL" and ticker in current_holdings:
+                # Skip tickers that were filtered out due to invalid prices
+                if ticker not in current_prices:
+                    print(f"  {ticker}: Skip SELL - No valid price data")
+                    continue
+                
                 shares = current_holdings[ticker]
                 raw_price = current_prices[ticker]
                 # Apply slippage (5 bps) - receive less on sell
@@ -298,6 +303,11 @@ def main():
                 print(f"\n Available Cash for Buys: ${available_cash:.2f}")
                 
                 for ticker, exp_ret in buy_candidates:
+                    # Skip tickers that were filtered out due to invalid prices
+                    if ticker not in current_prices:
+                        print(f" {ticker}: Skip - No valid price data")
+                        continue
+                    
                     raw_price = current_prices[ticker]
                     # Apply slippage (5 bps) - pay more on buy
                     exec_price, _ = cost_model.calculate_execution_price('BUY', raw_price, 1)
