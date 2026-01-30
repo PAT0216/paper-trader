@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-30T21:52:36.973974Z",
+  "timestamp": "2026-01-30T22:02:28.264373Z",
   "price_date": "2026-01-30",
   "initial_capital": 10000,
   "portfolios": {
@@ -48,8 +48,8 @@
         "NFLX": 11,
         "BAC": 34,
         "AAPL": 4,
-        "MA": 1,
-        "NWSA": 1
+        "NWSA": 1,
+        "MA": 1
       },
       "positions": 8
     }
@@ -57,9 +57,9 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 691.92,
+    "end_price": 691.97,
     "return_pct": 3.82,
-    "value": 10381.7,
+    "value": 10382.45,
     "start_date": "2025-10-01",
     "end_date": "2026-01-30"
   }
