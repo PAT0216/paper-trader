@@ -70,7 +70,7 @@ jobs:
           git add -A
           
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No changes to commit"
             exit 0
           fi
           
@@ -78,18 +78,69 @@ jobs:
           git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
           
           for i in 1 2 3; do
-            git pull --rebase origin "$BRANCH" 2>/dev/null || {
-              git rebase --abort 2>/dev/null || true
-              git reset --soft HEAD~1
-              git stash
-              git pull origin "$BRANCH"
-              git stash pop
+            echo "=== Push attempt $i ==="
+            
+            # Try simple push first
+            if git push origin "$BRANCH"; then
+              echo "Push successful!"
+              exit 0
+            fi
+            
+            echo "Push failed, pulling latest changes..."
+            
+            # Fetch and check for conflicts
+            git fetch origin "$BRANCH"
+            
+            # Try rebase
+            if git rebase origin/"$BRANCH"; then
+              echo "Rebase successful, retrying push..."
+              continue
+            fi
+            
+            echo "Rebase conflict detected, resolving..."
+            
+            # Abort the failed rebase
+            git rebase --abort 2>/dev/null || true
+            
+            # Reset to our commit
+            git reset --soft HEAD~1
+            
+            # Stash our changes
+            git stash push -m "strategy-changes"
+            
+            # Pull latest from remote (clean)
+            git pull origin "$BRANCH"
+            
+            # Pop stash, preferring ours for conflicts
+            git stash pop || {
+              # If stash pop fails due to conflict, resolve it
+              echo "Stash conflict, resolving with strategy preference..."
+              
+              # For the consolidated snapshot, accept theirs (we'll regenerate)
+              git checkout --theirs data/portfolio_snapshot.json 2>/dev/null || true
+              
+              # For strategy-specific files, accept ours (our changes are what we want)
+              git checkout --ours "data/ledgers/ledger_${{ inputs.strategy }}.csv" 2>/dev/null || true
+              git checkout --ours "data/snapshots/${{ inputs.strategy }}.json" 2>/dev/null || true
+              
               git add -A
-              git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d)"
+              git reset  # Unstage to allow re-consolidate
             }
-            git push origin "$BRANCH" && exit 0
-            sleep 10
+            
+            # Re-consolidate the snapshot to include all strategies
+            echo "Re-consolidating portfolio snapshot..."
+            docker run --rm -e GITHUB_ACTIONS=true -v ${{ github.workspace }}:/app paper-trader:latest \
+              conda run --no-capture-output -n paper-trader \
+              python scripts/utils/compute_portfolio_snapshot.py --consolidate 2>/dev/null || true
+            
+            # Re-commit all changes
+            git add -A
+            git commit -m "${{ inputs.strategy }}: Daily trade $(date +%Y-%m-%d) [resolved]" || true
+            
+            sleep 5
           done
+          
+          echo "Failed to push after 3 attempts"
           exit 1
 
       - name: Cleanup Docker cache
