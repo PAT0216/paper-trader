@@ -236,3 +236,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-01-30,AAPL,BUY,258.41,2,516.82,1101.07,8159.1,lstm,,
 2026-01-30,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10795.84,lstm,,
 2026-02-02,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10862.76,lstm,,
+2026-02-03,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10859.21,lstm,,
