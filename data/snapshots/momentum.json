@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-03T21:30:33.908689Z",
+  "timestamp": "2026-02-03T22:41:28.093865Z",
   "price_date": "2026-02-03",
   "initial_capital": 10000,
   "strategy": "momentum",
@@ -7,16 +7,16 @@
   "return_pct": 21.96,
   "cash": 1490.61,
   "holdings": {
+    "AVGO": 4,
     "LRCX": 6,
     "WBD": 41,
     "NEM": 10,
     "MU": 4,
     "STX": 3,
     "WDC": 6,
-    "AVGO": 4,
-    "AMD": 2,
+    "NVDA": 1,
     "GOOGL": 1,
-    "NVDA": 1
+    "AMD": 2
   },
   "positions": 10
 }
