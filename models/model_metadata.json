@@ -2,7 +2,6 @@
   "selected_features": [
     "RSI",
     "MACD",
-    "MACD_signal",
     "MACD_hist",
     "BB_Width",
     "Dist_SMA50",
@@ -33,26 +32,22 @@
     "BB_PctB",
     "Vol_Ratio"
   ],
-<<<<<<< Updated upstream
-  "training_date": "2026-02-03T02:28:55.841474",
-=======
-  "training_date": "2026-02-03T02:29:19.163181",
->>>>>>> Stashed changes
-  "training_samples": 1867765,
+  "training_date": "2026-02-03T22:01:30.249197",
+  "training_samples": 1868259,
   "xgboost_version": "2.0.3",
   "prediction_stats": {
-    "mean": 0.00071259296964854,
-    "std": 0.0024459909182041883,
-    "min": -0.12587158381938934,
-    "max": 0.30686232447624207,
+    "mean": 0.0007113146712072194,
+    "std": 0.0024265157990157604,
+    "min": -0.12784871459007263,
+    "max": 0.25973427295684814,
     "expected_range": [
       -0.1,
       0.1
     ]
   },
   "cv_metrics": {
-    "avg_rmse": 0.019615439569100942,
-    "avg_dir_accuracy": 0.5216811117464519,
-    "avg_spearman": 0.024338284273338957
+    "avg_rmse": 0.019623760732443887,
+    "avg_dir_accuracy": 0.5217556908689174,
+    "avg_spearman": 0.023917591319292632
   }
 }
