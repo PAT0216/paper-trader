@@ -134,3 +134,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-02-01,AVGO,BUY,331.47,2,662.93,864.26,8223.41,momentum,
 2026-02-01,GOOGL,BUY,338.4,1,338.4,525.86,8255.17,momentum,
 2026-02-01,NVDA,BUY,191.23,1,191.23,334.63,8255.17,momentum,
+2026-02-02,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12190.14,momentum,
