@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-03T01:43:58.572988Z",
+  "timestamp": "2026-02-03T02:29:11.839762Z",
   "price_date": "2026-02-02",
   "initial_capital": 10000,
   "portfolios": {
@@ -22,20 +22,19 @@
       "positions": 10
     },
     "ml": {
-      "value": 10727.95,
-      "return_pct": 7.28,
-      "cash": 7041.27,
+      "value": 10727.32,
+      "return_pct": 7.27,
+      "cash": 8294.04,
       "holdings": {
         "GLW": 11,
         "HPQ": 1,
-        "DIS": 12,
         "KVUE": 3,
         "DECK": 5,
         "PFE": 1,
         "NWSA": 2,
         "AMZN": 2
       },
-      "positions": 8
+      "positions": 7
     },
     "lstm": {
       "value": 10862.76,
