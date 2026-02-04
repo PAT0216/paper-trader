@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-04T21:57:33.454754Z",
+  "timestamp": "2026-02-04T22:04:40.197838Z",
   "price_date": "2026-02-04",
   "initial_capital": 10000,
   "portfolios": {
@@ -46,8 +46,8 @@
         "NFLX": 11,
         "BAC": 34,
         "AAPL": 4,
-        "NWSA": 1,
-        "MA": 1
+        "MA": 1,
+        "NWSA": 1
       },
       "positions": 8
     }
