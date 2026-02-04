@@ -136,3 +136,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-02-01,NVDA,BUY,191.23,1,191.23,334.63,8255.17,momentum,
 2026-02-02,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12190.14,momentum,
 2026-02-03,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12195.54,momentum,
+2026-02-04,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11555.78,momentum,
