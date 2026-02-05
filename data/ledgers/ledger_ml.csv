@@ -660,3 +660,5 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-02-03,NWSA,SELL,25.0,2,49.99,49.99,2028.19,ml,,
 2026-02-04,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10678.48,ml,,
 2026-02-05,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10685.8,ml,,
+2026-02-05,AMZN,SELL,222.58,2,445.16,445.16,1954.43,ml,,
+2026-02-05,PG,BUY,158.69,1,158.69,286.47,1954.43,ml,,
