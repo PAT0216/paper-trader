@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-02-06T21:26:05.650638Z",
+  "timestamp": "2026-02-06T22:04:33.327858Z",
   "price_date": "2026-02-06",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11041.96,
+  "value": 11041.95,
   "return_pct": 10.42,
-  "cash": 3646.45,
+  "cash": 3668.94,
   "holdings": {
     "MSI": 3,
     "VICI": 42,
@@ -13,8 +13,7 @@
     "NFLX": 11,
     "BAC": 34,
     "AAPL": 4,
-    "MA": 1,
-    "NWSA": 1
+    "MA": 1
   },
-  "positions": 8
+  "positions": 7
 }
