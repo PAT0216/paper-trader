@@ -8,7 +8,7 @@ Downloads data from S3, runs trading, uploads results back to S3.
 import os
 import json
 import boto3
-import subprocess
+import shutil
 from datetime import datetime
 
 # S3 client
@@ -18,6 +18,16 @@ s3 = boto3.client('s3')
 BUCKET_NAME = os.environ.get('S3_BUCKET', 'paper-trader-data')
 STRATEGY = os.environ.get('STRATEGY', 'momentum')
 
+
+def cleanup_tmp():
+    """Clean up /tmp to handle Lambda warm container reuse"""
+    for item in ['/tmp/market.db', '/tmp/data']:
+        if os.path.exists(item):
+            if os.path.isdir(item):
+                shutil.rmtree(item)
+            else:
+                os.remove(item)
+    print("Cleaned up /tmp")
 
 def download_from_s3():
     """Download market.db and ledgers from S3"""
@@ -65,6 +75,9 @@ def handler(event, context):
     print(f"Bucket: {BUCKET_NAME}")
     
     try:
+        # 0. Clean up /tmp from previous runs (warm containers)
+        cleanup_tmp()
+        
         # 1. Download data from S3
         download_from_s3()
         
