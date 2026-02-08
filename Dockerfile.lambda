@@ -3,16 +3,23 @@
 
 FROM public.ecr.aws/lambda/python:3.10
 
-# Install system dependencies for ta-lib
-RUN yum install -y wget tar gcc make && \
-    cd /tmp && \
-    wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+# Install system dependencies
+# Note: ta-lib from SourceForge is unreliable, using pre-compiled approach
+RUN yum install -y gcc make wget tar gzip
+
+# Install TA-Lib using a reliable GitHub mirror
+RUN cd /tmp && \
+    curl -L https://github.com/TA-Lib/ta-lib/releases/download/v0.4.0/ta-lib-0.4.0-src.tar.gz -o ta-lib.tar.gz && \
+    tar -xzf ta-lib.tar.gz && \
     cd ta-lib && \
     ./configure --prefix=/usr && \
-    make && make install && \
+    make && \
+    make install && \
     cd / && rm -rf /tmp/ta-lib* && \
     yum clean all
+
+# Set library path so Python can find ta-lib
+ENV LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH
 
 # Copy requirements first (for Docker layer caching)
 COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
@@ -29,41 +36,21 @@ COPY main.py ${LAMBDA_TASK_ROOT}/
 COPY lambda_handler.py ${LAMBDA_TASK_ROOT}/
 
 # Full src/ directory (all 11 subdirectories required)
-# - src/utils/config.py (load_config)
-# - src/data/ (loader, validator, universe, price_utils)
-# - src/trading/ (portfolio, risk_manager)
-# - src/strategies/ (momentum, ml, lstm, base, registry)
-# - src/features/ (indicators, momentum_features, factor_features, zhang_features, behavioral_factors)
-# - src/models/ (predictor, trainer, training_utils, zhang_trainer, factor_strategy)
-# - src/backtesting/ (backtester, costs, performance)
-# - src/analytics/ (portfolio_comparison)
-# - src/explainability/
-# - src/monitoring/
 COPY src/ ${LAMBDA_TASK_ROOT}/src/
 
 # Configuration files
 COPY config/ ${LAMBDA_TASK_ROOT}/config/
 
-# Pre-trained models (required for ML/LSTM strategies)
-# - xgb_model.joblib, xgb_ensemble.joblib
-# - lstm_model.h5, lstm_model_xgb.joblib
-# - model_metadata.json
+# Pre-trained models
 COPY models/ ${LAMBDA_TASK_ROOT}/models/
 
-# Static data files (tickers list for universe loading)
+# Static data files
 COPY data/sp500_tickers.txt ${LAMBDA_TASK_ROOT}/data/
 
 # Create directories Lambda needs at runtime
 RUN mkdir -p ${LAMBDA_TASK_ROOT}/data/ledgers \
     ${LAMBDA_TASK_ROOT}/data/snapshots \
     ${LAMBDA_TASK_ROOT}/logs
-
-# ============================================================
-# NOT INCLUDED (will be downloaded from S3 at runtime):
-# - data/market.db (523MB - too large for image)
-# - data/ledgers/*.csv (stateful, stored in S3)
-# - data/snapshots/*.json (stateful, stored in S3)
-# ============================================================
 
 # Set the Lambda handler
 CMD ["lambda_handler.handler"]
