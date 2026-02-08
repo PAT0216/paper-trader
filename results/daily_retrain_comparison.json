@@ -1,0 +1,16 @@
+{
+  "old": {
+    "name": "Old ML (Daily Retrain)",
+    "final": 10155.694621522922,
+    "return_pct": 1.5569462152292157,
+    "sharpe": 0.03615444458380657,
+    "max_dd_pct": -7.672023337500199
+  },
+  "new": {
+    "name": "New ML (Daily Retrain)",
+    "final": 9833.362684336686,
+    "return_pct": -1.6663731566331497,
+    "sharpe": -0.6706809222540925,
+    "max_dd_pct": -7.544828649049042
+  }
+}

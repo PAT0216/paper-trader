@@ -1,8 +1,10 @@
 name: ML Strategy Trade
 
+# DISABLED: Now handled by AWS Lambda
+# Re-enable by uncommenting the schedule below
 on:
-  schedule:
-    - cron: '30 21 * * 1-5'  # Mon-Fri 9:30 PM UTC
+  # schedule:
+  #   - cron: '30 21 * * 1-5'  # Mon-Fri 9:30 PM UTC
   workflow_dispatch:
 
 jobs:

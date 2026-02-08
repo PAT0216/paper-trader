@@ -43,7 +43,19 @@ class Portfolio:
                 if col not in self.ledger.columns:
                     self.ledger[col] = ''
         else:
-            self.ledger = pd.DataFrame(columns=self.columns)
+            # Define dtypes explicitly to avoid FutureWarning on concat
+            self.ledger = pd.DataFrame({
+                "date": pd.Series(dtype="str"),
+                "ticker": pd.Series(dtype="str"),
+                "action": pd.Series(dtype="str"),
+                "price": pd.Series(dtype="float64"),
+                "shares": pd.Series(dtype="int64"),
+                "amount": pd.Series(dtype="float64"),
+                "cash_balance": pd.Series(dtype="float64"),
+                "total_value": pd.Series(dtype="float64"),
+                "strategy": pd.Series(dtype="str"),
+                "momentum_score": pd.Series(dtype="object")
+            })
             # Initialize with starting cash
             self._add_entry(
                 datetime.now().strftime("%Y-%m-%d"), "CASH", "DEPOSIT", 

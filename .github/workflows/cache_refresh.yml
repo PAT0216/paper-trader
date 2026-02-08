@@ -83,9 +83,32 @@ jobs:
           path: data/market.db
           key: market-data-v3-${{ github.run_id }}
 
+      - name: Upload to S3 (Lambda source of truth)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-west-2
+        run: |
+          pip install awscli
+          
+          # Validate market.db size (should be > 100MB)
+          DB_SIZE=$(stat -c%s data/market.db 2>/dev/null || stat -f%z data/market.db)
+          echo "market.db size: $DB_SIZE bytes"
+          
+          if [ "$DB_SIZE" -lt 100000000 ]; then
+            echo "ERROR: market.db too small ($DB_SIZE bytes), skipping S3 upload"
+            exit 1
+          fi
+          
+          # Upload to S3
+          aws s3 cp data/market.db s3://paper-trader-data-pat0216/market.db
+          aws s3 cp data/sp500_tickers.txt s3://paper-trader-data-pat0216/sp500_tickers.txt
+          echo "Uploaded market.db and sp500_tickers.txt to S3"
+
       - name: Update Portfolio Snapshot Values
         run: |
           python scripts/utils/compute_portfolio_snapshot.py --update-value-only
+
 
       - name: Commit Updates
         run: |
