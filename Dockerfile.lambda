@@ -3,32 +3,11 @@
 
 FROM public.ecr.aws/lambda/python:3.10
 
-# Install build dependencies
-RUN yum install -y gcc gcc-c++ make wget curl tar gzip
-
-# Install TA-Lib C library from source
-RUN cd /tmp && \
-    curl -L -o ta-lib.tar.gz https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download && \
-    tar -xzf ta-lib.tar.gz && \
-    cd ta-lib && \
-    ./configure --prefix=/usr/local && \
-    make && \
-    make install && \
-    /sbin/ldconfig /usr/local/lib && \
-    cd / && rm -rf /tmp/ta-lib*
-
-# Set compiler flags so Python ta-lib wrapper can find C library
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-ENV CFLAGS="-I/usr/local/include"
-ENV LDFLAGS="-L/usr/local/lib"
-
 # Copy requirements first (for Docker layer caching)
 COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
 
-# Install Python packages with explicit ta-lib build flags
-RUN pip install --no-cache-dir numpy && \
-    pip install --no-cache-dir TA-Lib && \
-    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
+# Install Python packages
+RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
 
 # ============================================================
 # APPLICATION CODE
@@ -45,8 +24,5 @@ COPY data/sp500_tickers.txt ${LAMBDA_TASK_ROOT}/data/
 RUN mkdir -p ${LAMBDA_TASK_ROOT}/data/ledgers \
     ${LAMBDA_TASK_ROOT}/data/snapshots \
     ${LAMBDA_TASK_ROOT}/logs
-
-# Cleanup build dependencies to reduce image size
-RUN yum remove -y gcc gcc-c++ make wget && yum clean all
 
 CMD ["lambda_handler.handler"]
