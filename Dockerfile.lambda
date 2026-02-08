@@ -3,54 +3,49 @@
 
 FROM public.ecr.aws/lambda/python:3.10
 
-# Install system dependencies
-# Note: ta-lib from SourceForge is unreliable, using pre-compiled approach
-RUN yum install -y gcc make wget tar gzip
+# Install build dependencies
+RUN yum install -y gcc gcc-c++ make wget curl tar gzip
 
-# Install TA-Lib using a reliable GitHub mirror
+# Install TA-Lib C library from source
+# Must be installed BEFORE pip install ta-lib
 RUN cd /tmp && \
-    curl -L https://github.com/TA-Lib/ta-lib/releases/download/v0.4.0/ta-lib-0.4.0-src.tar.gz -o ta-lib.tar.gz && \
+    curl -L -o ta-lib.tar.gz https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download && \
     tar -xzf ta-lib.tar.gz && \
     cd ta-lib && \
-    ./configure --prefix=/usr && \
+    ./configure --prefix=/usr/local && \
     make && \
     make install && \
-    cd / && rm -rf /tmp/ta-lib* && \
-    yum clean all
+    ldconfig /usr/local/lib && \
+    cd / && rm -rf /tmp/ta-lib*
 
-# Set library path so Python can find ta-lib
-ENV LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH
+# Set library and header paths for Python ta-lib compilation
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV TA_LIBRARY_PATH=/usr/local/lib
+ENV TA_INCLUDE_PATH=/usr/local/include
 
 # Copy requirements first (for Docker layer caching)
 COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
 
-# Install Python packages
+# Install Python packages (ta-lib wrapper will compile against C library)
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
 
 # ============================================================
-# APPLICATION CODE (analyzed all imports from main.py -> src/)
+# APPLICATION CODE
 # ============================================================
 
-# Core application
 COPY main.py ${LAMBDA_TASK_ROOT}/
 COPY lambda_handler.py ${LAMBDA_TASK_ROOT}/
-
-# Full src/ directory (all 11 subdirectories required)
 COPY src/ ${LAMBDA_TASK_ROOT}/src/
-
-# Configuration files
 COPY config/ ${LAMBDA_TASK_ROOT}/config/
-
-# Pre-trained models
 COPY models/ ${LAMBDA_TASK_ROOT}/models/
-
-# Static data files
 COPY data/sp500_tickers.txt ${LAMBDA_TASK_ROOT}/data/
 
-# Create directories Lambda needs at runtime
+# Create runtime directories
 RUN mkdir -p ${LAMBDA_TASK_ROOT}/data/ledgers \
     ${LAMBDA_TASK_ROOT}/data/snapshots \
     ${LAMBDA_TASK_ROOT}/logs
 
-# Set the Lambda handler
+# Cleanup build dependencies to reduce image size
+RUN yum remove -y gcc gcc-c++ make wget && yum clean all
+
 CMD ["lambda_handler.handler"]
