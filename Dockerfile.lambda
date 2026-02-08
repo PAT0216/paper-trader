@@ -6,8 +6,9 @@ FROM public.ecr.aws/lambda/python:3.10
 # Copy requirements first (for Docker layer caching)
 COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
 
-# Install Python packages
-RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
+# Upgrade pip and install Python packages
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
 
 # ============================================================
 # APPLICATION CODE
