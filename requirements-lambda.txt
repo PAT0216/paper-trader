@@ -1,0 +1,13 @@
+# Lambda requirements (no conda, pure pip)
+# Lighter weight to fit Lambda constraints
+
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+yfinance>=0.2.30
+pyyaml>=6.0
+python-dotenv>=1.0.0
+ta-lib>=0.4.28
+boto3>=1.28.0
+requests>=2.31.0
