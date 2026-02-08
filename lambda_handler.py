@@ -49,6 +49,14 @@ def download_from_s3():
     except Exception as e:
         print(f"No market.db in S3 (first run?): {e}")
     
+    # Download S&P 500 ticker list (prevents Wikipedia fetch timeout)
+    try:
+        tickers_path = f'{TMP_DATA_DIR}/sp500_tickers.txt'
+        s3.download_file(BUCKET_NAME, 'sp500_tickers.txt', tickers_path)
+        print(f"Downloaded sp500_tickers.txt from S3")
+    except Exception as e:
+        print(f"No sp500_tickers.txt in S3: {e}")
+    
     try:
         ledger_key = f'ledgers/ledger_{STRATEGY}.csv'
         ledger_path = f'{TMP_LEDGER_DIR}/ledger_{STRATEGY}.csv'
