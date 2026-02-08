@@ -23,16 +23,18 @@ def download_from_s3():
     """Download market.db and ledgers from S3"""
     try:
         # Download market cache
-        s3.download_file(BUCKET_NAME, 'data/market.db', '/tmp/market.db')
+        s3.download_file(BUCKET_NAME, 'market.db', '/tmp/market.db')
         os.makedirs('data', exist_ok=True)
-        os.symlink('/tmp/market.db', 'data/market.db')
+        # Create symlink only if it doesn't exist
+        if not os.path.exists('data/market.db'):
+            os.symlink('/tmp/market.db', 'data/market.db')
         print(f"Downloaded market.db from S3")
     except Exception as e:
         print(f"No market.db in S3 (first run?): {e}")
     
     try:
         # Download ledger
-        ledger_key = f'data/ledgers/ledger_{STRATEGY}.csv'
+        ledger_key = f'ledgers/ledger_{STRATEGY}.csv'
         os.makedirs('data/ledgers', exist_ok=True)
         s3.download_file(BUCKET_NAME, ledger_key, f'data/ledgers/ledger_{STRATEGY}.csv')
         print(f"Downloaded ledger from S3")
@@ -45,14 +47,14 @@ def upload_to_s3():
     # Upload ledger
     ledger_path = f'data/ledgers/ledger_{STRATEGY}.csv'
     if os.path.exists(ledger_path):
-        s3.upload_file(ledger_path, BUCKET_NAME, ledger_path)
-        print(f"Uploaded {ledger_path} to S3")
+        s3.upload_file(ledger_path, BUCKET_NAME, f'ledgers/ledger_{STRATEGY}.csv')
+        print(f"Uploaded ledger to S3")
     
     # Upload snapshot
     snapshot_path = f'data/snapshots/{STRATEGY}.json'
     if os.path.exists(snapshot_path):
-        s3.upload_file(snapshot_path, BUCKET_NAME, snapshot_path)
-        print(f"Uploaded {snapshot_path} to S3")
+        s3.upload_file(snapshot_path, BUCKET_NAME, f'snapshots/{STRATEGY}.json')
+        print(f"Uploaded snapshot to S3")
 
 
 def handler(event, context):
