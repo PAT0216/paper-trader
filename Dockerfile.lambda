@@ -15,7 +15,7 @@ RUN cd /tmp && \
     ./configure --prefix=/usr/local && \
     make && \
     make install && \
-    ldconfig /usr/local/lib && \
+    /sbin/ldconfig /usr/local/lib && \
     cd / && rm -rf /tmp/ta-lib*
 
 # Set library and header paths for Python ta-lib compilation
