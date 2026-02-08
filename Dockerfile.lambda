@@ -7,7 +7,6 @@ FROM public.ecr.aws/lambda/python:3.10
 RUN yum install -y gcc gcc-c++ make wget curl tar gzip
 
 # Install TA-Lib C library from source
-# Must be installed BEFORE pip install ta-lib
 RUN cd /tmp && \
     curl -L -o ta-lib.tar.gz https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download && \
     tar -xzf ta-lib.tar.gz && \
@@ -18,16 +17,18 @@ RUN cd /tmp && \
     /sbin/ldconfig /usr/local/lib && \
     cd / && rm -rf /tmp/ta-lib*
 
-# Set library and header paths for Python ta-lib compilation
+# Set compiler flags so Python ta-lib wrapper can find C library
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-ENV TA_LIBRARY_PATH=/usr/local/lib
-ENV TA_INCLUDE_PATH=/usr/local/include
+ENV CFLAGS="-I/usr/local/include"
+ENV LDFLAGS="-L/usr/local/lib"
 
 # Copy requirements first (for Docker layer caching)
 COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
 
-# Install Python packages (ta-lib wrapper will compile against C library)
-RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
+# Install Python packages with explicit ta-lib build flags
+RUN pip install --no-cache-dir numpy && \
+    pip install --no-cache-dir TA-Lib && \
+    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
 
 # ============================================================
 # APPLICATION CODE

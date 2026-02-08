@@ -8,6 +8,5 @@ xgboost>=2.0.0
 yfinance>=0.2.30
 pyyaml>=6.0
 python-dotenv>=1.0.0
-ta-lib>=0.4.28
 boto3>=1.28.0
 requests>=2.31.0
