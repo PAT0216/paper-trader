@@ -278,26 +278,21 @@ def handler(event, context):
         os.chdir('/tmp')
         print(f"Changed working directory to /tmp")
         
-        # 3. Run the trading logic (only on rebalance days)
-        if is_rebalance:
-            print("\n=== Running Trading Logic ===")
-            from main import main as run_trading
-            import sys
-            
-            # Set arguments for main.py
-            sys.argv = ['main.py', '--mode', 'trade', '--strategy', STRATEGY, '--portfolio', STRATEGY]
-            
-            # Run trading
-            run_trading()
-        else:
-            print("\n=== Non-rebalance day: updating VALUE only ===")
-            # Run compute_portfolio_snapshot to record daily value
-            import sys
-            sys.path.insert(0, '/var/task')
-            from scripts.utils.compute_portfolio_snapshot import process_single_strategy
-            process_single_strategy(STRATEGY)
+        # 3. Run the trading logic
+        # Note: Even on non-rebalance days, we run main.py which handles VALUE updates
+        # The strategy itself determines if trades should be made
+        print("\n=== Running Trading Logic ===")
+        from main import main as run_trading
+        import sys
+        
+        # Set arguments for main.py
+        sys.argv = ['main.py', '--mode', 'trade', '--strategy', STRATEGY, '--portfolio', STRATEGY]
+        
+        # Run trading (handles both rebalance and non-rebalance days)
+        run_trading()
         
         # 4. Change back
+
         os.chdir(original_cwd)
         
         # 5. Update consolidated snapshot
