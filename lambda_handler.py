@@ -104,6 +104,45 @@ def upload_to_s3():
         print(f"Uploaded consolidated snapshot to S3")
 
 
+def download_from_github():
+    """Download ledger and portfolio_snapshot from GitHub (source of truth).
+    
+    This ensures we don't overwrite existing data when S3 is empty/stale.
+    GitHub is the source of truth for ledgers, S3 is just a backup.
+    """
+    if not GITHUB_PAT:
+        print("No GITHUB_PAT, skipping GitHub download")
+        return
+    
+    headers = {
+        'Authorization': f'token {GITHUB_PAT}',
+        'Accept': 'application/vnd.github.v3.raw',  # Get raw file content
+        'User-Agent': 'paper-trader-lambda'
+    }
+    
+    files_to_download = [
+        (f'data/ledgers/ledger_{STRATEGY}.csv', f'{TMP_LEDGER_DIR}/ledger_{STRATEGY}.csv'),
+        ('data/portfolio_snapshot.json', f'{TMP_DATA_DIR}/portfolio_snapshot.json'),
+    ]
+    
+    for repo_path, local_path in files_to_download:
+        try:
+            url = f'https://api.github.com/repos/{GITHUB_REPO}/contents/{repo_path}'
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                content = resp.read()
+                with open(local_path, 'wb') as f:
+                    f.write(content)
+                print(f"Downloaded {repo_path} from GitHub")
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                print(f"{repo_path} not found in GitHub (first run?)")
+            else:
+                print(f"Error downloading {repo_path}: {e}")
+        except Exception as e:
+            print(f"Error downloading {repo_path}: {e}")
+
+
 # ============ GitHub API Functions ============
 
 def _github_api_request(url: str, method: str, data: dict = None):
@@ -270,8 +309,12 @@ def handler(event, context):
         cleanup_tmp()
         setup_tmp_dirs()
         
-        # 1. Download data from S3
+        # 1. Download data from S3 (market.db, tickers)
         download_from_s3()
+        
+        # 1b. Download ledger and snapshot from GitHub (source of truth)
+        # This ensures we preserve existing data even if S3 is stale
+        download_from_github()
         
         # 2. Change to /tmp so relative paths work
         original_cwd = os.getcwd()
