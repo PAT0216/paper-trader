@@ -1,10 +1,10 @@
 {
   "ticker": "SPY",
   "start_date": "2025-10-01",
-  "end_date": "2026-02-06",
+  "end_date": "2026-02-09",
   "initial_value": 10000,
-  "final_value": 10362.19,
-  "total_return": 3.62,
+  "final_value": 10412.16,
+  "total_return": 4.12,
   "portfolio_history": [
     [
       "2025-10-01",
@@ -361,6 +361,10 @@
     [
       "2026-02-06",
       10362.19
+    ],
+    [
+      "2026-02-09",
+      10412.16
     ]
   ]
 }
