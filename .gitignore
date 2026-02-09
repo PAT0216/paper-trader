@@ -50,6 +50,5 @@ docs/STRATEGY_FEATURES_GUIDE.md
 .tests_sentinull/
 
 # Session progress notes
-progress.md
 .agent/
 progress.md

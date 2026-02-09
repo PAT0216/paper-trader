@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - main
-      - feature/aws-integration  # Testing branch
     paths:
       - 'src/**'
       - 'config/**'
