@@ -207,7 +207,9 @@ docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
 
 ## MLOps System Architecture
 
-![Paper Trader AI Architecture](docs/architecture.png)
+## MLOps System Architecture
+
+![Paper Trader AI Architecture](docs/system_architecture_v2.png)
 
 ### 1. Data Cycle (The Foundation)
 - **Sources**: yfinance (OHLCV), FRED (Macroeconomic), S&P 500 Tickers
@@ -232,16 +234,19 @@ Three distinct algorithmic approaches running in parallel:
 
 ## Strategy Deep Dive
 
-### LSTM Neural Network Flow
-1. **Sequence Generation**: Rolling 60-day windows of normalized price/volume data
-2. **Model Architecture**:
-   - `LSTM(64)` input layer
-   - `Dropout(0.2)` regularization
-   - `Dense(32, relu)` hidden layer
-   - `Dense(1, sigmoid)` output probability
-3. **Inference**: Predicts probability of `Next_Day_Return > 0`
-4. **Signal**: Long if Probability > 0.55 (with position sizing based on confidence)
+### LSTM Neural Network Flow (Daily)
 
+```mermaid
+flowchart LR
+    A[Market Data] --> B[Generate 60-Day<br/>Sequences]
+    B --> C{LSTM Model}
+    C -->|Input| D[LSTM Layer<br/>64 Units]
+    D --> E[Dropout 20%]
+    E --> F[Dense Layer<br/>32 Units]
+    F --> G[Sigmoid Output]
+    G --> H{Prob > 0.55?}
+    H -->|Yes| I[Buy Signal]
+    H -->|No| J[Hold/Cash]
 ```
 
 ### Momentum Strategy Flow (Monthly)
@@ -249,11 +254,11 @@ Three distinct algorithmic approaches running in parallel:
 ```mermaid
 flowchart LR
     A[S&P 500 Tickers] --> B[Fetch 12-Month Prices]
-    B --> C[Calculate Returns<br/>Skip Last Month]
+    B --> C[Calculate Returns]
     C --> D[Rank by Momentum]
     D --> E[Select Top 10]
     E --> F[Apply Risk Limits]
-    F --> G[Execute Trades<br/>5 bps Slippage]
+    F --> G[Execute Trades]
     G --> H[Daily Stop-Loss<br/>Check 15%]
 ```
 
