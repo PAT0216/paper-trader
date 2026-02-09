@@ -169,7 +169,7 @@ The trading system can run as a serverless Lambda function on AWS, providing cos
 |-----------|---------|---------------|
 | **Compute** | AWS Lambda | 2048 MB, 15 min timeout |
 | **Container** | ECR | `paper-trader:latest` |
-| **Schedule** | EventBridge | **NOT YET CONFIGURED** (see Setup below) |
+| **Schedule** | EventBridge | 3 schedules (ML 4:30 PM, LSTM 4:35 PM, Momentum 1st-3rd) |
 | **Storage** | S3 | `paper-trader-data-{user}` |
 | **Version Control** | GitHub | Source of truth for ledgers |
 
@@ -203,15 +203,22 @@ docker tag paper-trader:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-t
 docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
 ```
 
-### EventBridge Schedule Setup (Required)
+### EventBridge Scheduler Configuration
 
-The Lambda schedule is NOT automatically created. To set up:
+Three EventBridge schedules trigger Lambda for each strategy:
 
-1. **Go to:** EventBridge > Schedules > Create schedule
-2. **Name:** `paper-trader-daily`
-3. **Schedule:** `cron(30 21 ? * MON-FRI *)` (1:30 PM PT = 21:30 UTC)
-4. **Target:** Lambda function `paper-trader-daily`
-5. **Input:** `{"strategy": "momentum"}` (or `ml`, `lstm`)
+| Schedule Name | Cron (PT) | Days | Payload |
+|---------------|-----------|------|---------|
+| `paper-trader-daily-trigger` | 4:30 PM | Mon-Fri | `{"strategy": "ml"}` |
+| `paper-trader-lstm` | 4:35 PM | Mon-Fri | `{"strategy": "lstm"}` |
+| `paper-trader-momentum` | 4:30 PM | 1st-3rd | `{"strategy": "momentum"}` |
+
+**Daily data refresh** via `cache_refresh.yml` (GitHub Actions) at 1:00 PM PT updates all ledger VALUES.
+
+**To add/modify schedules:**
+1. Go to: EventBridge > Schedules
+2. Create/edit schedule with target `paper-trader-daily`
+3. Set payload: `{"strategy": "<strategy_name>"}`
 
 ---
 
