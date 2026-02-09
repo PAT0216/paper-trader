@@ -33,7 +33,8 @@ class MomentumStrategy(BaseStrategy):
     def __init__(
         self, 
         lookback_days: int = 252, 
-        skip_days: int = 21
+        skip_days: int = 21,
+        n_stocks: int = 10
     ):
         """
         Initialize momentum strategy.
@@ -41,9 +42,11 @@ class MomentumStrategy(BaseStrategy):
         Args:
             lookback_days: Days for momentum calculation (default 252 = 1 year)
             skip_days: Recent days to skip (default 21 = 1 month)
+            n_stocks: Number of top stocks to select (default 10)
         """
         self.lookback_days = lookback_days
         self.skip_days = skip_days
+        self.n_stocks = n_stocks
     
     def get_name(self) -> str:
         """Return strategy identifier."""
@@ -117,6 +120,18 @@ class MomentumStrategy(BaseStrategy):
         
         # Sort descending by momentum
         return dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
+    
+    def select_holdings(self, scores: Dict[str, float]) -> list:
+        """
+        Select top N stocks from ranked scores.
+        
+        Args:
+            scores: {ticker: momentum_score} sorted by score descending
+            
+        Returns:
+            List of top n_stocks tickers
+        """
+        return list(scores.keys())[:self.n_stocks]
     
     def generate_signals(
         self, 

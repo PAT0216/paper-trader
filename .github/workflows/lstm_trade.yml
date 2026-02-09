@@ -1,8 +1,10 @@
 name: LSTM Strategy Trade
 
+# DISABLED: Now handled by AWS Lambda
+# Re-enable by uncommenting the schedule below
 on:
-  schedule:
-    - cron: '45 21 * * 1-5'  # Mon-Fri 9:45 PM UTC
+  # schedule:
+  #   - cron: '45 21 * * 1-5'  # Mon-Fri 9:45 PM UTC
   workflow_dispatch:
 
 jobs:

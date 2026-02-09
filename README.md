@@ -155,6 +155,63 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 - **GitHub Actions**: Automated trading + universe sync
 - **Streamlit Dashboard**: Live comparison with SPY benchmark
 - **Point-in-time Universe**: Monthly S&P 500 sync
+- **AWS Lambda**: Serverless trading execution (see below)
+
+---
+
+## AWS Lambda Deployment
+
+The trading system can run as a serverless Lambda function on AWS, providing cost-effective automated execution.
+
+### Architecture
+
+| Component | Service | Configuration |
+|-----------|---------|---------------|
+| **Compute** | AWS Lambda | 3008 MB, 300s timeout |
+| **Container** | ECR | `paper-trader-lambda:latest` |
+| **Schedule** | EventBridge | Mon-Fri 4:30 PM PT |
+| **Storage** | S3 | `paper-trader-data-{user}` |
+| **Version Control** | GitHub | Source of truth for ledgers |
+
+### Data Flow
+
+```
+cache_refresh.yml → S3 (market.db)
+EventBridge → Lambda → downloads from S3 + GitHub
+Lambda → runs trading → commits to GitHub → uploads to S3
+GitHub → Dashboard auto-refreshes
+```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `AWS_REGION` | Lambda region (us-west-2) |
+| `BUCKET_NAME` | S3 bucket for market data |
+| `STRATEGY` | Trading strategy (momentum, ml, lstm) |
+| `GITHUB_PAT` | GitHub token for commits |
+
+### Build & Deploy
+
+```bash
+# Build Lambda container
+docker build -f Dockerfile.lambda -t paper-trader-lambda .
+
+# Push to ECR (automatic via aws-ecr-push.yml on push to main)
+aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-west-2.amazonaws.com
+docker tag paper-trader-lambda:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
+docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
+```
+
+### Cost Estimate
+
+| Service | Monthly Cost |
+|---------|-------------|
+| Lambda | Free (within free tier) |
+| S3 | ~$0.02 |
+| ECR | ~$0.12 |
+| EventBridge | Free |
+| **Total** | **~$0.15/month** |
 
 ---
 

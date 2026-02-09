@@ -39,6 +39,7 @@ DB_PATH = 'data/market.db'
 OUTPUT_PATH = 'data/portfolio_snapshot.json'
 SNAPSHOTS_DIR = 'data/snapshots'
 INITIAL_CAPITAL = 10000
+TRADING_START_DATE = "2025-10-01"  # Known first trading day - fallback if data corrupted
 
 
 def is_github_actions() -> bool:
@@ -221,15 +222,35 @@ def add_spy_benchmark(snapshot: dict):
     
     print("\nComputing SPY benchmark...")
     try:
-        # Get first ledger date
-        first_date = None
-        ledgers = ['data/ledgers/ledger_momentum.csv', 'data/ledgers/ledger_ml.csv', 'data/ledgers/ledger_lstm.csv']
-        for path in ledgers:
-            if os.path.exists(path):
-                df = pd.read_csv(path)
-                if not df.empty and 'date' in df.columns:
-                    first_date = df['date'].min()
-                    break
+        # PRIORITY 1: Preserve existing start_date from spy_benchmark.json
+        # This prevents data corruption when ledgers are temporarily corrupted
+        existing_start = None
+        if os.path.exists('data/spy_benchmark.json'):
+            try:
+                with open('data/spy_benchmark.json', 'r') as f:
+                    existing = json.load(f)
+                    existing_start = existing.get('start_date')
+                    if existing_start:
+                        print(f"  Preserving existing start_date: {existing_start}")
+            except Exception as e:
+                print(f"  Could not read existing spy_benchmark.json: {e}")
+        
+        # PRIORITY 2: Get first ledger date (only if no existing start)
+        first_date = existing_start
+        if not first_date:
+            ledgers = ['data/ledgers/ledger_momentum.csv', 'data/ledgers/ledger_ml.csv', 'data/ledgers/ledger_lstm.csv']
+            for path in ledgers:
+                if os.path.exists(path):
+                    df = pd.read_csv(path)
+                    if not df.empty and 'date' in df.columns:
+                        first_date = df['date'].min()
+                        print(f"  Using ledger first_date: {first_date}")
+                        break
+        
+        # PRIORITY 3: Fallback to known trading start date
+        if not first_date:
+            first_date = TRADING_START_DATE
+            print(f"  Using fallback TRADING_START_DATE: {first_date}")
         
         spy_df = None
         

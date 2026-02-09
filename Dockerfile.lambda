@@ -1,0 +1,29 @@
+# Lambda-compatible Dockerfile
+# Uses AWS Lambda base image with Python 3.10
+
+FROM public.ecr.aws/lambda/python:3.10
+
+# Copy requirements first (for Docker layer caching)
+COPY requirements-lambda.txt ${LAMBDA_TASK_ROOT}/
+
+# Upgrade pip and install Python packages
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements-lambda.txt
+
+# ============================================================
+# APPLICATION CODE
+# ============================================================
+
+COPY main.py ${LAMBDA_TASK_ROOT}/
+COPY lambda_handler.py ${LAMBDA_TASK_ROOT}/
+COPY src/ ${LAMBDA_TASK_ROOT}/src/
+COPY config/ ${LAMBDA_TASK_ROOT}/config/
+COPY models/ ${LAMBDA_TASK_ROOT}/models/
+COPY data/sp500_tickers.txt ${LAMBDA_TASK_ROOT}/data/
+
+# Create runtime directories
+RUN mkdir -p ${LAMBDA_TASK_ROOT}/data/ledgers \
+    ${LAMBDA_TASK_ROOT}/data/snapshots \
+    ${LAMBDA_TASK_ROOT}/logs
+
+CMD ["lambda_handler.handler"]
