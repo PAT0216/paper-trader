@@ -167,9 +167,9 @@ The trading system can run as a serverless Lambda function on AWS, providing cos
 
 | Component | Service | Configuration |
 |-----------|---------|---------------|
-| **Compute** | AWS Lambda | 3008 MB, 300s timeout |
+| **Compute** | AWS Lambda | 2048 MB, 15 min timeout |
 | **Container** | ECR | `paper-trader:latest` |
-| **Schedule** | EventBridge | Mon-Fri 1:30 PM PT (Market Close) |
+| **Schedule** | EventBridge | **NOT YET CONFIGURED** (see Setup below) |
 | **Storage** | S3 | `paper-trader-data-{user}` |
 | **Version Control** | GitHub | Source of truth for ledgers |
 
@@ -202,6 +202,16 @@ aws ecr get-login-password --region us-west-2 | docker login --username AWS --pa
 docker tag paper-trader:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
 docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
 ```
+
+### EventBridge Schedule Setup (Required)
+
+The Lambda schedule is NOT automatically created. To set up:
+
+1. **Go to:** EventBridge > Schedules > Create schedule
+2. **Name:** `paper-trader-daily`
+3. **Schedule:** `cron(30 21 ? * MON-FRI *)` (1:30 PM PT = 21:30 UTC)
+4. **Target:** Lambda function `paper-trader-daily`
+5. **Input:** `{"strategy": "momentum"}` (or `ml`, `lstm`)
 
 ---
 
