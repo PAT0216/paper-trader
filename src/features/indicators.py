@@ -177,9 +177,8 @@ def create_target(df, target_type='regression', horizon=1):
     
     if target_type == 'regression':
         # Predict N-day return (percentage)
-        # pct_change(horizon) calculates N-day return
-        # shift(-horizon) looks into the future - ONLY use in training data
-        df['Target'] = close.pct_change(horizon).shift(-horizon)
+        # Manual pct_change to avoid pandas 2.1.4 bug with numpy argmax on empty mask
+        df['Target'] = (close / close.shift(horizon) - 1).shift(-horizon)
     else:
         # Binary classification: 1 if next close > current close
         df['Target'] = (close.shift(-horizon) > close).astype(int)
