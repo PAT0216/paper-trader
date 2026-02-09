@@ -161,64 +161,33 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ## AWS Lambda Deployment
 
-The trading system can run as a serverless Lambda function on AWS, providing cost-effective automated execution.
+The trading system runs as a serverless Lambda function on AWS, providing cost-effective automated execution.
 
 ### Architecture
 
 | Component | Service | Configuration |
 |-----------|---------|---------------|
 | **Compute** | AWS Lambda | 2048 MB, 15 min timeout |
-| **Container** | ECR | `paper-trader:latest` |
-| **Schedule** | EventBridge | 3 schedules (ML 4:30 PM, LSTM 4:35 PM, Momentum 1st-3rd) |
-| **Storage** | S3 | `paper-trader-data-{user}` |
-| **Version Control** | GitHub | Source of truth for ledgers |
+| **Container** | Amazon ECR | Docker image with ML models |
+| **Scheduler** | EventBridge | 3 automated schedules |
+| **Storage** | S3 | Market data cache |
+| **CI/CD** | GitHub Actions | Automatic ECR deployment on push |
+
+### Automated Execution Schedule
+
+| Strategy | Schedule | Description |
+|----------|----------|-------------|
+| **ML (XGBoost)** | Mon-Fri 4:30 PM PT | Daily ML predictions |
+| **LSTM** | Mon-Fri 4:35 PM PT | Daily deep learning signals |
+| **Momentum** | 1st-3rd monthly | Monthly factor rebalance |
 
 ### Data Flow
 
 ```
-cache_refresh.yml -> S3 (market.db)
-EventBridge -> Lambda -> downloads from S3 + GitHub
-Lambda -> runs trading -> commits to GitHub -> uploads to S3
-GitHub -> Dashboard auto-refreshes
+GitHub Actions (daily) -> Refresh market cache -> S3
+EventBridge Scheduler -> Lambda -> Execute trades -> Commit to GitHub
+GitHub -> Dashboard auto-refresh
 ```
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `AWS_REGION` | Lambda region (us-west-2) |
-| `BUCKET_NAME` | S3 bucket for market data |
-| `STRATEGY` | Trading strategy (momentum, ml, lstm) |
-| `GITHUB_PAT` | GitHub token for commits |
-
-### Build & Deploy
-
-```bash
-# Build Lambda container
-docker build -f Dockerfile.lambda -t paper-trader .
-
-# Push to ECR (automatic via aws-ecr-push.yml on push to main)
-aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-west-2.amazonaws.com
-docker tag paper-trader:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
-docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
-```
-
-### EventBridge Scheduler Configuration
-
-Three EventBridge schedules trigger Lambda for each strategy:
-
-| Schedule Name | Cron (PT) | Days | Payload |
-|---------------|-----------|------|---------|
-| `paper-trader-daily-trigger` | 4:30 PM | Mon-Fri | `{"strategy": "ml"}` |
-| `paper-trader-lstm` | 4:35 PM | Mon-Fri | `{"strategy": "lstm"}` |
-| `paper-trader-momentum` | 4:30 PM | 1st-3rd | `{"strategy": "momentum"}` |
-
-**Daily data refresh** via `cache_refresh.yml` (GitHub Actions) at 1:00 PM PT updates all ledger VALUES.
-
-**To add/modify schedules:**
-1. Go to: EventBridge > Schedules
-2. Create/edit schedule with target `paper-trader-daily`
-3. Set payload: `{"strategy": "<strategy_name>"}`
 
 ---
 
