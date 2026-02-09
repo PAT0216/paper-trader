@@ -30,6 +30,78 @@ This session focused on diagnosing and resolving **5 critical bugs** preventing 
 
 ---
 
+## Session: February 8, 2026 - AWS Lambda Integration
+
+**Session ID:** c326d96c-f45b-4fe6-8ba8-c0a499fa7197
+
+### Overview
+
+This session completed AWS Lambda integration and fixed critical data integrity issues that arose during testing.
+
+### Changes Made
+
+#### 1. AWS Lambda Integration (PR #12: feature/aws-integration)
+
+| File | Change |
+|------|--------|
+| `lambda_handler.py` | Complete handler for serverless trading |
+| `Dockerfile.lambda` | Container build for Lambda |
+| `.github/workflows/aws-ecr-push.yml` | Automatic ECR push on merge to main |
+| `requirements-lambda.txt` | Lightweight dependencies |
+
+**Lambda Architecture:**
+- EventBridge: Mon-Fri 4:30 PM PT
+- S3: `paper-trader-data-pat0216` for market.db
+- ECR: `paper-trader-lambda:latest`
+- GitHub: Source of truth for ledgers
+
+#### 2. Data Integrity Fixes
+
+**Problem**: Lambda test run corrupted historical data by downloading from empty S3, creating fresh ledger, and overwriting GitHub.
+
+**Fix 1: Lambda downloads from GitHub first**
+```python
+# lambda_handler.py
+def download_from_github():
+    """Download ledger and portfolio_snapshot from GitHub (source of truth)."""
+```
+
+**Fix 2: SPY benchmark preserves start_date**
+```python
+# compute_portfolio_snapshot.py - add_spy_benchmark()
+# Priority 1: Preserve existing start_date from spy_benchmark.json
+# Priority 2: Use ledger min date
+# Priority 3: Fallback to TRADING_START_DATE constant
+```
+
+**Fix 3: Added fallback constant**
+```python
+TRADING_START_DATE = "2025-10-01"  # Known first trading day
+```
+
+#### 3. Data Restoration
+
+Restored from feature branch to main:
+- `ledger_momentum.csv`: 15 -> 141 lines
+- `spy_benchmark.json`: 13 -> 365 lines
+
+#### 4. Documentation
+
+- Updated README.md with AWS Lambda section
+- Added architecture, data flow, environment variables, build/deploy, cost estimates
+
+### Verification
+
+| Check | Status |
+|-------|--------|
+| CI tests | Passed |
+| ECR build | Complete |
+| Dashboard momentum graph | Restored (Oct 2025-Feb 2026) |
+| SPY benchmark | Correct (+3.62%) |
+| Line counts | Correct (141/365) |
+
+---
+
 ## Bugs Fixed
 
 ### Bug 1: Docker Container Missing GITHUB_ACTIONS Env
