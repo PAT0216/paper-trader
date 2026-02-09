@@ -168,7 +168,7 @@ The trading system can run as a serverless Lambda function on AWS, providing cos
 | Component | Service | Configuration |
 |-----------|---------|---------------|
 | **Compute** | AWS Lambda | 3008 MB, 300s timeout |
-| **Container** | ECR | `paper-trader-lambda:latest` |
+| **Container** | ECR | `paper-trader:latest` |
 | **Schedule** | EventBridge | Mon-Fri 1:30 PM PT (Market Close) |
 | **Storage** | S3 | `paper-trader-data-{user}` |
 | **Version Control** | GitHub | Source of truth for ledgers |
@@ -176,10 +176,10 @@ The trading system can run as a serverless Lambda function on AWS, providing cos
 ### Data Flow
 
 ```
-cache_refresh.yml → S3 (market.db)
-EventBridge → Lambda → downloads from S3 + GitHub
-Lambda → runs trading → commits to GitHub → uploads to S3
-GitHub → Dashboard auto-refreshes
+cache_refresh.yml -> S3 (market.db)
+EventBridge -> Lambda -> downloads from S3 + GitHub
+Lambda -> runs trading -> commits to GitHub -> uploads to S3
+GitHub -> Dashboard auto-refreshes
 ```
 
 ### Environment Variables
@@ -195,12 +195,12 @@ GitHub → Dashboard auto-refreshes
 
 ```bash
 # Build Lambda container
-docker build -f Dockerfile.lambda -t paper-trader-lambda .
+docker build -f Dockerfile.lambda -t paper-trader .
 
 # Push to ECR (automatic via aws-ecr-push.yml on push to main)
 aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-west-2.amazonaws.com
-docker tag paper-trader-lambda:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
-docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
+docker tag paper-trader:latest <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
+docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader:latest
 ```
 
 ---
