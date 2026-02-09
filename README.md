@@ -169,7 +169,7 @@ The trading system can run as a serverless Lambda function on AWS, providing cos
 |-----------|---------|---------------|
 | **Compute** | AWS Lambda | 3008 MB, 300s timeout |
 | **Container** | ECR | `paper-trader-lambda:latest` |
-| **Schedule** | EventBridge | Mon-Fri 4:30 PM PT |
+| **Schedule** | EventBridge | Mon-Fri 1:30 PM PT (Market Close) |
 | **Storage** | S3 | `paper-trader-data-{user}` |
 | **Version Control** | GitHub | Source of truth for ledgers |
 
