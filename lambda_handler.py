@@ -331,7 +331,15 @@ def handler(event, context):
         # This ensures we preserve existing data even if S3 is stale
         download_from_github(strategy)
         
-        # 2. Change to /tmp so relative paths work
+        # 2. Change to /tmp so relative paths work for data/
+        # Symlink models/ and config/ from /var/task so relative paths resolve
+        for dirname in ['models', 'config', 'src']:
+            target = f'/var/task/{dirname}'
+            link = f'/tmp/{dirname}'
+            if os.path.exists(target) and not os.path.exists(link):
+                os.symlink(target, link)
+                print(f"Symlinked {link} -> {target}")
+        
         original_cwd = os.getcwd()
         os.chdir('/tmp')
         print(f"Changed working directory to /tmp")
