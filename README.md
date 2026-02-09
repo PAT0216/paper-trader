@@ -207,8 +207,6 @@ docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
 
 ## MLOps System Architecture
 
-## MLOps System Architecture
-
 ![Paper Trader AI Architecture](docs/system_architecture_v2.png)
 
 ### 1. Data Cycle (The Foundation)
