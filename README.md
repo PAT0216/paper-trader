@@ -203,51 +203,45 @@ docker tag paper-trader-lambda:latest <account>.dkr.ecr.us-west-2.amazonaws.com/
 docker push <account>.dkr.ecr.us-west-2.amazonaws.com/paper-trader-lambda:latest
 ```
 
-### Cost Estimate
+---
 
-| Service | Monthly Cost |
-|---------|-------------|
-| Lambda | Free (within free tier) |
-| S3 | ~$0.02 |
-| ECR | ~$0.12 |
-| EventBridge | Free |
-| **Total** | **~$0.15/month** |
+## MLOps System Architecture
+
+![Paper Trader AI Architecture](docs/architecture.png)
+
+### 1. Data Cycle (The Foundation)
+- **Sources**: yfinance (OHLCV), FRED (Macroeconomic), S&P 500 Tickers
+- **Processing**: Automated cleaners, split adjustments, macroeconomic normalization
+- **Storage**: SQLite cache (local/container) + S3 Bucket (cloud persistence)
+
+### 2. Strategy Engine (The Brains)
+Three distinct algorithmic approaches running in parallel:
+
+| Strategy | Logic | Rebalancing |
+|----------|-------|-------------|
+| **Momentum** | Classical Factor Investing (12-month returns + Relative Strength) | Monthly |
+| **XGBoost** | Ensemble Learning (15 technical features, noise filtration) | Daily |
+| **LSTM** | Deep Learning (60-day sequential patterns, TensorFlow) | Daily |
+
+### 3. Execution & Deployment (The Muscle)
+- **Serverless**: AWS Lambda handles compute, triggered by EventBridge schedules
+- **CI/CD**: GitHub Actions automates testing, Docker builds, and universe synchronization
+- **Ledger**: Git-based transaction recording ensures 100% auditability and transparency
 
 ---
 
-## System Architecture
+## Strategy Deep Dive
 
-![QuantCore - MLOps System Architecture](docs/architecture.png)
+### LSTM Neural Network Flow
+1. **Sequence Generation**: Rolling 60-day windows of normalized price/volume data
+2. **Model Architecture**:
+   - `LSTM(64)` input layer
+   - `Dropout(0.2)` regularization
+   - `Dense(32, relu)` hidden layer
+   - `Dense(1, sigmoid)` output probability
+3. **Inference**: Predicts probability of `Next_Day_Return > 0`
+4. **Signal**: Long if Probability > 0.55 (with position sizing based on confidence)
 
-### Pipeline Overview
-
-| Stage | Components | Description |
-|-------|------------|-------------|
-| **1. Data Pipeline** | SQLite cache, yfinance, FRED API | Market data collection and storage (4.3M+ rows) |
-| **2. Feature Engineering** | Technical indicators, momentum factors, LSTM sequences | Transform raw data for model consumption |
-| **3. Model Layer** | Momentum, XGBoost Ensemble, LSTM Neural Network | Three independent trading strategies |
-| **4. Trading Engine** | Risk management, position sizing, transaction costs | Trade execution with 5 bps slippage |
-| **5. Deployment** | GitHub Actions, Docker, CSV Ledgers | Automated daily operations |
-| **6. Monitoring** | Streamlit Dashboard, SPY Benchmark | Live performance tracking |
-
-## Strategy Architecture
-
-### Adding a New Strategy
-
-```python
-# 1. Create src/strategies/my_strategy.py
-from src.strategies.base import BaseStrategy
-
-class MyStrategy(BaseStrategy):
-    def get_name(self): return "my_strategy"
-    def needs_training(self): return False
-    def rank_universe(self, data_dict): ...
-    def generate_signals(self, data_dict): ...
-
-# 2. Register in src/strategies/registry.py
-STRATEGIES["my_strategy"] = MyStrategy
-
-# Done! No main.py changes needed.
 ```
 
 ### Momentum Strategy Flow (Monthly)
