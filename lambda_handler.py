@@ -332,13 +332,19 @@ def handler(event, context):
         download_from_github(strategy)
         
         # 2. Change to /tmp so relative paths work for data/
-        # Symlink models/ and config/ from /var/task so relative paths resolve
-        for dirname in ['models', 'config', 'src']:
+        # Symlink read-only dirs, copy config/ (needs to be writable)
+        for dirname in ['models', 'src']:
             target = f'/var/task/{dirname}'
             link = f'/tmp/{dirname}'
             if os.path.exists(target) and not os.path.exists(link):
                 os.symlink(target, link)
                 print(f"Symlinked {link} -> {target}")
+        # Copy config (must be writable to override retrain_daily)
+        config_src = '/var/task/config'
+        config_dst = '/tmp/config'
+        if os.path.exists(config_src) and not os.path.exists(config_dst):
+            shutil.copytree(config_src, config_dst)
+            print(f"Copied config/ to /tmp/config/")
         
         original_cwd = os.getcwd()
         os.chdir('/tmp')
