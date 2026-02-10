@@ -363,12 +363,12 @@ def handler(event, context):
         # Run trading (handles both rebalance and non-rebalance days)
         run_trading()
         
-        # 4. Change back
-
-        os.chdir(original_cwd)
-        
-        # 5. Run snapshot computation (parity with GitHub Actions)
+        # 4. Run snapshot computation while CWD is still /tmp
+        # (script uses relative paths like data/snapshots/ which must resolve to /tmp/data/)
         run_snapshot_computation(strategy)
+        
+        # 5. Change back to original directory
+        os.chdir(original_cwd)
         
         # 6. Upload to S3 (backup - ledger + per-strategy snapshot only)
         upload_to_s3(strategy)
