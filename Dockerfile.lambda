@@ -19,6 +19,7 @@ COPY lambda_handler.py ${LAMBDA_TASK_ROOT}/
 COPY src/ ${LAMBDA_TASK_ROOT}/src/
 COPY config/ ${LAMBDA_TASK_ROOT}/config/
 COPY models/ ${LAMBDA_TASK_ROOT}/models/
+COPY scripts/ ${LAMBDA_TASK_ROOT}/scripts/
 COPY data/sp500_tickers.txt ${LAMBDA_TASK_ROOT}/data/
 
 # Create runtime directories

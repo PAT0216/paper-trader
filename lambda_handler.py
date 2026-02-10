@@ -18,6 +18,14 @@ import base64
 import urllib.request
 import urllib.error
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+# Pacific timezone for consistent date handling
+PT = ZoneInfo('America/Los_Angeles')
+
+def pt_now():
+    """Current time in Pacific."""
+    return datetime.now(PT)
 
 # S3 client
 s3 = boto3.client('s3')
@@ -94,7 +102,7 @@ def download_from_s3(strategy: str):
 
 
 def upload_to_s3(strategy: str):
-    """Upload results back to S3 (backup)"""
+    """Upload per-strategy results back to S3 (backup)."""
     # Upload ledger
     ledger_path = f'{TMP_LEDGER_DIR}/ledger_{strategy}.csv'
     if os.path.exists(ledger_path):
@@ -106,12 +114,6 @@ def upload_to_s3(strategy: str):
     if os.path.exists(snapshot_path):
         s3.upload_file(snapshot_path, BUCKET_NAME, f'snapshots/{strategy}.json')
         print(f"Uploaded snapshot to S3")
-    
-    # Upload consolidated snapshot
-    consolidated_path = f'{TMP_DATA_DIR}/portfolio_snapshot.json'
-    if os.path.exists(consolidated_path):
-        s3.upload_file(consolidated_path, BUCKET_NAME, 'portfolio_snapshot.json')
-        print(f"Uploaded consolidated snapshot to S3")
 
 
 def download_from_github(strategy: str):
@@ -232,12 +234,13 @@ def commit_to_github(strategy: str):
     
     print("\n=== Committing to GitHub ===")
     
-    commit_msg = f'{strategy}: Lambda trade {datetime.now().strftime("%Y-%m-%d")}'
+    commit_msg = f'{strategy}: Lambda trade {pt_now().strftime("%Y-%m-%d")}'
     
+    # Only commit per-strategy files (not portfolio_snapshot.json)
+    # Consolidated snapshot is computed by cache_refresh.yml to avoid race conditions
     files_to_commit = [
         (f'{TMP_LEDGER_DIR}/ledger_{strategy}.csv', f'data/ledgers/ledger_{strategy}.csv'),
         (f'{TMP_SNAPSHOT_DIR}/{strategy}.json', f'data/snapshots/{strategy}.json'),
-        (f'{TMP_DATA_DIR}/portfolio_snapshot.json', 'data/portfolio_snapshot.json'),
     ]
     
     success_count = 0
@@ -250,40 +253,25 @@ def commit_to_github(strategy: str):
     return success_count > 0
 
 
-def update_consolidated_snapshot(strategy: str):
-    """Update the consolidated portfolio_snapshot.json with this strategy's data."""
-    print("\n=== Updating Consolidated Snapshot ===")
+def run_snapshot_computation(strategy: str):
+    """Run compute_portfolio_snapshot.py for this strategy (same as GitHub Actions).
     
-    consolidated_path = f'{TMP_DATA_DIR}/portfolio_snapshot.json'
-    
-    # Try to download existing consolidated snapshot from S3
+    This recomputes portfolio value from ledger + latest prices in market.db,
+    appends a VALUE row to the ledger, and writes per-strategy snapshot JSON.
+    """
+    print(f"\n=== Computing Portfolio Snapshot ({strategy}) ===")
+    import sys
+    original_argv = sys.argv
     try:
-        s3.download_file(BUCKET_NAME, 'portfolio_snapshot.json', consolidated_path)
-        with open(consolidated_path, 'r') as f:
-            consolidated = json.load(f)
-        print("Downloaded existing consolidated snapshot")
+        sys.argv = ['compute_portfolio_snapshot.py', '--strategy', strategy, '--force']
+        from scripts.utils.compute_portfolio_snapshot import main as run_snapshot
+        run_snapshot()
     except Exception as e:
-        print(f"No existing consolidated snapshot, creating new: {e}")
-        consolidated = {'strategies': {}, 'last_updated': None}
-    
-    # Ensure 'strategies' key exists
-    if 'strategies' not in consolidated:
-        consolidated['strategies'] = {}
-    
-    # Load this strategy's snapshot
-    snapshot_path = f'{TMP_SNAPSHOT_DIR}/{strategy}.json'
-    if os.path.exists(snapshot_path):
-        with open(snapshot_path, 'r') as f:
-            strategy_data = json.load(f)
-        consolidated['strategies'][strategy] = strategy_data
-        consolidated['last_updated'] = datetime.now().isoformat()
-        print(f"Added {strategy} data to consolidated snapshot")
-    
-    # Save consolidated snapshot
-    with open(consolidated_path, 'w') as f:
-        json.dump(consolidated, f, indent=2)
-    
-    print(f"Saved consolidated snapshot")
+        print(f"Snapshot computation failed: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        sys.argv = original_argv
 
 
 # ============ Rebalance Logic ============
@@ -293,7 +281,7 @@ def should_rebalance_today(strategy: str) -> bool:
     Check if today is a rebalance day.
     Momentum strategy rebalances on 1st-3rd of each month.
     """
-    day = datetime.now().day
+    day = pt_now().day
     if strategy == 'momentum':
         return day <= 3
     # For other strategies, always run trading
@@ -304,7 +292,7 @@ def should_rebalance_today(strategy: str) -> bool:
 
 def handler(event, context):
     """Lambda entrypoint"""
-    start_time = datetime.now()
+    start_time = pt_now()
     
     # Get strategy from event (EventBridge) or env var
     strategy = get_strategy_from_event(event)
@@ -333,7 +321,7 @@ def handler(event, context):
         
         # 2. Change to /tmp so relative paths work for data/
         # Symlink read-only dirs, copy config/ (needs to be writable)
-        for dirname in ['models', 'src']:
+        for dirname in ['models', 'src', 'scripts']:
             target = f'/var/task/{dirname}'
             link = f'/tmp/{dirname}'
             if os.path.exists(target) and not os.path.exists(link):
@@ -379,16 +367,16 @@ def handler(event, context):
 
         os.chdir(original_cwd)
         
-        # 5. Update consolidated snapshot
-        update_consolidated_snapshot(strategy)
+        # 5. Run snapshot computation (parity with GitHub Actions)
+        run_snapshot_computation(strategy)
         
-        # 6. Upload to S3 (backup)
+        # 6. Upload to S3 (backup - ledger + per-strategy snapshot only)
         upload_to_s3(strategy)
         
         # 7. Commit to GitHub (for dashboard)
         commit_to_github(strategy)
         
-        elapsed = (datetime.now() - start_time).total_seconds()
+        elapsed = (pt_now() - start_time).total_seconds()
         return {
             'statusCode': 200,
             'body': json.dumps({
