@@ -351,6 +351,18 @@ def handler(event, context):
         from main import main as run_trading
         import sys
         
+        # Override retrain_daily - Lambda uses pre-trained model from container
+        # Retraining exceeds Lambda's 3008 MB memory limit
+        import yaml
+        config_path = os.path.join('/tmp', 'config', 'settings.yaml')
+        if os.path.exists(config_path):
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+            config['model']['retrain_daily'] = False
+            with open(config_path, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+            print("Disabled retrain_daily for Lambda (using pre-trained model)")
+        
         # Set arguments for main.py
         sys.argv = ['main.py', '--mode', 'trade', '--strategy', strategy, '--portfolio', strategy]
         
