@@ -1,0 +1,91 @@
+name: Update Portfolio Snapshots
+
+# Runs AFTER all Lambda trades have completed and committed their ledgers.
+# Reads ledgers from GitHub to compute fresh portfolio values and snapshots.
+#
+# Timeline (PT):
+#   1:00 PM  cache_refresh.yml  -> fetches market data, uploads to S3
+#   1:50 PM  Lambda ML          -> trades, commits ledger_ml.csv
+#   1:55 PM  Lambda LSTM        -> trades, commits ledger_lstm.csv
+#   2:10 PM  THIS WORKFLOW      -> computes snapshots from ledgers + market.db
+
+on:
+  schedule:
+    - cron: '10 22 * * 1-5'  # 2:10 PM PT (10:10 PM UTC), Mon-Fri
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-snapshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore Market Data Cache
+        uses: actions/cache@v4
+        with:
+          path: data/market.db
+          key: market-data-v3-${{ github.run_id }}
+          restore-keys: |
+            market-data-v3-
+
+      - name: Verify Market Data
+        run: |
+          if [ ! -f data/market.db ]; then
+            echo "ERROR: No market.db cache found"
+            exit 1
+          fi
+          DB_SIZE=$(stat -c%s data/market.db 2>/dev/null || stat -f%z data/market.db)
+          echo "market.db size: $DB_SIZE bytes"
+          if [ "$DB_SIZE" -lt 100000000 ]; then
+            echo "ERROR: market.db too small ($DB_SIZE bytes)"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install pandas yfinance
+
+      - name: Compute All Strategy Snapshots
+        env:
+          GITHUB_ACTIONS: "true"
+        run: |
+          # Process each strategy individually using process_single_strategy()
+          # which reads holdings from the LEDGER (authoritative source),
+          # NOT from potentially stale snapshot JSONs.
+          # Each call also consolidates all snapshots into portfolio_snapshot.json.
+          python scripts/utils/compute_portfolio_snapshot.py --strategy ml
+          python scripts/utils/compute_portfolio_snapshot.py --strategy lstm
+          python scripts/utils/compute_portfolio_snapshot.py --strategy momentum
+
+      - name: Commit and Push Snapshots
+        run: |
+          git config user.name "PAT0216"
+          git config user.email "69978508+PAT0216@users.noreply.github.com"
+
+          git add data/portfolio_snapshot.json data/spy_benchmark.json data/ledgers/ledger_*.csv data/snapshots/*.json
+
+          git diff --cached --quiet && { echo "No changes to commit"; exit 0; }
+
+          git commit -m "Daily snapshot update $(date +%Y-%m-%d)"
+
+          # Retry push with rebase (Lambda may have committed between our checkout and push)
+          for i in 1 2 3; do
+            git push origin main && { echo "Push succeeded"; exit 0; }
+            echo "Push failed (attempt $i), rebasing..."
+            git pull --rebase origin main || {
+              git rebase --abort 2>/dev/null || true
+              git pull origin main --no-rebase
+            }
+          done
+          echo "WARNING: Push failed after 3 attempts"
+          exit 1

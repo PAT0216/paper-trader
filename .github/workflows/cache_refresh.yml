@@ -105,18 +105,15 @@ jobs:
           aws s3 cp data/sp500_tickers.txt s3://paper-trader-data-pat0216/sp500_tickers.txt
           echo "Uploaded market.db and sp500_tickers.txt to S3"
 
-      - name: Update Portfolio Snapshot Values
-        run: |
-          python scripts/utils/compute_portfolio_snapshot.py --update-value-only
+      # NOTE: Snapshot computation moved to snapshot_update.yml (runs after Lambda trades)
+      # This avoids git conflicts between cache_refresh, Lambda, and snapshot updates
 
-
-      - name: Commit Updates
+      - name: Commit Cache Timestamp
         run: |
           git config user.name "PAT0216"
           git config user.email "69978508+PAT0216@users.noreply.github.com"
           date > .cache_last_updated
-          git add .cache_last_updated data/portfolio_snapshot.json data/spy_benchmark.json data/ledgers/ledger_*.csv data/snapshots/*.json
-          git diff --cached --quiet || git commit -m "📦 Cache + snapshot updated $(date +%Y-%m-%d)"
-          git pull --rebase origin main || true
-          git push || echo "No changes to push"
+          git add .cache_last_updated
+          git diff --cached --quiet || git commit -m "Cache refreshed $(date +%Y-%m-%d)"
+          git push origin main || echo "No changes to push"
 

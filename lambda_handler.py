@@ -236,11 +236,10 @@ def commit_to_github(strategy: str):
     
     commit_msg = f'{strategy}: Lambda trade {pt_now().strftime("%Y-%m-%d")}'
     
-    # Only commit per-strategy files (not portfolio_snapshot.json)
-    # Consolidated snapshot is computed by cache_refresh.yml to avoid race conditions
+    # Only commit the ledger (unique per strategy, no conflict risk).
+    # Snapshots are computed and committed by snapshot_update.yml (runs after all Lambdas).
     files_to_commit = [
         (f'{TMP_LEDGER_DIR}/ledger_{strategy}.csv', f'data/ledgers/ledger_{strategy}.csv'),
-        (f'{TMP_SNAPSHOT_DIR}/{strategy}.json', f'data/snapshots/{strategy}.json'),
     ]
     
     success_count = 0
