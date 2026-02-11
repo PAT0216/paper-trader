@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
 ![Strategy](https://img.shields.io/badge/strategy-triple--portfolio-orange)
-![Version](https://img.shields.io/badge/version-2.0.0-green)
+![Version](https://img.shields.io/badge/version-2.1.0-green)
 
 **Paper Trader AI** is a production-grade algorithmic trading system featuring a **Triple Portfolio Architecture** that runs three independent strategies simultaneously for performance comparison.
 
@@ -21,14 +21,14 @@
 | **ML** | XGBoost ensemble predictions | Daily (weekdays) | `data/ledgers/ledger_ml.csv` |
 | **LSTM** | TensorFlow neural network | Daily (weekdays) | `data/ledgers/ledger_lstm.csv` |
 
-### Live Performance (Oct 1, 2025 - Jan 26, 2026)
+### Live Performance (Oct 1, 2025 - Feb 10, 2026)
 
 | Metric | Momentum | ML Ensemble | LSTM | SPY |
 |--------|----------|-------------|------|-----|
-| **Return** | +18.65% | +6.95% | +7.94% | +3.94% |
+| **Return** | +17.58% | +8.79% | +10.04% | +3.85% |
 | **Sharpe Ratio** | 2.04 | 0.92 | 1.65 | 0.97 |
 | **Max Drawdown** | -9.1% | -14.8% | -7.8% | -5.1% |
-| **Excess vs SPY** | +14.71% | +3.01% | +4.00% | — |
+| **Excess vs SPY** | +13.73% | +4.94% | +6.19% | -- |
 
 > All strategies include realistic transaction costs (5 basis points slippage on all trades).
 
@@ -152,10 +152,10 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ### Infrastructure
 - **SQLite data cache**: 4.3M+ rows, 503 S&P 500 tickers
-- **GitHub Actions**: Automated trading + universe sync
-- **Streamlit Dashboard**: Live comparison with SPY benchmark
+- **AWS Lambda**: Serverless trading execution via EventBridge schedules
+- **3-Stage Pipeline**: Cache refresh -> Lambda trades -> Snapshot computation
+- **Streamlit Dashboard**: Live comparison with SPY benchmark (auto-redeploys on data updates)
 - **Point-in-time Universe**: Monthly S&P 500 sync
-- **AWS Lambda**: Serverless trading execution (see below)
 
 ---
 
@@ -173,20 +173,21 @@ The trading system runs as a serverless Lambda function on AWS, providing cost-e
 | **Storage** | S3 | Market data cache |
 | **CI/CD** | GitHub Actions | Automatic ECR deployment on push |
 
-### Automated Execution Schedule
+### 3-Stage Daily Pipeline
 
-| Strategy | Schedule | Description |
-|----------|----------|-------------|
-| **ML (XGBoost)** | Mon-Fri 4:30 PM PT | Daily ML predictions |
-| **LSTM** | Mon-Fri 4:35 PM PT | Daily deep learning signals |
-| **Momentum** | 1st-3rd monthly | Monthly factor rebalance |
+| Stage | Time (PT) | Component | Action |
+|-------|-----------|-----------|--------|
+| 1 | 1:00 PM | `cache_refresh.yml` | Fetch market data, upload to S3 |
+| 2 | 1:50/1:55 PM | Lambda (ML/LSTM) | Execute trades, commit ledgers |
+| 3 | 2:10 PM | `snapshot_update.yml` | Compute snapshots, trigger dashboard redeploy |
+| Monthly | 1:50 PM 1st-3rd | Lambda (Momentum) | Monthly factor rebalance |
 
 ### Data Flow
 
 ```
-GitHub Actions (daily) -> Refresh market cache -> S3
-EventBridge Scheduler -> Lambda -> Execute trades -> Commit to GitHub
-GitHub -> Dashboard auto-refresh
+cache_refresh.yml  -> market.db -> S3
+EventBridge        -> Lambda    -> Ledger commits to GitHub
+snapshot_update.yml -> Compute snapshots -> Update _data_version.py -> Streamlit redeploys
 ```
 
 ---
@@ -268,12 +269,14 @@ flowchart LR
 
 | Workflow | Purpose | Schedule |
 |----------|---------|----------|
+| **Cache Refresh** | Fetch market data, upload to S3 | Daily, 9 PM UTC (1 PM PT) |
+| **Snapshot Update** | Compute snapshots, trigger dashboard redeploy | Daily, 10:10 PM UTC (2:10 PM PT) |
 | **Universe Refresh** | Update S&P 500 ticker list | 1st of month, 8 PM UTC |
-| **Cache Refresh** | Update price data + snapshot | Daily, 9 PM UTC |
-| **Momentum Strategy Trade** | Monthly momentum rebalance | 1st-3rd of month, 9:30 PM UTC |
-| **ML Strategy Trade** | Daily ML predictions | Mon-Fri, 9:30 PM UTC |
-| **LSTM Strategy Trade** | Daily LSTM predictions | Mon-Fri, 9:45 PM UTC |
 | **Monthly Retrain** | Retrain LSTM model | 2nd of month, 10 PM UTC |
+| **CI Tests** | Run test suite | On push/PR |
+| **ECR Push** | Build and push Lambda container | On merge to main |
+
+> Trading workflows (ML, LSTM, Momentum) have been migrated to AWS Lambda + EventBridge. The GitHub Actions trade workflows are disabled.
 
 Run manually: **Actions** > Select workflow > **Run workflow**
 
@@ -314,7 +317,8 @@ paper-trader/
 │   │   └── compute_portfolio_snapshot.py
 │   └── simulate_production.py      # Production simulation (NEW v2.0)
 ├── dashboard/
-│   └── app.py                      # Streamlit dashboard
+│   ├── app.py                      # Streamlit dashboard
+│   └── _data_version.py            # Deploy trigger (auto-updated)
 ├── data/
 │   ├── ledgers/                    # Trade ledgers (NEW v2.0)
 │   │   ├── ledger_ml.csv
@@ -323,6 +327,8 @@ paper-trader/
 │   ├── snapshots/                  # Per-strategy snapshots
 │   ├── market.db                   # SQLite price cache
 │   └── portfolio_snapshot.json     # Consolidated metrics
+├── lambda_handler.py               # AWS Lambda entry point
+├── Dockerfile.lambda               # Lambda container build
 ├── tests/                          # Unit tests (75 tests)
 ├── .github/workflows/              # CI/CD automation
 └── docs/                           # Documentation
@@ -366,4 +372,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-*Built by Prabuddha Tamhane - v2.0.0 January 2026*
+*Built by Prabuddha Tamhane - v2.1.0 February 2026*

@@ -2,8 +2,8 @@
 
 > **Complete Technical Reference** - All functions, classes, and modules documented
 
-**Last Updated**: January 2026 (v2.0.0)  
-**Version**: 2.0 (with Transaction Costs)
+**Last Updated**: February 2026 (v2.1.0)  
+**Version**: 2.1 (with Transaction Costs + AWS Lambda)
 
 ---
 
@@ -49,9 +49,11 @@ flowchart TB
     end
 
     subgraph DEPLOY["DEPLOYMENT"]
-        E1["GitHub Actions"]
-        E2["Ledger CSV"]
-        E3["Streamlit Dashboard"]
+        E1["AWS Lambda"]
+        E2["EventBridge Scheduler"]
+        E3["Ledger CSV"]
+        E4["Streamlit Dashboard"]
+        E5["snapshot_update.yml"]
     end
 
     DATA --> MODELS
@@ -634,17 +636,23 @@ Streamlit-based live dashboard.
 **URL**: [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
 
 **Features**:
-- Portfolio Overview cards (Momentum, ML, SPY)
+- Portfolio Overview cards (Momentum, ML, LSTM, SPY)
 - Performance chart with all 3 strategies
 - Current Holdings tables
 - Recent Trades display
 - Detailed Metrics table
+- Data freshness indicator (from `_data_version.py`)
 
 **Data Sources**:
 - `data/portfolio_snapshot.json` - Summary metrics
-- `data/ledgers/ledger_momentum.csv` - Trade history
-- `data/ledgers/ledger_ml.csv` - Trade history
+- `data/ledgers/ledger_momentum.csv` - Momentum trade history
+- `data/ledgers/ledger_ml.csv` - ML trade history
+- `data/ledgers/ledger_lstm.csv` - LSTM trade history
 - `data/spy_benchmark.json` - SPY comparison
+- `dashboard/_data_version.py` - Last data update timestamp
+
+**Deploy Trigger**:
+Streamlit Cloud only redeploys on Python file changes. `snapshot_update.yml` updates `dashboard/_data_version.py` after each run. Since `app.py` imports it, Streamlit detects the change and auto-redeploys.
 
 ---
 
@@ -695,18 +703,17 @@ make clean      # Clean artifacts
 
 ---
 
-## Current Performance (Jan 2026)
+## Current Performance (Feb 2026)
 
-### With 5 bps Transaction Costs (Oct 1 - Dec 19, 2025)
+### With 5 bps Transaction Costs (Oct 1, 2025 - Feb 10, 2026)
 
-| Metric | Momentum | ML | SPY |
-|--------|----------|-----|-----|
-| **Final Value** | $10,720 | $10,158 | $10,310 |
-| **Return** | +7.20% | +1.58% | +3.10% |
-| **Excess Return** | +4.10% | -1.52% | — |
-| **Total Trades** | 50 | 526 | — |
+| Metric | Momentum | ML | LSTM | SPY |
+|--------|----------|-----|------|-----|
+| **Final Value** | $11,758 | $10,879 | $11,004 | $10,385 |
+| **Return** | +17.58% | +8.79% | +10.04% | +3.85% |
+| **Excess Return** | +13.73% | +4.94% | +6.19% | -- |
 
-**Key Insight**: Momentum outperforms with transaction costs due to lower turnover (50 vs 526 trades).
+**Key Insight**: Momentum leads with lowest turnover. All 3 strategies outperform SPY.
 
 ---
 
@@ -744,11 +751,13 @@ paper-trader/
 │   ├── validation/                      # PIT validation
 │   └── utils/                           # Utility scripts
 ├── dashboard/
-│   └── app.py                           # Streamlit dashboard
+│   ├── app.py                           # Streamlit dashboard
+│   └── _data_version.py                 # Deploy trigger (auto-updated)
 ├── data/ledgers/ledger_ml.csv                        # ML trade history
+├── data/ledgers/ledger_lstm.csv                      # LSTM trade history
 └── data/ledgers/ledger_momentum.csv                  # Momentum trade history
 ```
 
 ---
 
-*Built by Prabuddha Tamhane • 2025*
+*Built by Prabuddha Tamhane - v2.1.0 February 2026*

@@ -2,7 +2,7 @@
 
 > **Private Documentation** - Comprehensive guide to the entire system architecture.
 
-**Last Updated**: January 2026 (v2.0.0)  
+**Last Updated**: February 2026 (v2.1.0)  
 **Transaction Costs**: 5 bps slippage on all trades
 
 ---
@@ -13,8 +13,8 @@ Paper Trader AI is a **triple-portfolio algorithmic trading system** that:
 - Runs **three independent strategies** (Momentum, ML, LSTM) in parallel
 - Uses **SQLite caching** to store 4M+ rows of market data
 - Applies **realistic transaction costs** (5 basis points slippage)
-- Deploys via **GitHub Actions** for automated daily trading
-- Displays results on a **Streamlit dashboard**
+- Deploys via **AWS Lambda + EventBridge** for automated daily trading
+- Displays results on a **Streamlit dashboard** (auto-redeploys on data updates)
 
 ### Live Dashboard
  [paper-trader-ai.streamlit.app](https://paper-trader-ai.streamlit.app/)
@@ -38,15 +38,14 @@ Paper Trader AI is a **triple-portfolio algorithmic trading system** that:
 5. Apply 5 bps slippage to all trades
 ```
 
-### Performance (Oct 1 - Dec 19, 2025 with Transaction Costs)
+### Performance (Oct 1, 2025 - Feb 10, 2026 with Transaction Costs)
 
 | Metric | Value |
 |--------|-------|
 | **Initial Capital** | $10,000 |
-| **Final Value** | $10,720 |
-| **Total Return** | +7.20% |
-| **vs SPY** | +4.10% excess |
-| **Total Trades** | 50 |
+| **Final Value** | $11,758 |
+| **Total Return** | +17.58% |
+| **vs SPY** | +13.73% excess |
 | **Rebalance Freq** | Monthly |
 
 ---
@@ -68,15 +67,14 @@ Paper Trader AI is a **triple-portfolio algorithmic trading system** that:
 5. Apply 5 bps slippage to all trades
 ```
 
-### Performance (Oct 1 - Dec 19, 2025 with Transaction Costs)
+### Performance (Oct 1, 2025 - Feb 10, 2026 with Transaction Costs)
 
 | Metric | Value |
 |--------|-------|
 | **Initial Capital** | $10,000 |
-| **Final Value** | $10,158 |
-| **Total Return** | +1.58% |
-| **vs SPY** | -1.52% underperform |
-| **Total Trades** | 526 |
+| **Final Value** | $10,879 |
+| **Total Return** | +8.79% |
+| **vs SPY** | +4.94% excess |
 | **Rebalance Freq** | Daily |
 
 ### ML Model Details
@@ -162,17 +160,21 @@ data = fetch_from_cache_only(['AAPL'], '2024-01-01', '2025-01-01')
 ##  Streamlit Dashboard
 
 ### Features
-- **Portfolio Overview**: Momentum vs ML vs SPY cards
+- **Portfolio Overview**: Momentum vs ML vs LSTM vs SPY cards
 - **Performance Chart**: All 3 strategies with daily values
 - **Holdings Tables**: Current positions per strategy
 - **Trade History**: Recent trades with prices
+- **Data Freshness**: Header shows actual last data update time (not render time)
 
-### Data Flow
+### Data Flow (3-Stage Pipeline)
 ```
-GitHub Actions → main.py → data/ledgers/ledger_*.csv → dashboard/app.py
-                         → data/snapshots/*.json
-                         → data/portfolio_snapshot.json
+1. cache_refresh.yml  -> Fetch market data -> S3 upload
+2. EventBridge        -> Lambda (ML/LSTM) -> Commit ledgers to GitHub
+3. snapshot_update.yml -> Compute snapshots -> Update _data_version.py -> Streamlit redeploys
 ```
+
+### Deploy Trigger Mechanism
+Streamlit Cloud only redeploys on Python file changes. `snapshot_update.yml` updates `dashboard/_data_version.py` with a timestamp on each run. Since `app.py` imports this file, Streamlit detects a Python change and auto-redeploys.
 
 ---
 
@@ -216,11 +218,14 @@ paper-trader/
 │   ├── utils/                           # Utility scripts
 │   └── simulate_production.py           # 3-day trade simulation
 ├── dashboard/
-│   └── app.py                           # Streamlit application
+│   ├── app.py                           # Streamlit application
+│   └── _data_version.py                 # Deploy trigger (auto-updated)
 ├── models/
 │   ├── xgb_ensemble.joblib              # Trained model
 │   └── model_metadata.json              # Features & metrics
-├── tests/                               # 42 unit tests
+├── lambda_handler.py                    # AWS Lambda entry point
+├── Dockerfile.lambda                    # Lambda container build
+├── tests/                               # 75 unit tests
 └── docs/                                # Documentation
 ```
 
@@ -256,20 +261,26 @@ make clean      # Clean artifacts
 
 ---
 
-##  GitHub Actions
+##  Automation
 
-### Scheduled Workflows
+### GitHub Actions Workflows
 
 | Workflow | Schedule | Action |
 |----------|----------|--------|
-| `strategy-trade.yml` | Uses reusable template | Shared trade logic |
-| `momentum_trade.yml` | 1st-3rd of month, 10pm UTC | Monthly rebalance |
-| `ml_trade.yml` | Daily, 9:30pm UTC | Daily ML trades |
-| `lstm_trade.yml` | Daily, 9:45pm UTC | Daily LSTM trades |
-| `cache_refresh.yml` | Daily, 9pm UTC | Refresh market data |
+| `cache_refresh.yml` | Daily, 9 PM UTC (1 PM PT) | Fetch market data, upload to S3 |
+| `snapshot_update.yml` | Daily, 10:10 PM UTC (2:10 PM PT) | Compute snapshots, trigger dashboard redeploy |
+| `universe_refresh.yml` | 1st of month, 8 PM UTC | Update S&P 500 list |
+| `monthly_retrain.yml` | 2nd of month, 10 PM UTC | Retrain LSTM model |
+| `ci_tests.yml` | On push/PR | Run test suite |
+| `aws-ecr-push.yml` | On merge to main | Build & push Lambda container |
 
-### Secrets Required
-- `GH_TOKEN` - For pushing ledger updates
+### AWS Lambda (EventBridge)
+
+| Schedule | Time (PT) | Strategy |
+|----------|-----------|----------|
+| `paper-trader-daily-trigger` | 1:50 PM Mon-Fri | ML |
+| `paper-trader-lstm` | 1:55 PM Mon-Fri | LSTM |
+| `paper-trader-momentum` | 1:50 PM 1st-3rd | Momentum |
 
 ---
 
@@ -293,4 +304,4 @@ make clean      # Clean artifacts
 
 ---
 
-*Built by Prabuddha Tamhane • v2.0.0 January 2026*
+*Built by Prabuddha Tamhane - v2.1.0 February 2026*
