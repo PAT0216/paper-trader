@@ -67,12 +67,25 @@ jobs:
           python scripts/utils/compute_portfolio_snapshot.py --strategy lstm
           python scripts/utils/compute_portfolio_snapshot.py --strategy momentum
 
+      - name: Update Deploy Trigger
+        run: |
+          # Streamlit Cloud only redeploys on Python file changes.
+          # Updating this file ensures the dashboard picks up new data.
+          cat > dashboard/_data_version.py << EOF
+          # Auto-updated by snapshot_update.yml after computing daily snapshots.
+          # Streamlit Cloud only redeploys when Python files change, so updating
+          # this file ensures the dashboard picks up new data commits.
+          LAST_DATA_UPDATE = "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          EOF
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' dashboard/_data_version.py
+
       - name: Commit and Push Snapshots
         run: |
           git config user.name "PAT0216"
           git config user.email "69978508+PAT0216@users.noreply.github.com"
 
-          git add data/portfolio_snapshot.json data/spy_benchmark.json data/ledgers/ledger_*.csv data/snapshots/*.json
+          git add data/portfolio_snapshot.json data/spy_benchmark.json data/ledgers/ledger_*.csv data/snapshots/*.json dashboard/_data_version.py
 
           git diff --cached --quiet && { echo "No changes to commit"; exit 0; }
 

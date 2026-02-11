@@ -8,6 +8,11 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+
+try:
+    from _data_version import LAST_DATA_UPDATE
+except ImportError:
+    LAST_DATA_UPDATE = None
 import os
 import sys
 from datetime import datetime
@@ -525,11 +530,21 @@ with st.sidebar:
 
 # ============ MAIN CONTENT ============
 # Header - minimal
+if LAST_DATA_UPDATE:
+    from datetime import datetime as _dt
+    try:
+        _data_ts = _dt.fromisoformat(LAST_DATA_UPDATE.replace('Z', '+00:00'))
+        _updated_str = _data_ts.strftime('%b %d, %Y')
+    except Exception:
+        _updated_str = datetime.now().strftime('%b %d, %Y')
+else:
+    _updated_str = datetime.now().strftime('%b %d, %Y')
+
 st.markdown(f"""
     <div style="margin-bottom: 32px;">
         <h1 style="margin: 0 0 4px 0;">Dashboard</h1>
         <p style="color: #52525b; font-size: 0.8rem; margin: 0;">
-            Updated {datetime.now().strftime('%b %d, %Y')} · Live since Oct 2025
+            Updated {_updated_str} · Live since Oct 2025
         </p>
     </div>
 """, unsafe_allow_html=True)
