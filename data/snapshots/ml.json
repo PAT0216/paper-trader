@@ -1,17 +1,17 @@
 {
-  "timestamp": "2026-02-12T22:48:24.236932Z",
-  "price_date": "2026-02-12",
+  "timestamp": "2026-02-13T22:50:52.387125Z",
+  "price_date": "2026-02-13",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 10920.3,
-  "return_pct": 9.2,
+  "value": 10940.22,
+  "return_pct": 9.4,
   "cash": 8630.5,
   "holdings": {
     "GLW": 11,
     "HPQ": 1,
     "KVUE": 3,
-    "DECK": 5,
     "PFE": 1,
+    "DECK": 5,
     "PG": 1
   },
   "positions": 6
