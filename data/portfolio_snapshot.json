@@ -1,22 +1,22 @@
 {
-  "timestamp": "2026-02-13T22:50:55.817292Z",
+  "timestamp": "2026-02-16T22:47:46.155980Z",
   "price_date": "2026-02-13",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 12127.32,
+      "value": 12127.29,
       "return_pct": 21.27,
       "cash": 1490.61,
       "holdings": {
         "AVGO": 4,
         "LRCX": 6,
-        "WBD": 41,
         "NEM": 10,
-        "MU": 4,
+        "WBD": 41,
         "STX": 3,
         "WDC": 6,
-        "GOOGL": 1,
+        "MU": 4,
         "AMD": 2,
+        "GOOGL": 1,
         "NVDA": 1
       },
       "positions": 10
