@@ -144,3 +144,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-02-11,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12099.68,momentum,
 2026-02-12,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12098.55,momentum,
 2026-02-13,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12127.32,momentum,
+2026-02-17,PORTFOLIO,VALUE,1.0,0,0.0,0.0,12080.85,momentum,
