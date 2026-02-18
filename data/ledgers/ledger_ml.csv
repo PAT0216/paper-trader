@@ -670,3 +670,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-02-13,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10940.22,ml,,
 2026-02-17,HPQ,SELL,18.48,1,18.48,18.48,1665.66,ml,,
 2026-02-17,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10913.6,ml,,
+2026-02-18,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10936.41,ml,,
