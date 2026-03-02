@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-02-27T22:39:56.192258Z",
-  "price_date": "2026-02-27",
+  "timestamp": "2026-03-02T22:45:40.314278Z",
+  "price_date": "2026-03-02",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11119.95,
-  "return_pct": 11.2,
+  "value": 11142.09,
+  "return_pct": 11.42,
   "cash": 4751.19,
   "holdings": {
     "VICI": 42,
