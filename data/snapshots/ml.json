@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-03-02T22:45:38.562659Z",
-  "price_date": "2026-03-02",
+  "timestamp": "2026-03-03T22:46:43.851506Z",
+  "price_date": "2026-03-03",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11205.58,
-  "return_pct": 12.06,
+  "value": 11064.67,
+  "return_pct": 10.65,
   "cash": 8705.8,
   "holdings": {
     "GLW": 11,
-    "PFE": 1,
     "DECK": 5,
+    "PFE": 1,
     "PG": 1
   },
   "positions": 4

@@ -1,20 +1,23 @@
 {
-  "timestamp": "2026-03-02T22:45:40.314278Z",
-  "price_date": "2026-03-02",
+  "timestamp": "2026-03-03T22:46:45.807092Z",
+  "price_date": "2026-03-03",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11142.09,
-  "return_pct": 11.42,
-  "cash": 4751.19,
+  "value": 11156.21,
+  "return_pct": 11.56,
+  "cash": 4971.21,
   "holdings": {
-    "VICI": 42,
     "NFLX": 11,
     "BAC": 34,
     "AAPL": 4,
     "MA": 1,
     "VRSN": 2,
     "MDT": 3,
-    "NWSA": 1
+    "NWSA": 1,
+    "BXP": 9,
+    "WAT": 1,
+    "SOLV": 3,
+    "F": 2
   },
-  "positions": 8
+  "positions": 11
 }
