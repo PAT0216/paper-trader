@@ -684,3 +684,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-03-04,DECK,SELL,108.69,5,543.43,543.43,1683.81,ml,,
 2026-03-04,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11027.39,ml,,
 2026-03-05,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10911.97,ml,,
+2026-03-06,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10786.1,ml,,
