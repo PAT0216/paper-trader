@@ -1,28 +1,28 @@
 {
-  "timestamp": "2026-03-12T22:43:40.213353Z",
-  "price_date": "2026-03-12",
+  "timestamp": "2026-03-13T22:43:21.278805Z",
+  "price_date": "2026-03-13",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11564.05,
-      "return_pct": 15.64,
+      "value": 11636.1,
+      "return_pct": 16.36,
       "cash": 1713.55,
       "holdings": {
         "AVGO": 4,
         "LRCX": 6,
         "NEM": 10,
         "WBD": 41,
-        "STX": 3,
-        "WDC": 6,
         "MU": 4,
+        "WDC": 6,
+        "STX": 3,
         "NVDA": 2,
         "GOOGL": 1
       },
       "positions": 9
     },
     "ml": {
-      "value": 10854.06,
-      "return_pct": 8.54,
+      "value": 10846.78,
+      "return_pct": 8.47,
       "cash": 9249.23,
       "holdings": {
         "GLW": 11,
@@ -32,8 +32,8 @@
       "positions": 3
     },
     "lstm": {
-      "value": 10867.74,
-      "return_pct": 8.68,
+      "value": 10847.17,
+      "return_pct": 8.47,
       "cash": 4971.21,
       "holdings": {
         "NFLX": 11,
@@ -43,10 +43,10 @@
         "NWSA": 1,
         "MDT": 3,
         "VRSN": 2,
-        "BXP": 9,
-        "WAT": 1,
+        "F": 2,
         "SOLV": 3,
-        "F": 2
+        "BXP": 9,
+        "WAT": 1
       },
       "positions": 11
     }
@@ -54,10 +54,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 666.48,
-    "end_price": 666.06,
-    "return_pct": -0.06,
-    "value": 9993.69,
+    "end_price": 662.29,
+    "return_pct": -0.63,
+    "value": 9937.12,
     "start_date": "2025-10-01",
-    "end_date": "2026-03-12"
+    "end_date": "2026-03-13"
   }
 }

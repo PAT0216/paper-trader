@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-12T22:43:38.765240Z",
-  "price_date": "2026-03-12",
+  "timestamp": "2026-03-13T22:43:19.721276Z",
+  "price_date": "2026-03-13",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 10867.74,
-  "return_pct": 8.68,
+  "value": 10847.17,
+  "return_pct": 8.47,
   "cash": 4971.21,
   "holdings": {
     "NFLX": 11,
@@ -14,10 +14,10 @@
     "NWSA": 1,
     "MDT": 3,
     "VRSN": 2,
-    "BXP": 9,
-    "WAT": 1,
+    "F": 2,
     "SOLV": 3,
-    "F": 2
+    "BXP": 9,
+    "WAT": 1
   },
   "positions": 11
 }
