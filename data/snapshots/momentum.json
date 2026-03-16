@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-13T22:43:21.278499Z",
-  "price_date": "2026-03-13",
+  "timestamp": "2026-03-16T22:49:39.458577Z",
+  "price_date": "2026-03-16",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 11636.1,
-  "return_pct": 16.36,
+  "value": 11912.24,
+  "return_pct": 19.12,
   "cash": 1713.55,
   "holdings": {
     "AVGO": 4,
@@ -14,8 +14,8 @@
     "MU": 4,
     "WDC": 6,
     "STX": 3,
-    "NVDA": 2,
-    "GOOGL": 1
+    "GOOGL": 1,
+    "NVDA": 2
   },
   "positions": 9
 }
