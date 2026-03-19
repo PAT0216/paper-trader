@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-18T22:47:32.798608Z",
-  "price_date": "2026-03-18",
+  "timestamp": "2026-03-19T22:47:11.959560Z",
+  "price_date": "2026-03-19",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 10853.17,
-  "return_pct": 8.53,
+  "value": 10834.47,
+  "return_pct": 8.34,
   "cash": 4971.21,
   "holdings": {
     "NFLX": 11,
