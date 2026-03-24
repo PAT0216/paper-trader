@@ -283,3 +283,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-03-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10887.78,lstm,,
 2026-03-24,WAT,SELL,301.66,1,301.66,301.66,6123.14,lstm,,
 2026-03-24,INVH,BUY,24.77,4,99.09,202.57,6123.15,lstm,,
+2026-03-24,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10874.05,lstm,,
