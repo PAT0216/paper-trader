@@ -291,3 +291,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-03-26,VTRS,BUY,13.51,2,27.01,544.75,5914.35,lstm,,
 2026-03-26,DIS,BUY,96.0,3,287.99,256.76,5914.36,lstm,,
 2026-03-26,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10926.43,lstm,,
+2026-03-27,PORTFOLIO,VALUE,1.0,0,0.0,0.0,10821.81,lstm,,
