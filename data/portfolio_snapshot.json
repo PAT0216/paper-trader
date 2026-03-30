@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-03-27T22:50:42.155054Z",
-  "price_date": "2026-03-27",
+  "timestamp": "2026-03-30T22:54:46.623644Z",
+  "price_date": "2026-03-30",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11146.11,
-      "return_pct": 11.46,
+      "value": 10717.01,
+      "return_pct": 7.17,
       "cash": 1713.55,
       "holdings": {
         "AVGO": 4,
@@ -21,8 +21,8 @@
       "positions": 9
     },
     "ml": {
-      "value": 10923.89,
-      "return_pct": 9.24,
+      "value": 10835.77,
+      "return_pct": 8.36,
       "cash": 9249.23,
       "holdings": {
         "GLW": 11,
@@ -32,24 +32,24 @@
       "positions": 3
     },
     "lstm": {
-      "value": 10821.81,
-      "return_pct": 8.22,
+      "value": 10850.78,
+      "return_pct": 8.51,
       "cash": 5430.54,
       "holdings": {
         "NFLX": 11,
         "BAC": 34,
         "MA": 1,
         "NWSA": 1,
-        "MDT": 3,
         "VRSN": 2,
-        "F": 2,
-        "SOLV": 3,
+        "MDT": 3,
         "BXP": 9,
+        "SOLV": 3,
+        "F": 2,
         "INVH": 4,
         "DIS": 3,
+        "VTRS": 2,
         "KDP": 4,
-        "HD": 1,
-        "VTRS": 2
+        "HD": 1
       },
       "positions": 14
     }
@@ -57,10 +57,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 664.67,
-    "end_price": 634.09,
-    "return_pct": -4.6,
-    "value": 9539.99,
+    "end_price": 631.97,
+    "return_pct": -4.92,
+    "value": 9508.09,
     "start_date": "2025-10-01",
-    "end_date": "2026-03-27"
+    "end_date": "2026-03-30"
   }
 }
