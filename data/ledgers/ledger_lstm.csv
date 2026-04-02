@@ -299,3 +299,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-04-02,VRSN,SELL,250.64,2,501.29,501.29,5662.04,lstm,,
 2026-04-02,MAA,BUY,122.61,2,245.22,256.07,5662.04,lstm,,
 2026-04-02,SMCI,BUY,22.52,1,22.52,233.55,5662.04,lstm,,
+2026-04-02,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11001.06,lstm,,

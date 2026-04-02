@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-04-01T22:56:11.202745Z",
-  "price_date": "2026-04-01",
+  "timestamp": "2026-04-02T22:49:29.254833Z",
+  "price_date": "2026-04-02",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 11730.62,
-      "return_pct": 17.31,
+      "value": 11708.07,
+      "return_pct": 17.08,
       "cash": 2000.97,
       "holdings": {
         "LRCX": 6,
@@ -20,8 +20,8 @@
       "positions": 8
     },
     "ml": {
-      "value": 10988.05,
-      "return_pct": 9.88,
+      "value": 11047.79,
+      "return_pct": 10.48,
       "cash": 9249.23,
       "holdings": {
         "GLW": 11,
@@ -31,34 +31,35 @@
       "positions": 3
     },
     "lstm": {
-      "value": 10957.16,
-      "return_pct": 9.57,
-      "cash": 5455.31,
+      "value": 11001.06,
+      "return_pct": 10.01,
+      "cash": 5688.86,
       "holdings": {
         "NFLX": 11,
         "BAC": 34,
         "MA": 1,
         "MDT": 3,
-        "VRSN": 2,
-        "F": 2,
-        "SOLV": 3,
         "BXP": 9,
+        "SOLV": 3,
+        "F": 2,
         "INVH": 4,
         "KDP": 4,
         "HD": 1,
         "VTRS": 2,
-        "DIS": 3
+        "DIS": 3,
+        "MAA": 2,
+        "SMCI": 1
       },
-      "positions": 13
+      "positions": 14
     }
   },
   "benchmark": {
     "ticker": "SPY",
     "start_price": 664.67,
-    "end_price": 655.24,
-    "return_pct": -1.42,
-    "value": 9858.19,
+    "end_price": 655.83,
+    "return_pct": -1.33,
+    "value": 9867.07,
     "start_date": "2025-10-01",
-    "end_date": "2026-04-01"
+    "end_date": "2026-04-02"
   }
 }
