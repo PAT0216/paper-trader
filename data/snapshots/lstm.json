@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-02T22:49:27.878288Z",
+  "timestamp": "2026-04-03T22:52:05.583320Z",
   "price_date": "2026-04-02",
   "initial_capital": 10000,
   "strategy": "lstm",
@@ -11,9 +11,9 @@
     "BAC": 34,
     "MA": 1,
     "MDT": 3,
-    "BXP": 9,
-    "SOLV": 3,
     "F": 2,
+    "SOLV": 3,
+    "BXP": 9,
     "INVH": 4,
     "KDP": 4,
     "HD": 1,
