@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-04-07T22:56:16.481471Z",
-  "price_date": "2026-04-07",
+  "timestamp": "2026-04-08T22:58:32.978862Z",
+  "price_date": "2026-04-08",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11026.81,
-  "return_pct": 10.27,
+  "value": 11155.1,
+  "return_pct": 11.55,
   "cash": 5688.86,
   "holdings": {
     "NFLX": 11,
@@ -12,15 +12,15 @@
     "MA": 1,
     "MDT": 3,
     "F": 2,
-    "SOLV": 3,
     "BXP": 9,
+    "SOLV": 3,
     "INVH": 4,
     "KDP": 4,
     "HD": 1,
     "VTRS": 2,
     "DIS": 3,
-    "SMCI": 1,
-    "MAA": 2
+    "MAA": 2,
+    "SMCI": 1
   },
   "positions": 14
 }
