@@ -310,3 +310,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-04-09,NCLH,BUY,20.17,1,20.17,609.96,5572.79,lstm,,
 2026-04-09,TSLA,BUY,343.42,1,343.42,266.54,5572.79,lstm,,
 2026-04-09,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11194.86,lstm,,
+2026-04-10,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11185.04,lstm,,
