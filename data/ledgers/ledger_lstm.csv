@@ -313,3 +313,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-04-10,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11185.04,lstm,,
 2026-04-13,BAC,SELL,52.51,34,1785.47,1785.47,5367.89,lstm,,
 2026-04-13,TSLA,BUY,349.12,1,349.12,1436.35,5367.89,lstm,,
+2026-04-13,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11227.82,lstm,,
