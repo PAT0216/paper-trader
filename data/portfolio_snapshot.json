@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-04-17T22:59:01.117167Z",
-  "price_date": "2026-04-17",
+  "timestamp": "2026-04-20T23:01:05.926220Z",
+  "price_date": "2026-04-20",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 13626.01,
-      "return_pct": 36.26,
+      "value": 13512.78,
+      "return_pct": 35.13,
       "cash": 2000.97,
       "holdings": {
+        "AVGO": 4,
         "LRCX": 6,
         "WBD": 41,
         "NEM": 10,
         "MU": 4,
         "STX": 3,
         "WDC": 6,
-        "AVGO": 4,
         "NVDA": 2
       },
       "positions": 8
     },
     "ml": {
-      "value": 11231.43,
-      "return_pct": 12.31,
+      "value": 11239.99,
+      "return_pct": 12.4,
       "cash": 9276.32,
       "holdings": {
         "GLW": 11,
@@ -30,36 +30,38 @@
       "positions": 2
     },
     "lstm": {
-      "value": 11428.82,
-      "return_pct": 14.29,
-      "cash": 7598.29,
+      "value": 11418.0,
+      "return_pct": 14.18,
+      "cash": 7815.05,
       "holdings": {
         "MA": 1,
         "MDT": 3,
-        "BXP": 9,
         "F": 2,
         "INVH": 4,
         "DIS": 3,
         "VTRS": 2,
-        "HD": 2,
         "KDP": 4,
+        "HD": 2,
         "SMCI": 1,
         "MAA": 2,
-        "NCLH": 1,
         "BLDR": 1,
         "NKE": 1,
-        "TSLA": 2
+        "NCLH": 1,
+        "TSLA": 2,
+        "ADM": 1,
+        "BA": 1,
+        "CAG": 1
       },
-      "positions": 15
+      "positions": 17
     }
   },
   "benchmark": {
     "ticker": "SPY",
     "start_price": 664.67,
-    "end_price": 710.14,
-    "return_pct": 6.84,
-    "value": 10684.17,
+    "end_price": 708.72,
+    "return_pct": 6.63,
+    "value": 10662.81,
     "start_date": "2025-10-01",
-    "end_date": "2026-04-17"
+    "end_date": "2026-04-20"
   }
 }
