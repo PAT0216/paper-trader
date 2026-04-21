@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-04-20T23:01:05.926037Z",
-  "price_date": "2026-04-20",
+  "timestamp": "2026-04-21T22:56:15.689034Z",
+  "price_date": "2026-04-21",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 13512.78,
-  "return_pct": 35.13,
+  "value": 13552.42,
+  "return_pct": 35.52,
   "cash": 2000.97,
   "holdings": {
     "AVGO": 4,

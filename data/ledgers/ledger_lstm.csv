@@ -327,3 +327,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-04-21,SMCI,SELL,28.8,1,28.8,28.8,3547.09,lstm,,
 2026-04-21,VTRS,SELL,14.86,2,29.73,58.53,3549.8,lstm,,
 2026-04-21,NCLH,SELL,20.25,1,20.25,78.78,3549.88,lstm,,
+2026-04-21,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11355.1,lstm,,
