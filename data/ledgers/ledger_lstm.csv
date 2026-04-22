@@ -330,3 +330,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-04-21,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11355.1,lstm,,
 2026-04-22,MDT,SELL,81.96,3,245.88,245.88,3426.58,lstm,,
 2026-04-22,TSCO,BUY,39.59,1,39.59,206.29,3426.58,lstm,,
+2026-04-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11356.59,lstm,,
