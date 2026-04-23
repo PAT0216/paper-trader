@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-04-22T23:03:10.527809Z",
-  "price_date": "2026-04-22",
+  "timestamp": "2026-04-23T23:03:31.265166Z",
+  "price_date": "2026-04-23",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 13953.06,
+  "value": 13953.33,
   "return_pct": 39.53,
   "cash": 2000.97,
   "holdings": {
