@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-05-05T23:09:07.088849Z",
-  "price_date": "2026-05-05",
+  "timestamp": "2026-05-06T23:04:20.077100Z",
+  "price_date": "2026-05-06",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 15629.72,
-  "return_pct": 56.3,
+  "value": 16092.13,
+  "return_pct": 60.92,
   "cash": 2000.97,
   "holdings": {
+    "AVGO": 4,
     "LRCX": 6,
     "WBD": 41,
     "NEM": 10,
     "MU": 4,
-    "STX": 3,
     "WDC": 6,
-    "AVGO": 4,
+    "STX": 3,
     "NVDA": 2
   },
   "positions": 8
