@@ -1,22 +1,21 @@
 {
-  "timestamp": "2026-05-11T23:09:29.059040Z",
-  "price_date": "2026-05-11",
+  "timestamp": "2026-05-12T23:16:06.857530Z",
+  "price_date": "2026-05-12",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11286.18,
-  "return_pct": 12.86,
-  "cash": 8989.7,
+  "value": 11294.57,
+  "return_pct": 12.95,
+  "cash": 9105.32,
   "holdings": {
     "MA": 1,
-    "INVH": 4,
     "DIS": 3,
     "KDP": 4,
     "HD": 2,
     "MAA": 2,
-    "BLDR": 1,
     "NKE": 1,
+    "BLDR": 1,
     "CAG": 4,
     "RMD": 1
   },
-  "positions": 10
+  "positions": 9
 }
