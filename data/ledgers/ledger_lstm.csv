@@ -356,3 +356,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-05-12,INVH,SELL,28.91,4,115.62,115.62,2378.49,lstm,,
 2026-05-12,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11294.57,lstm,,
 2026-05-13,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11265.07,lstm,,
+2026-05-14,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11263.82,lstm,,
