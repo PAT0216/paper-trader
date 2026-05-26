@@ -365,3 +365,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-05-21,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11295.64,lstm,,
 2026-05-22,NKE,SELL,44.37,1,44.37,44.37,2180.96,lstm,,
 2026-05-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11294.79,lstm,,
+2026-05-26,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11283.85,lstm,,
