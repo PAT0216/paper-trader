@@ -366,3 +366,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-05-22,NKE,SELL,44.37,1,44.37,44.37,2180.96,lstm,,
 2026-05-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11294.79,lstm,,
 2026-05-26,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11283.85,lstm,,
+2026-05-27,KDP,SELL,29.54,4,118.14,118.14,2149.21,lstm,,
