@@ -368,3 +368,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-05-26,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11283.85,lstm,,
 2026-05-27,KDP,SELL,29.54,4,118.14,118.14,2149.21,lstm,,
 2026-05-27,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11302.06,lstm,,
+2026-05-28,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11304.14,lstm,,
