@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-06-05T23:22:40.389966Z",
-  "price_date": "2026-06-05",
+  "timestamp": "2026-06-08T23:22:21.486218Z",
+  "price_date": "2026-06-08",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11376.24,
-  "return_pct": 13.76,
+  "value": 11484.36,
+  "return_pct": 14.84,
   "cash": 9276.32,
   "holdings": {
     "GLW": 11,
