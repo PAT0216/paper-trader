@@ -755,3 +755,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-06-10,AES,BUY,14.67,21,308.01,1604.37,2071.07,ml,,
 2026-06-10,AVB,BUY,186.94,1,186.94,1417.43,2063.94,ml,,
 2026-06-10,TROW,BUY,105.96,1,105.96,1311.47,2063.94,ml,,
+2026-06-10,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11337.09,ml,,

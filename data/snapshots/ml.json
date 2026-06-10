@@ -1,14 +1,16 @@
 {
-  "timestamp": "2026-06-09T23:39:50.223994Z",
-  "price_date": "2026-06-09",
+  "timestamp": "2026-06-10T23:47:15.347197Z",
+  "price_date": "2026-06-10",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11338.33,
-  "return_pct": 13.38,
-  "cash": 9276.32,
+  "value": 11337.09,
+  "return_pct": 13.37,
+  "cash": 10587.79,
   "holdings": {
-    "GLW": 11,
-    "PG": 1
+    "PG": 1,
+    "AES": 21,
+    "AVB": 1,
+    "TROW": 1
   },
-  "positions": 2
+  "positions": 4
 }
