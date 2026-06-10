@@ -379,3 +379,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-06-05,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11258.08,lstm,,
 2026-06-08,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11244.81,lstm,,
 2026-06-09,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11283.87,lstm,,
+2026-06-10,BRO,SELL,59.08,1,59.08,59.08,1844.93,lstm,,
