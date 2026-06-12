@@ -757,3 +757,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-06-10,TROW,BUY,105.96,1,105.96,1311.47,2063.94,ml,,
 2026-06-10,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11337.09,ml,,
 2026-06-11,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11336.83,ml,,
+2026-06-12,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11342.35,ml,,
