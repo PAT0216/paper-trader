@@ -761,3 +761,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-06-15,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11339.62,ml,,
 2026-06-16,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11341.39,ml,,
 2026-06-17,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11332.91,ml,,
+2026-06-18,AVB,SELL,179.54,1,179.54,179.54,745.07,ml,,
