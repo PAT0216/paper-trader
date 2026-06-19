@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-18T23:58:35.215696Z",
+  "timestamp": "2026-06-19T23:12:10.856680Z",
   "price_date": "2026-06-18",
   "initial_capital": 10000,
   "portfolios": {
@@ -25,8 +25,8 @@
       "cash": 10767.33,
       "holdings": {
         "PG": 1,
-        "AES": 21,
-        "TROW": 1
+        "TROW": 1,
+        "AES": 21
       },
       "positions": 3
     },
@@ -46,10 +46,10 @@
   },
   "benchmark": {
     "ticker": "SPY",
-    "start_price": 664.67,
+    "start_price": 662.96,
     "end_price": 746.74,
-    "return_pct": 12.35,
-    "value": 11234.82,
+    "return_pct": 12.64,
+    "value": 11263.77,
     "start_date": "2025-10-01",
     "end_date": "2026-06-18"
   }

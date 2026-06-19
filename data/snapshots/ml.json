@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-18T23:58:30.815226Z",
+  "timestamp": "2026-06-19T23:12:07.448816Z",
   "price_date": "2026-06-18",
   "initial_capital": 10000,
   "strategy": "ml",
@@ -8,8 +8,8 @@
   "cash": 10767.33,
   "holdings": {
     "PG": 1,
-    "AES": 21,
-    "TROW": 1
+    "TROW": 1,
+    "AES": 21
   },
   "positions": 3
 }
