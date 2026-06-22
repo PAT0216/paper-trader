@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-06-19T23:12:09.410737Z",
-  "price_date": "2026-06-18",
+  "timestamp": "2026-06-22T23:41:45.360351Z",
+  "price_date": "2026-06-22",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11309.9,
-  "return_pct": 13.1,
+  "value": 11282.98,
+  "return_pct": 12.83,
   "cash": 9598.45,
   "holdings": {
     "MA": 1,
