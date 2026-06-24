@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-06-23T23:19:38.997345Z",
-  "price_date": "2026-06-23",
+  "timestamp": "2026-06-24T23:20:04.921137Z",
+  "price_date": "2026-06-24",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11332.89,
+  "value": 11332.85,
   "return_pct": 13.33,
   "cash": 10767.33,
   "holdings": {
     "PG": 1,
-    "AES": 21,
-    "TROW": 1
+    "TROW": 1,
+    "AES": 21
   },
   "positions": 3
 }
