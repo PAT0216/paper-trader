@@ -766,3 +766,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-06-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11330.65,ml,,
 2026-06-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11332.89,ml,,
 2026-06-24,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11332.85,ml,,
+2026-06-25,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11330.03,ml,,
