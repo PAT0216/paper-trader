@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-02T23:20:15.668672Z",
+  "timestamp": "2026-07-03T23:16:47.023731Z",
   "price_date": "2026-07-02",
   "initial_capital": 10000,
   "portfolios": {
@@ -10,9 +10,9 @@
       "holdings": {
         "AVGO": 4,
         "LRCX": 6,
-        "WBD": 41,
         "NEM": 10,
         "MU": 4,
+        "WBD": 41,
         "STX": 3,
         "WDC": 6,
         "NVDA": 2
@@ -20,13 +20,13 @@
       "positions": 8
     },
     "ml": {
-      "value": 11343.47,
+      "value": 11343.31,
       "return_pct": 13.43,
-      "cash": 10767.33,
+      "cash": 11045.44,
       "holdings": {
         "PG": 1,
-        "AES": 21,
-        "TROW": 1
+        "TROW": 1,
+        "CCL": 1
       },
       "positions": 3
     },
@@ -50,7 +50,7 @@
     "start_price": 662.96,
     "end_price": 744.78,
     "return_pct": 12.34,
-    "value": 11234.2,
+    "value": 11234.21,
     "start_date": "2025-10-01",
     "end_date": "2026-07-02"
   }
