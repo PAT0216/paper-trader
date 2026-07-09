@@ -778,3 +778,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,momentu
 2026-07-07,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11345.03,ml,,
 2026-07-08,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11337.44,ml,,
 2026-07-09,CCL,SELL,25.63,1,25.63,25.63,290.28,ml,,
+2026-07-09,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11334.97,ml,,
