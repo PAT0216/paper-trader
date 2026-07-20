@@ -1,18 +1,18 @@
 {
-  "timestamp": "2026-07-17T23:04:28.512510Z",
-  "price_date": "2026-07-17",
+  "timestamp": "2026-07-20T23:12:20.217150Z",
+  "price_date": "2026-07-20",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11382.77,
-  "return_pct": 13.83,
+  "value": 11374.39,
+  "return_pct": 13.74,
   "cash": 9806.16,
   "holdings": {
     "MA": 1,
     "HD": 2,
     "CAG": 4,
     "RMD": 1,
-    "T": 2,
-    "KR": 1
+    "KR": 1,
+    "T": 2
   },
   "positions": 6
 }
