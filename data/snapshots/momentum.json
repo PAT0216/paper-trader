@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-07-22T23:13:57.034580Z",
-  "price_date": "2026-07-22",
+  "timestamp": "2026-07-23T23:09:24.008713Z",
+  "price_date": "2026-07-23",
   "initial_capital": 10000,
   "strategy": "momentum",
-  "value": 17847.66,
-  "return_pct": 78.48,
+  "value": 17968.92,
+  "return_pct": 79.69,
   "cash": 2000.97,
   "holdings": {
     "LRCX": 6,
