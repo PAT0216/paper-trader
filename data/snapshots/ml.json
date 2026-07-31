@@ -1,14 +1,13 @@
 {
-  "timestamp": "2026-07-30T23:16:45.614262Z",
-  "price_date": "2026-07-30",
+  "timestamp": "2026-07-31T23:13:46.875064Z",
+  "price_date": "2026-07-31",
   "initial_capital": 10000,
   "strategy": "ml",
-  "value": 11334.31,
-  "return_pct": 13.34,
-  "cash": 11071.07,
+  "value": 11326.71,
+  "return_pct": 13.27,
+  "cash": 11214.96,
   "holdings": {
-    "PG": 1,
     "TROW": 1
   },
-  "positions": 2
+  "positions": 1
 }
