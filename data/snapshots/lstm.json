@@ -1,19 +1,18 @@
 {
-  "timestamp": "2026-08-07T22:51:46.393458Z",
-  "price_date": "2026-08-07",
+  "timestamp": "2026-08-10T22:53:03.624562Z",
+  "price_date": "2026-08-10",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11389.63,
+  "value": 11390.01,
   "return_pct": 13.9,
-  "cash": 10362.46,
+  "cash": 10925.13,
   "holdings": {
-    "MA": 1,
     "CAG": 4,
     "T": 2,
     "NWSA": 1,
     "VICI": 5,
-    "HAL": 3,
-    "DIS": 1
+    "DIS": 1,
+    "HAL": 3
   },
-  "positions": 7
+  "positions": 6
 }
