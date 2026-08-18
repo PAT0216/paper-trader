@@ -440,3 +440,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-08-14,NWSA,SELL,28.93,1,28.93,133.68,473.13,lstm,,
 2026-08-14,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11397.49,lstm,,
 2026-08-17,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11396.0,lstm,,
+2026-08-18,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11395.98,lstm,,
