@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-08-20T22:40:51.544452Z",
-  "price_date": "2026-08-20",
+  "timestamp": "2026-08-21T22:37:22.711761Z",
+  "price_date": "2026-08-21",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11402.35,
-  "return_pct": 14.02,
+  "value": 11401.0,
+  "return_pct": 14.01,
   "cash": 11108.59,
   "holdings": {
     "CAG": 4,
-    "VICI": 5,
-    "HAL": 3
+    "HAL": 3,
+    "VICI": 5
   },
   "positions": 3
 }
