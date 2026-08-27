@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-08-25T22:41:34.020729Z",
-  "price_date": "2026-08-25",
+  "timestamp": "2026-08-27T03:07:33.143639Z",
+  "price_date": "2026-08-26",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11395.28,
-  "return_pct": 13.95,
+  "value": 11395.75,
+  "return_pct": 13.96,
   "cash": 11108.59,
   "holdings": {
     "CAG": 4,
