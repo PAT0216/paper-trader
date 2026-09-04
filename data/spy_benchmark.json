@@ -1,7 +1,7 @@
 {
   "ticker": "SPY",
   "start_date": "2025-10-01",
-  "end_date": "2026-09-02",
+  "end_date": "2026-09-03",
   "initial_value": 10000,
   "final_value": NaN,
   "total_return": NaN,
@@ -932,6 +932,10 @@
     ],
     [
       "2026-09-02",
+      11541.61
+    ],
+    [
+      "2026-09-03",
       NaN
     ]
   ]
