@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05T00:00:23.674565Z",
+  "timestamp": "2026-09-08T00:19:35.433500Z",
   "price_date": "2026-09-04",
   "initial_capital": 10000,
   "portfolios": {
@@ -42,9 +42,9 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 662.96,
-    "end_price": NaN,
-    "return_pct": NaN,
-    "value": NaN,
+    "end_price": 770.19,
+    "return_pct": 16.17,
+    "value": 11617.49,
     "start_date": "2025-10-01",
     "end_date": "2026-09-04"
   }
