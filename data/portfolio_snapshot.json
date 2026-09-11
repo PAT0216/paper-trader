@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-10T00:10:09.182983Z",
-  "price_date": "2026-09-09",
+  "timestamp": "2026-09-11T00:06:09.424285Z",
+  "price_date": "2026-09-10",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 17894.8,
-      "return_pct": 78.95,
+      "value": 17348.88,
+      "return_pct": 73.49,
       "cash": 2000.97,
       "holdings": {
         "AVGO": 4,
@@ -20,17 +20,15 @@
       "positions": 8
     },
     "ml": {
-      "value": 11322.7,
+      "value": 11322.65,
       "return_pct": 13.23,
-      "cash": 11214.96,
-      "holdings": {
-        "TROW": 1
-      },
-      "positions": 1
+      "cash": 11322.65,
+      "holdings": {},
+      "positions": 0
     },
     "lstm": {
-      "value": 11391.75,
-      "return_pct": 13.92,
+      "value": 11389.35,
+      "return_pct": 13.89,
       "cash": 11211.86,
       "holdings": {
         "CAG": 4,
@@ -46,6 +44,6 @@
     "return_pct": NaN,
     "value": NaN,
     "start_date": "2025-10-01",
-    "end_date": "2026-09-09"
+    "end_date": "2026-09-10"
   }
 }
