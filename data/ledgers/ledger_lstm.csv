@@ -469,3 +469,4 @@ date,ticker,action,price,shares,amount,cash_balance,total_value,strategy,confide
 2026-09-22,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11385.6,lstm,,
 2026-09-23,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11384.2,lstm,,
 2026-09-24,PORTFOLIO,VALUE,1.0,0,0.0,0.0,11382.05,lstm,,
+2026-09-25,VICI,SELL,23.26,5,116.29,116.29,172.74,lstm,,
