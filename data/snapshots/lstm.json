@@ -1,14 +1,13 @@
 {
-  "timestamp": "2026-09-25T00:31:38.912185Z",
-  "price_date": "2026-09-24",
+  "timestamp": "2026-09-26T00:35:58.610249Z",
+  "price_date": "2026-09-25",
   "initial_capital": 10000,
   "strategy": "lstm",
-  "value": 11382.05,
+  "value": 11381.99,
   "return_pct": 13.82,
-  "cash": 11211.86,
+  "cash": 11328.15,
   "holdings": {
-    "CAG": 4,
-    "VICI": 5
+    "CAG": 4
   },
-  "positions": 2
+  "positions": 1
 }
