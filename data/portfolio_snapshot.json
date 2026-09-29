@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-26T00:35:59.973873Z",
-  "price_date": "2026-09-25",
+  "timestamp": "2026-09-29T01:53:12.988933Z",
+  "price_date": "2026-09-28",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 18053.64,
-      "return_pct": 80.54,
+      "value": 17871.02,
+      "return_pct": 78.71,
       "cash": 2000.97,
       "holdings": {
         "LRCX": 6,
@@ -39,10 +39,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 661.32,
-    "end_price": NaN,
-    "return_pct": NaN,
-    "value": NaN,
+    "end_price": 765.61,
+    "return_pct": 15.77,
+    "value": 11577.08,
     "start_date": "2025-10-01",
-    "end_date": "2026-09-25"
+    "end_date": "2026-09-28"
   }
 }
