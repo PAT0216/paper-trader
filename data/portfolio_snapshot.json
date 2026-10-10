@@ -1,20 +1,20 @@
 {
-  "timestamp": "2026-10-09T02:05:47.312711Z",
-  "price_date": "2026-10-08",
+  "timestamp": "2026-10-10T01:44:18.546153Z",
+  "price_date": "2026-10-09",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 17078.17,
-      "return_pct": 70.78,
+      "value": 17114.76,
+      "return_pct": 71.15,
       "cash": 2000.97,
       "holdings": {
         "AVGO": 4,
         "LRCX": 6,
         "NEM": 10,
         "WBD": 41,
-        "MU": 4,
-        "WDC": 6,
         "STX": 3,
+        "WDC": 6,
+        "MU": 4,
         "NVDA": 2
       },
       "positions": 8
@@ -39,10 +39,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 661.32,
-    "end_price": 773.93,
-    "return_pct": 17.03,
-    "value": 11702.89,
+    "end_price": 778.57,
+    "return_pct": 17.73,
+    "value": 11773.05,
     "start_date": "2025-10-01",
-    "end_date": "2026-10-08"
+    "end_date": "2026-10-09"
   }
 }
