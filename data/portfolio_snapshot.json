@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-20T01:04:13.735694Z",
-  "price_date": "2026-10-19",
+  "timestamp": "2026-10-21T00:35:19.807191Z",
+  "price_date": "2026-10-20",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 15571.05,
-      "return_pct": 55.71,
+      "value": 15584.73,
+      "return_pct": 55.85,
       "cash": 2000.97,
       "holdings": {
         "AVGO": 4,
@@ -43,6 +43,6 @@
     "return_pct": NaN,
     "value": NaN,
     "start_date": "2025-10-01",
-    "end_date": "2026-10-19"
+    "end_date": "2026-10-20"
   }
 }
