@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-22T00:39:30.686523Z",
-  "price_date": "2026-10-21",
+  "timestamp": "2026-10-23T00:37:06.325583Z",
+  "price_date": "2026-10-22",
   "initial_capital": 10000,
   "strategy": "lstm",
   "value": 11381.99,
