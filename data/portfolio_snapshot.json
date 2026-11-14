@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-13T02:35:54.673416Z",
-  "price_date": "2026-11-12",
+  "timestamp": "2026-11-14T02:19:56.659265Z",
+  "price_date": "2026-11-13",
   "initial_capital": 10000,
   "portfolios": {
     "momentum": {
-      "value": 14285.26,
-      "return_pct": 42.85,
+      "value": 13942.59,
+      "return_pct": 39.43,
       "cash": 2000.97,
       "holdings": {
         "AVGO": 4,
@@ -39,10 +39,10 @@
   "benchmark": {
     "ticker": "SPY",
     "start_price": 661.32,
-    "end_price": 757.12,
-    "return_pct": 14.49,
-    "value": 11448.7,
+    "end_price": 754.37,
+    "return_pct": 14.07,
+    "value": 11407.12,
     "start_date": "2025-10-01",
-    "end_date": "2026-11-12"
+    "end_date": "2026-11-13"
   }
 }
