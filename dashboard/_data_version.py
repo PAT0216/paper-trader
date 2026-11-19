@@ -1,4 +1,4 @@
 # Auto-updated by snapshot_update.yml after computing daily snapshots.
 # Streamlit Cloud only redeploys when Python files change, so updating
 # this file ensures the dashboard picks up new data commits.
-LAST_DATA_UPDATE = "2026-11-18T03:40:53Z"
+LAST_DATA_UPDATE = "2026-11-19T03:19:00Z"
